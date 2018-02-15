@@ -106,7 +106,7 @@ int GEMNumberingScheme::baseNumberToUnitNumber(const MuonBaseNumber& num) {
   
   
   //#ifdef LOCAL_DEBUG
-  std::cout << id.rawId() << " DetId " << id << std::endl;
+  //std::cout << id.rawId() << " DetId " << id << std::endl;
   //#endif
       
   return id.rawId();

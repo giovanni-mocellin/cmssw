@@ -45,11 +45,14 @@ BaseFlatGunProducer::BaseFlatGunProducer( const ParameterSet& pset ) :
    // it looks like it's NOT even necessary to check if it is,
    // before trying to extract parameters - if it is empty,
    // the default values seem to be taken
-   fPartIDs    = pgun_params.getParameter< vector<int> >("PartID");  
-   fMinEta     = pgun_params.getParameter<double>("MinEta");
-   fMaxEta     = pgun_params.getParameter<double>("MaxEta");
-   fMinPhi     = pgun_params.getParameter<double>("MinPhi");
-   fMaxPhi     = pgun_params.getParameter<double>("MaxPhi");
+   fPartIDs     = pgun_params.getParameter< vector<int> >("PartID");
+   fMinPhi      = pgun_params.getParameter<double>("MinPhi");
+   fMaxPhi      = pgun_params.getParameter<double>("MaxPhi");
+   //fMinEta      = pgun_params.getParameter<double>("MinEta");
+   //fMaxEta      = pgun_params.getParameter<double>("MaxEta");  
+   fMinTheta    = pgun_params.getParameter<double>("MinTheta");
+   fMaxTheta    = pgun_params.getParameter<double>("MaxTheta");
+   fIsThetaFlat = pgun_params.getParameter<bool>("IsThetaFlat"); // If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
 
   //
   //fPDGTablePath = "/afs/cern.ch/sw/lcg/external/clhep/1.9.2.1/slc3_ia32_gcc323/data/HepPDT/" ;

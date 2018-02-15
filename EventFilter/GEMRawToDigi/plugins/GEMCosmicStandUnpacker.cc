@@ -87,7 +87,9 @@ class GEMCosmicStandUnpacker : public edm::EDProducer {
                 std::vector<int> columnVector_;
                 std::vector<int> layerVector_;
                 std::vector<int> hitsVector_;
+                std::vector<int> nullstripVector_;
                 std::vector<unsigned long long> missingVector_; 
+                std::vector<int> mulmissing_;
                 //std::vector<unsigned long long> missingPositionInVector_; // not useful
 
 
@@ -169,6 +171,7 @@ GEMCosmicStandUnpacker::beginRun(const edm::Run &run, const edm::EventSetup& iSe
 
         for (unsigned int i=0; i<vfatVector_.size(); i++){
                 hitsVector_.push_back(0);  
+                nullstripVector_.push_back(0);  
         }
 
 
@@ -345,6 +348,8 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                 if(crc!=crc_check) std::cout<<"DIFFERENT CRC :"<<crc<<"   "<<crc_check<<std::endl;
 
                                 bool Quality = (b1010==10) && (b1100==12) && (b1110==14) && (crc==crc_check) ;
+                                
+                                if(!Quality && checkQualityEvent_) {std::cout << "Bad quality" << std::endl; continue;}
 
                                 uint64_t converted=ChipID+0xf000;    
                                 bool foundChip=false;
@@ -352,6 +357,7 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                 int row=1;
                                 int chamberPosition=1;
                                 int slot=0;
+                                int nNoVFAT = 0;
                                 for(unsigned int i=0; i<vfatVector_.size(); i++) { 
                                         if( converted == vfatVector_[i]) {
                                                 foundChip=true; 
@@ -360,15 +366,21 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                                 row=rowVector_[i]; 
                                                 chamberPosition=layerVector_[i]; 
                                                 hitsVector_[i]++;
+                                                nNoVFAT = i;
                                         }}
                                 int schamberPosition=1+2*(row-1)+10*(column-1);
                                 if (!foundChip) {
                                         bool alreadyin=false;
                                         for (unsigned int i=0; i<missingVector_.size(); i++) {
-                                                if(converted==missingVector_[i]) alreadyin=true;   
+                                                if(converted==missingVector_[i]) {
+                                                    alreadyin=true;   
+                                                    mulmissing_[ i ]++;
+                                                    std::cout<<"##### Multiple VFAT not in the configuration!!!"<<std::endl;
+                                                }
                                         }
                                         if(!alreadyin) {
                                                 missingVector_.push_back(converted);
+                                                mulmissing_.push_back(1);
                                                 //missingPositionInVector_.push_back(k);
                                                 std::cout<<"Unpacked VFAT not in the configuration - double check the settings"<<std::endl;
                                                 std::cout<<" ---> VFAT--->"<<converted<<" (will only give this warning once)"<<std::endl;
@@ -382,10 +394,12 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                         std::cout<<std::dec<<" --> COLUMN = "<<column<<"    ROW  = "<<row<<"     Layer:"<<chamberPosition<<" -->   SC:"<<schamberPosition<<std::endl;
                                 }
 
-                                if(!Quality && checkQualityEvent_) continue;
+                                //if(!Quality && checkQualityEvent_) continue;
+                                if(!Quality && checkQualityEvent_) {std::cout << "Bad quality" << std::endl; continue;}
 
                                 int bx=0;  
                                 uint8_t chan0xf = 0;
+                                int nIsFilled = 0;
 
                                 for(int chan = 0; chan < 128; ++chan) {
 
@@ -396,6 +410,7 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                         }
 
                                         if(chan0xf==0) continue;  
+                                        nIsFilled = 1;
 
                                         GEMROmap::eCoord ec;
                                         ec.chamberId=31;
@@ -414,6 +429,7 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
                                         int etaP=dc.etaId;
 
+                                        //std::cout << "etaId, chamberPos, schamberPos, etaId : " << etaP << ", " << chamberPosition << ", " << schamberPosition << ", " << etaP << std::endl;
                                         if(etaP == 0) {
                                                 if(foundChip){
                                                         std::cout<<"WARNING: wrong digi! DoubleCheck the configuration"<<std::endl;
@@ -434,6 +450,11 @@ GEMCosmicStandUnpacker::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                                         }
                                 }
                                 delete m_vfatdata;
+                                
+                                if ( nIsFilled == 0 ) {
+                                    nullstripVector_[ nNoVFAT ]++;
+                                    //std::cout << "null strip" << std::endl;
+                                }
 
                         }
                         std::fread(&m_word, sizeof(uint64_t), 1, m_file);
@@ -557,11 +578,11 @@ GEMCosmicStandUnpacker::endRun(edm::Run const&, edm::EventSetup const&)
         std::cout<<"FILLED VFATS"<<std::endl;
         std::cout<<"SLOT - VFAT - LAYER - COLUMN - ROW ---> Number of events with hits"<<std::endl;
         for (unsigned int i=0; i<vfatVector_.size(); i++){
-                std::cout<<std::dec<<"\t"<<slotVector_.at(i)<<"\t"<<std::hex<<vfatVector_.at(i)<<"\t"<<layerVector_.at(i)<<"\t"<<columnVector_.at(i)<<"\t"<<rowVector_.at(i)<<"  -----> "<<std::dec<<hitsVector_.at(i)<<std::endl;
+                std::cout<<std::dec<<"\t"<<slotVector_.at(i)<<"\t"<<std::hex<<vfatVector_.at(i)<<"\t"<<layerVector_.at(i)<<"\t"<<columnVector_.at(i)<<"\t"<<rowVector_.at(i)<<"  -----> "<<std::dec<<hitsVector_.at(i)<<"\t("<<hitsVector_.at(i) - nullstripVector_.at(i)<<")"<<std::endl;
         }
         std::cout<<"MISSING VFATS"<<std::endl;
         for (unsigned int i=0; i<missingVector_.size(); i++){
-                std::cout<<std::hex<<missingVector_[i]<<std::dec<<std::endl;
+                std::cout<<std::hex<<missingVector_[i]<<std::dec<<"\t("<<mulmissing_[ i ]<<")"<<std::endl;
         }
 
 

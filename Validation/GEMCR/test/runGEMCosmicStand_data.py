@@ -157,7 +157,19 @@ process.gemcrValidation = cms.EDAnalyzer('gemcrValidation',
     MuonSmootherParameters = cms.PSet(
                              PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
                              PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
-                             RescalingFactor = cms.double(5.0))
+                             RescalingFactor = cms.double(5.0)), 
+    
+    ScincilUpperY      = cms.double(100.0), 
+    ScincilUpperLeft   = cms.double(-100.0), 
+    ScincilUpperRight  = cms.double(100.0), 
+    ScincilUpperTop    = cms.double(-40.0), 
+    ScincilUpperBottom = cms.double(40.0), 
+    
+    ScincilLowerY      = cms.double(0.0), 
+    ScincilLowerLeft   = cms.double(-100.0), 
+    ScincilLowerRight  = cms.double(100.0), 
+    ScincilLowerTop    = cms.double(-40.0), 
+    ScincilLowerBottom = cms.double(40.0), 
 
 )
 

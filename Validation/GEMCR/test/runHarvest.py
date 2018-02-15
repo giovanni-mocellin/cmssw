@@ -35,6 +35,29 @@ process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring()
 )
 
+import sys, os
+if len(sys.argv) >= 3: 
+  process.source.fileNames.pop()
+  
+  strDir = sys.argv[ 2 ]
+  listSrcOrg = os.listdir(strDir)
+  listSrc = []
+  listSrcSort = []
+  
+  for strSrc in listSrcOrg:
+    if ".root" not in strSrc: continue
+    if ".root_asdf" in strSrc: continue
+    
+    listSrc.append(strSrc)
+  
+  listSrcSort = sorted(listSrc, key = lambda strSrc: int(strSrc.split("_")[ -1 ].split(".")[ 0 ]))
+  nMaxSrc = len(listSrc)
+  if len(sys.argv) >= 4: nMaxSrc = int(sys.argv[ 3 ])
+  
+  for (i, strSrc) in enumerate(listSrcSort):
+    if i >= nMaxSrc: break
+    process.source.fileNames.append("file:" + strDir + "/" + strSrc)
+
 process.options = cms.untracked.PSet(
     Rethrow = cms.untracked.vstring('ProductNotFound'),
     fileMode = cms.untracked.string('FULLMERGE')

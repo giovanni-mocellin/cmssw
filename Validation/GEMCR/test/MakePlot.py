@@ -25,6 +25,8 @@ gStyle.SetPalette(100, array("i", myPalette))
 
 import configureRun_cfi as runConfig
 
+if len(sys.argv) > 1 : runConfig.RunNumber = int(sys.argv[ 1 ])
+#if len(sys.argv) > 1 : runConfig.RunNumber = int(1)
 rootF = "DQM_V0001_R%09d__Global__CMSSW_X_Y_Z__RECO.root"%runConfig.RunNumber
 run = runConfig.RunNumber
 tDir = "DQMData/Run %d/MuonGEMRecHitsV/Run summary/GEMRecHitsTask"%(run)
@@ -63,6 +65,23 @@ for c in [1,2,3]:
   for r in [1,2,3,4,5]:
     chamGEO["chamber_{}".format(chIndex[chi])] = [c,r]
     chi+=1
+
+#dicGEMININo = {"GE1/1-SCS-002": 1, "GE1/1-SCS-003": 27, "GE1/1-SCL-001": 28, "GE1/1-SCS-001": 29, "GE1/1-SCL-002": 30}
+dicGEMININo = {
+    "GE1/1-VII-S-CERN-0001":  1, "GE1/1-VII-S-CERN-0002":  1, 
+    "GE1/1-VII-S-CERN-0004": 27, "GE1/1-VII-S-CERN-0003": 27, 
+    "GE1/1-VII-L-CERN-0002": 28, "GE1/1-VII-L-CERN-0004": 28, 
+    "GE1/1-VII-S-CERN-0006": 29, "GE1/1-VII-S-CERN-0005": 29, 
+    "GE1/1-VII-L-CERN-0003": 30, "GE1/1-VII-L-CERN-0001": 30, 
+}
+
+dicLayerNo = {
+    "GE1/1-VII-S-CERN-0001": 1, "GE1/1-VII-S-CERN-0002": 2, 
+    "GE1/1-VII-S-CERN-0004": 1, "GE1/1-VII-S-CERN-0003": 2, 
+    "GE1/1-VII-L-CERN-0002": 1, "GE1/1-VII-L-CERN-0004": 2, 
+    "GE1/1-VII-S-CERN-0006": 1, "GE1/1-VII-S-CERN-0005": 2, 
+    "GE1/1-VII-L-CERN-0003": 1, "GE1/1-VII-L-CERN-0001": 2, 
+}
 
 tmpID = [x for x in csv.reader(open("../data/GEMRAWID.dat","r"))][0]
 GEMRAWID = {}
@@ -793,12 +812,27 @@ def makeSummary():
 }
 }
 
+\\newcommand{\imageFiveInOneLine}[5]{
+\scalebox{0.11}{
+\includegraphics{\\baseLoc#1}
+\includegraphics{\\baseLoc#2}
+\includegraphics{\\baseLoc#3}
+\includegraphics{\\baseLoc#4}
+\includegraphics{\\baseLoc#5}
+}
+}
+
 
 \\begin{document}
 """
   t_recHit = """
 \\begin{frame}[plain]{%s recHit}
 \imageSix{%s_digi_gemDigi.png}{%s_recHit_gemDigi.png}{%s_CLS_gemDigi.png}{%s_recHit.png}{%s_recHit_size.png}{%s_recHit_size_map.png}
+\end{frame}
+"""
+  t_recHit_reduced = """
+\\begin{frame}[plain]{%s recHit}
+\imageThree{%s_digi_gemDigi.png}{%s_recHit.png}{%s_recHit_size.png}
 \end{frame}
 """
   t_recHitMask = """
@@ -842,6 +876,21 @@ def makeSummary():
 
 \\begin{frame}[plain]{fired chambers}
 \imageTwo{firedMul.png}{firedChamber.png}
+\end{frame}
+
+"""
+  t_info = """
+\\begin{frame}[plain]{Run Info.}
+\\begin{itemize}
+  \item RAWFileName : %s
+\end{itemize}
+\end{frame}
+
+"""
+  t_preview_hits = """
+\\begin{frame}[plain]{Rec hit}
+\imageFiveInOneLine%s
+\imageFiveInOneLine%s
 \end{frame}
 
 """
@@ -898,8 +947,8 @@ def makeSummary():
 """
 
   chamber.sort()
-  for c in emptyChamber:
-    chamber.remove(c)
+  #for c in emptyChamber:
+  #  chamber.remove(c)
 
   os.chdir(oDir)
   outF = open(runConfig.OutputFileName.replace(".root", ".tex"), "w")
@@ -907,7 +956,8 @@ def makeSummary():
   if runConfig.makeTrack: trackCheck = "True"
   else : trackCheck = "False"
 
-  outF.write(t_info%(runConfig.RAWFileName.split("/")[-1].replace("_","\_"), runConfig.OutputFileName.replace("_","\_"),runConfig.MaxEvents, int(rate[0][2]),runConfig.minClusterSize, runConfig.maxClusterSize, runConfig.maxResidual, trackCheck, runConfig.trackChi2, runConfig.trackResX, runConfig.trackResY ))
+  #outF.write(t_info%(runConfig.RAWFileName.split("/")[-1].replace("_","\_"), runConfig.OutputFileName.replace("_","\_"),runConfig.MaxEvents, int(rate[0][2]),runConfig.minClusterSize, runConfig.maxClusterSize, runConfig.maxResidual, trackCheck, runConfig.trackChi2, runConfig.trackResX, runConfig.trackResY ))
+  outF.write(t_info%(runConfig.RAWFileName.split("/")[-1].replace("_","\_")))
   if showRate:
     outF.write("\\begin{frame}[plain]{noise rates}\n\\begin{itemize}")
     for x in rate:
@@ -918,17 +968,31 @@ def makeSummary():
       outF.write(ratevfat_t%(x,d,d))
       for r in xrange(1,9):
         outF.write(rate_t%(x,r,d,d,r,d,d,r))
+  
+  arrPreviewlist = ["", ""]
+  
+  for i, x in enumerate(chamber):
+    t = x.replace("GE1/1", "GE11")
+    x = t+"/"+t
+    if i < 5: arrPreviewlist[ 0 ] += "{%s_recHit.png}"%(x)
+    else:     arrPreviewlist[ 1 ] += "{%s_recHit.png}"%(x)
+  
+  outF.write(t_preview_hits%(arrPreviewlist[ 0 ], arrPreviewlist[ 1 ]))
+    
   for x in chamber:
     t = x.replace("GE1/1", "GE11")
     x = t+"/"+t
     t = t.replace("GE11", "GE1/1")
-    outF.write(hitMul_t%(t,x,x,x))
-    outF.write(hitRoll_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))
+    t1 = "GEMINI %i L %i (%s)"%(dicGEMININo[ t ], dicLayerNo[ t ], t)
+    t = t1
+    #outF.write(hitMul_t%(t,x,x,x))
+    #outF.write(hitRoll_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))
     #if maskPlot : outF.write(t_recHitMask%(t,x,x,x,x,x,x))
     #else : outF.write(t_recHit%(t,x,x,x,x,x,x))
     if makeMaskList: outF.write(t_recHitMask%(t,x,x,x,x,x,x))
-    else : outF.write(t_recHit%(t,x,x,x,x,x,x))
-    outF.write(CLS_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))
+    #else : outF.write(t_recHit%(t,x,x,x,x,x,x))
+    else : outF.write(t_recHit_reduced%(t,x,x,x))
+    #outF.write(CLS_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))
     if makeMaskList: 
       outF.write(digimul_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))
       outF.write(rollCut_t%(t, x,1, x,2, x,3, x,4, x,5, x,6, x,7, x,8))

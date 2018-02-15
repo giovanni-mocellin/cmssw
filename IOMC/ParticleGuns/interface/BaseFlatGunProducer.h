@@ -46,10 +46,14 @@ namespace edm
     
     // gun particle(s) characteristics
     std::vector<int> fPartIDs ;
-    double           fMinEta ;
-    double           fMaxEta ;
     double           fMinPhi ;
     double           fMaxPhi ;
+    double           fMinEta ;
+    double           fMaxEta ;
+    double           fMinTheta ;
+    double           fMaxTheta ;
+    bool	     fIsThetaFlat ; // If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
+    
 
     // the event format itself
     HepMC::GenEvent* fEvt;
