@@ -95,12 +95,12 @@ void gemcrValidation::bookHistograms(DQMStore::IBooker & ibooker, edm::Run const
   
   ibooker.setCurrentFolder("MuonGEMRecHitsV/GEMRecHitsTask");
 
-  gemcr_g = ibooker.book3D("gemcr_g","GEMCR GLOBAL RECHITS", 260,-130,130,165,-82.5,82.5, 140,0,140);
-  gemcrGen_g = ibooker.book3D("gemcrGen_g","GEMCR GLOBAL GEN HITS", 260,-130,130,30,-82.5,82.5, 140,0,140);
-  gemcrTr_g = ibooker.book3D("gemcrTr_g","GEMCR GLOBAL RECHITS", 260,-130,130,165,-82.5,82.5, 140,0,140);
-  gemcrCf_g = ibooker.book3D("gemcrCf_g","GEMCR GLOBAL RECHITS CONFIRMED", 260,-130,130,165,-82.5,82.5, 140,0,140);
-  gemcrTrScint_g = ibooker.book3D("gemcrTrScint_g","GEMCR GLOBAL RECHITS", 260,-130,130,165,-82.5,82.5, 140,0,140);
-  gemcrCfScint_g = ibooker.book3D("gemcrCfScint_g","GEMCR GLOBAL RECHITS SCINTILLATED", 260,-130,130,165,-82.5,82.5, 140,0,140);
+  gemcr_g = ibooker.book3D("gemcr_g","GEMCR GLOBAL RECHITS", 200,-100,100,156,-61,95,167,-12,155);
+  gemcrGen_g = ibooker.book3D("gemcrGen_g","GEMCR GLOBAL GEN HITS", 200,-100,100,156,-61,95,167,-12,155);
+  gemcrTr_g = ibooker.book3D("gemcrTr_g","GEMCR GLOBAL RECHITS", 200,-100,100,156,-61,95,167,-12,155);
+  gemcrCf_g = ibooker.book3D("gemcrCf_g","GEMCR GLOBAL RECHITS CONFIRMED", 200,-100,100,156,-61,95,167,-12,155);
+  gemcrTrScint_g = ibooker.book3D("gemcrTrScint_g","GEMCR GLOBAL RECHITS", 200,-100,100,156,-61,95,167,-12,155);
+  gemcrCfScint_g = ibooker.book3D("gemcrCfScint_g","GEMCR GLOBAL RECHITS SCINTILLATED", 200,-100,100,156,-61,95,167,-12,155);
   gem_cls_tot = ibooker.book1D("cluster_size","Cluseter size",20,0,20);  
   gem_bx_tot = ibooker.book1D("bx", "BX" , 30, -15,15);
   tr_size = ibooker.book1D("tr_size", "track size",10,0,10);
@@ -112,10 +112,10 @@ void gemcrValidation::bookHistograms(DQMStore::IBooker & ibooker, edm::Run const
   trajectoryh->setBinLabel(4, "passed chi2");
   firedMul = ibooker.book1D("firedMul","fired chamber multiplicity",n_ch+1,0,n_ch+1);
   firedChamber = ibooker.book1D("firedChamber", "fired chamber",n_ch,0,n_ch);
-  scinUpperHit = ibooker.book3D("scinUpperHit","UPPER SCINTILLATOR GLOBAL", 260,-130,130,30,-82.5,82.5, 140,0,140);
-  scinLowerHit = ibooker.book3D("scinUpperHit","LOWER SCINTILLATOR GLOBAL", 260,-130,130,30,-82.5,82.5, 140,0,140);
-  scinUpperRecHit = ibooker.book3D("scinLowerRecHit","UPPER SCINTILLATOR GLOBAL RECHITS", 260,-130,130,30,-82.5,82.5, 140,0,140);
-  scinLowerRecHit = ibooker.book3D("scinLowerRecHit","LOWER SCINTILLATOR GLOBAL RECHITS", 260,-130,130,30,-82.5,82.5, 140,0,140);
+  scinUpperHit = ibooker.book3D("scinUpperHit","UPPER SCINTILLATOR GLOBAL", 200,-100,100,156,-61,95,167,-12,155);
+  scinLowerHit = ibooker.book3D("scinUpperHit","LOWER SCINTILLATOR GLOBAL", 200,-100,100,156,-61,95,167,-12,155);
+  scinUpperRecHit = ibooker.book3D("scinLowerRecHit","UPPER SCINTILLATOR GLOBAL RECHITS", 200,-100,100,156,-61,95,167,-12,155);
+  scinLowerRecHit = ibooker.book3D("scinLowerRecHit","LOWER SCINTILLATOR GLOBAL RECHITS", 200,-100,100,156,-61,95,167,-12,155);
   
   resXSim = ibooker.book1D("residualx_sim", " residual x (sim)",200,-3,3);
   resXByErrSim = ibooker.book1D("residualxbyeff_sim", " residual x / x_err (sim)",200,-10,10);
@@ -575,7 +575,7 @@ void gemcrValidation::analyze(const edm::Event& e, const edm::EventSetup& iSetup
     
     float fPGenRecX = fXGenGP1x + ( rh_g_Y - fXGenGP1y ) * genMuon->momentum().x() / genMuon->momentum().y();
     float fPGenRecZ = fXGenGP1z + ( rh_g_Y - fXGenGP1y ) * genMuon->momentum().z() / genMuon->momentum().y();
-    gemcrGen_g->Fill(fPGenRecX, fPGenRecZ, rh_g_Y);
+    gemcrGen_g->Fill(-fPGenRecX, fPGenRecZ, rh_g_Y);
   }
   
   for ( int ich = 0 ; ich < n_ch ; ich++ ) {
@@ -758,23 +758,30 @@ void gemcrValidation::analyze(const edm::Event& e, const edm::EventSetup& iSetup
         if ( (tlp.x()>(min_x)) & (tlp.x() < (max_x)) )
         {
           // For testing the edge eta partition on the top and bottom layers only vertical seeds are allowed!
-          if ( ( ( vecChamType[ countTC - 1 ] == 2 || vecChamType[ countTC - 1 ] == 1 ) && 
-            ( mRoll == 1 || mRoll == 8 ) ) && 
-            ( unTypeSeed & QC8FLAG_SEEDINFO_MASK_REFVERTROLL18 ) == 0 ) continue;
+          if ( ( vecChamType[ countTC - 1 ] == 2 || vecChamType[ countTC - 1 ] == 1 ) && 
+               ( mRoll == 1 || mRoll == 8 ) && 
+               ( unTypeSeed & QC8FLAG_SEEDINFO_MASK_REFVERTROLL18 ) == 0 ) continue;
+            
+          uint32_t topOrBottomEtaIs8 = (unTypeSeed & QC8FLAG_SEEDINFO_MASK_TOPBOTTOMETA8) >> QC8FLAG_SEEDINFO_SHIFT_TOPBOTTOMETA8;       
+
+          if (vecChamType[ countTC - 1 ] == 0 &&
+          	  SuperChamType[ int((countTC-1)/2) ] == "S" &&
+          	  topOrBottomEtaIs8 != 0)
+          {
+          	continue;
+          }
           
           uint32_t unDiffCol = ( unTypeSeed & QC8FLAG_SEEDINFO_MASK_DIFFCOL ) >> QC8FLAG_SEEDINFO_SHIFT_DIFFCOL;
-          
-          if ( mRoll < 8 ) {
-            double min_x_nextroll = ch.etaPartition(mRoll+1)->centreOfStrip(1).x();
-            double max_x_nextroll = ch.etaPartition(mRoll+1)->centreOfStrip(n_strip).x();
             
-            if ( !( (tlp.x()>(min_x_nextroll)) & (tlp.x() < (max_x_nextroll)) ) ) {
-              if ( unDiffCol == 1 ) 
-              {
-                continue;
-              } else if ( ( vecChamType[ countTC - 1 ] == 2 || vecChamType[ countTC - 1 ] == 1 ) ) {
-                continue;
-              }
+          if ( ! ( (tlp.x()>(min_x + 1.5)) & (tlp.x() < (max_x - 1.5)) ) )
+          {
+            if ( unDiffCol == 1 ) 
+            {
+              continue;
+            }
+            else if ( ( vecChamType[ countTC - 1 ] == 2 || vecChamType[ countTC - 1 ] == 1 ) )
+            {
+              continue;
             }
           }
           

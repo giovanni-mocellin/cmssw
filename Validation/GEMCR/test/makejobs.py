@@ -6,8 +6,8 @@ strJobNum = sys.argv[ 1 ]
 strJobName = "res_" + strJobNum
 
 #strNumJob = "500" if len(sys.argv) < 3 else sys.argv[ 2 ]
-strNumJob = "100"
-strEvtNum = "1000"
+strNumJob = "200"
+strEvtNum = "50000"
 
 if not os.path.isdir(strJobName): 
   os.mkdir(strJobName)

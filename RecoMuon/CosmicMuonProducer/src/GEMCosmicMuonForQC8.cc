@@ -141,7 +141,8 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
   
   int countTC = 0;
     
-  for (auto tch : gemChambers){
+  for (auto tch : gemChambers)
+  {
     countTC++;
     MuonTransientTrackingRecHit::MuonRecHitContainer muRecHits;
     MuonTransientTrackingRecHit::MuonRecHitContainer seedupRecHits;
@@ -284,14 +285,14 @@ int GEMCosmicMuonForQC8::findSeeds(std::vector<TrajectorySeed> *tmptrajectorySee
 {
   for (auto hit1 : seeddnRecHits){
     for (auto hit2 : seedupRecHits){
-      if (hit1->globalPosition().y() < hit2->globalPosition().y()) {
+      if (hit1->globalPosition().y() < hit2->globalPosition().y())
+      {
         LocalPoint segPos = hit1->localPosition();
         GlobalVector segDirGV(hit2->globalPosition().x() - hit1->globalPosition().x(),
-                              (hit2->globalPosition().y() - hit1->globalPosition().y()),
+                              hit2->globalPosition().y() - hit1->globalPosition().y(),
                               hit2->globalPosition().z() - hit1->globalPosition().z());
 
         segDirGV *=10;
-        //segDirGV *=1;
         LocalVector segDir = hit1->det()->toLocal(segDirGV);
 
         int charge= 1;
@@ -314,7 +315,8 @@ int GEMCosmicMuonForQC8::findSeeds(std::vector<TrajectorySeed> *tmptrajectorySee
         uint32_t unInfoSeeds = 0;
         
         GEMDetId detId1(hit1->rawId()), detId2(hit2->rawId());
-        uint32_t unChNo1 = detId1.chamber(), unChNo2 = detId2.chamber();
+        uint32_t unChNo1 = detId1.chamber()+detId1.layer()-1;
+        uint32_t unChNo2 = detId2.chamber()+detId2.layer()-1;
         
         uint32_t unRoll1 = detId1.roll(), unRoll2 = detId2.roll();
         uint32_t unDiffRoll = (uint32_t)abs(( (int32_t)unRoll1 ) - ( (int32_t)unRoll2 ));
@@ -329,8 +331,16 @@ int GEMCosmicMuonForQC8::findSeeds(std::vector<TrajectorySeed> *tmptrajectorySee
         
         uint32_t unIsForRef = ( g_vecChamType[ unChNo1 - 1 ] == 3 || g_vecChamType[ unChNo2 - 1 ] == 4 ? 1 : 0 );
         
-        if ( unIsForRef == 1 && ( ( unRoll1 == 1 && unRoll2 == 1 ) || ( unRoll1 == 8 && unRoll2 == 8 ) ) ) {
+        if ( unIsForRef == 1 && ( ( unRoll1 == 1 && unRoll2 == 1 ) || ( unRoll1 == 8 && unRoll2 == 8 ) ) )
+        {
           unInfoSeeds |= QC8FLAG_SEEDINFO_MASK_REFVERTROLL18;
+        }
+        
+        if ( (g_SuperChamType[ int((unChNo1-1)/2) ] == "L" && unRoll1 == 8) ||
+        	 (g_SuperChamType[ int((unChNo2-1)/2) ] == "L" && unRoll2 == 8) )
+        {
+          uint32_t seedingEight = 1;
+          unInfoSeeds |= ( seedingEight ) << QC8FLAG_SEEDINFO_SHIFT_TOPBOTTOMETA8;
         }
         
         tmptrajectorySeeds->push_back(seed);
@@ -351,8 +361,8 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   TrajectoryStateOnSurface tsos = trajectoryStateTransform::transientState(ptsd1,&bp,&*theService->magneticField());
   TrajectoryStateOnSurface tsosCurrent = tsos;
   TransientTrackingRecHit::ConstRecHitContainer consRecHits;
-  for (auto ch : gemChambers){
-    //if (ch == testChamber) continue;
+  for (auto ch : gemChambers)
+  {
     std::shared_ptr<MuonTransientTrackingRecHit> tmpRecHit;
     tsosCurrent = theService->propagator("SteppingHelixPropagatorAny")->propagate(tsosCurrent, theService->trackingGeometry()->idToDet(ch.id())->surface());
     if (!tsosCurrent.isValid()) return Trajectory();
@@ -365,8 +375,8 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
       {
         GlobalPoint hitGP = hit->globalPosition();
         double y_err = hit->localPositionError().yy();
-        if (abs(hitGP.x() - tsosGP.x()) > trackResX * MulSigmaOnWindow) continue;
-        if (abs(hitGP.z() - tsosGP.z()) > trackResY * MulSigmaOnWindow * y_err ) continue; // global z, local y
+        if (fabs(hitGP.x() - tsosGP.x()) > trackResX * MulSigmaOnWindow) continue;
+        if (fabs(hitGP.z() - tsosGP.z()) > trackResY * MulSigmaOnWindow * y_err) continue; // global z, local y
         float deltaR = (hitGP - tsosGP).mag();
         if (maxR > deltaR)
         {

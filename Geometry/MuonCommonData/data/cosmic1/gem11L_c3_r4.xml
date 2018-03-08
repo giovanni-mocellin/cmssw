@@ -16,12 +16,12 @@
   <PosPart copyNumber="27">
     <rParent name="gembox:GEMBox"/>
     <rChild name="gem11:GEMBox11L"/>
-    <Translation x="[dxChamber]" y="4*[separation]" z="12*cm" />
+    <Translation x="[dxChamber]" y="4*[separation]" z="22*cm" />
   </PosPart>
   <PosPart copyNumber="28">
     <rParent name="gembox:GEMBox"/>
     <rChild name="gem11:GEMBox11L"/>
-    <Translation x="[dxChamber]" y="4*[separation]+[dyChamber]" z="12*cm" />
+    <Translation x="[dxChamber]" y="4*[separation]+[dyChamber]" z="22*cm" />
   </PosPart>
   
 </PosPartSection>

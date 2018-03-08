@@ -29,10 +29,10 @@ options.register('idxJob',
 
 options.parseArguments()
 
-# Insert the type 0 , S , L of the superchambers in 15 positions: rear view
+# Insert the type 0 , S , L of the superchambers in 15 positions: frontal view, 90 deg rotated
 SuperChType = ['L','L','L','L','L',\
-			   'L','L','L','L','L',\
-			   'L','L','L','L','L']
+			   'L','S','S','S','L',\
+			   'L','S','S','S','L']		   
 
 # Calculation of SuperChSeedingLayers from SuperChType
 SuperChSeedingLayers = [1,3, 0,0, 0,0, 0,0, 4,2,\
