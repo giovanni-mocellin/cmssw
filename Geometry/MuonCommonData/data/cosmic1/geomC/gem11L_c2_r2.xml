@@ -5,7 +5,7 @@
   <Constant name="layers"     value="5"/>
   <Constant name="separation" value="23*cm"/>
   <Constant name="dyChamber"  value="3.47*cm"/>
-  <Constant name="dxChamber"  value="44.5*cm"/>
+  <Constant name="dxChamber"  value="39*cm"/>
   <Constant name="dyBox"      value="2*([layers]*[separation]/2+10.0*cm)"/>
   <Constant name="dxBox"      value="3*([dxChamber]+5)*cm"/>
   <Constant name="dzBox"      value="200*cm"/>
@@ -21,14 +21,14 @@
   <PosPart copyNumber="13">
     <rParent name="gembox:GEMBox"/>
     <rChild name="gem11:GEMBox11L"/>
-    <rRotation name="RotTypeA" />
-    <Translation x="0*fm" y="15*cm" z="2*[separation]" />
+    <rRotation name="RotTypeC" />
+    <Translation x="0*fm" y="22*cm" z="2*[separation]" />
   </PosPart>
   <PosPart copyNumber="14">
     <rParent name="gembox:GEMBox"/>
     <rChild name="gem11:GEMBox11L"/>
-    <rRotation name="RotTypeA" />
-    <Translation x="0*fm" y="15*cm" z="2*[separation]+[dyChamber]" />
+    <rRotation name="RotTypeC" />
+    <Translation x="0*fm" y="22*cm" z="2*[separation]+[dyChamber]" />
   </PosPart>
   
 </PosPartSection>
