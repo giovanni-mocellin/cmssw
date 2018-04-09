@@ -60,6 +60,21 @@ def simGeoLoad(score):
     elif score == "2023D5":
        process.load('Geometry.CMSCommonData.cmsExtendedGeometry2023D5XML_cfi')
 
+    elif score == "MaPSA":
+       process.load('Geometry.TrackerCommonData.mapsaGeometryXML_cfi')
+
+    elif score == "CRack":
+       process.load('Geometry.TrackerCommonData.crackGeometryXML_cfi')
+
+    elif score == "GEMCosmic":
+       process.load('Geometry.GEMGeometry.GeometryGEMCosmicStand_cff')
+
+    elif score == "DB":
+        process.load("Configuration.StandardSequences.GeometryDB_cff")
+        process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+        from Configuration.AlCa.autoCond import autoCond
+        process.GlobalTag.globaltag = autoCond['run2_mc']
+
     else:
       help()
 

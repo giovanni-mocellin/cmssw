@@ -88,6 +88,9 @@ def recoGeoLoad(score):
        from Configuration.AlCa.autoCond import autoCond
        process.GlobalTag.globaltag = autoCond['run2_mc']
        process.load('Configuration.Geometry.GeometryExtended2023D5Reco_cff')
+
+    elif score == "GEMCosmic":
+       process.load('Geometry.GEMGeometry.GeometryGEMCosmicStandFull_cff')
        
     elif score == "MaPSA":
        process.load('Geometry.TrackerGeometryBuilder.idealForDigiTrackerGeometry_cff')

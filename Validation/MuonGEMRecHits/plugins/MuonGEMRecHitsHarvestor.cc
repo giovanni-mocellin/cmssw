@@ -87,6 +87,80 @@ TProfile* MuonGEMRecHitsHarvestor::ComputeEff(TH1F* num, TH1F* denum )
   return efficHist;
 }
 
+
+TProfile* MuonGEMRecHitsHarvestor::ComputeEff2DForHitEff(TH2F* num, TH2F* denum )
+{
+  std::string name  = "eff_"+std::string(num->GetName());
+  std::string title = "Eff. "+std::string(num->GetTitle());
+  //TProfile * efficHist = new TProfile(name.c_str(), title.c_str(),denum->GetXaxis()->GetNbins(), denum->GetXaxis()->GetXmin(),denum->GetXaxis()->GetXmax());
+  TProfile * efficHist = new TProfile(name.c_str(), title.c_str(), 24, 0 - 0.5, 24 - 0.5);
+
+  for (int i=1; i <= denum->GetNbinsX(); i++) {
+    for (int j=1; j <= denum->GetNbinsY(); j++) {
+
+      int nIdx = 8 * ( i - 1 ) + j;
+      
+      double nNum = num->GetBinContent(i, j);
+      double nDenum = denum->GetBinContent(i, j);
+      if ( nDenum == 0 || nNum ==0  ) {
+        continue;
+      }
+      if ( nNum > nDenum ) {
+        double temp = nDenum;
+        nDenum = nNum;
+        nNum = temp;
+        std::cout<<"Alert! specific bin's num is bigger than denum"<<std::endl;
+      }
+      const double effVal = nNum/nDenum;
+      efficHist->SetBinContent(nIdx, effVal);
+      efficHist->SetBinEntries(nIdx,1);
+      efficHist->SetBinError(nIdx,0);
+      const double errLo = TEfficiency::ClopperPearson((int)nDenum,(int)nNum,0.683,false);
+      const double errUp = TEfficiency::ClopperPearson((int)nDenum,(int)nNum,0.683,true);
+      const double errVal = (effVal - errLo > errUp - effVal) ? effVal - errLo : errUp - effVal;
+      efficHist->SetBinError(nIdx, sqrt(effVal * effVal + errVal * errVal));
+    }
+  }
+  return efficHist;
+}
+
+
+TH2F* MuonGEMRecHitsHarvestor::ComputeEff2DForCopad(TH2F* num, TH2F* denum )
+{
+  std::string name  = "eff_"+std::string(num->GetName());
+  std::string title = "Eff. "+std::string(num->GetTitle());
+  //TProfile * efficHist = new TProfile(name.c_str(), title.c_str(),denum->GetXaxis()->GetNbins(), denum->GetXaxis()->GetXmin(),denum->GetXaxis()->GetXmax());
+  TH2F * efficHist = new TH2F(name.c_str(), title.c_str(), 3, 1, 4, 8, 1, 9);
+
+  for (int i=1; i <= denum->GetNbinsX(); i++) {
+    for (int j=1; j <= denum->GetNbinsY(); j++) {
+
+      //int nIdx = 8 * ( i - 1 ) + j;
+      
+      double nNum = num->GetBinContent(i, j);
+      double nDenum = denum->GetBinContent(i, j);
+      if ( nDenum == 0 || nNum ==0  ) {
+        continue;
+      }
+      if ( nNum > nDenum ) {
+        double temp = nDenum;
+        nDenum = nNum;
+        nNum = temp;
+        std::cout<<"Alert! specific bin's num is bigger than denum"<<std::endl;
+      }
+      const double effVal = nNum/nDenum;
+      efficHist->SetBinContent(i, j, effVal);
+      //efficHist->SetBinEntries(i, j,1);
+      efficHist->SetBinError(i, j,0);
+      const double errLo = TEfficiency::ClopperPearson((int)nDenum,(int)nNum,0.683,false);
+      const double errUp = TEfficiency::ClopperPearson((int)nDenum,(int)nNum,0.683,true);
+      const double errVal = (effVal - errLo > errUp - effVal) ? effVal - errLo : errUp - effVal;
+      efficHist->SetBinError(i, j, sqrt(effVal * effVal + errVal * errVal));
+    }
+  }
+  return efficHist;
+}
+
 void MuonGEMRecHitsHarvestor::ProcessBooking( DQMStore::IBooker& ibooker, DQMStore::IGetter& ig, const char* label, TString suffix, TH1F* track_hist, TH1F* sh_hist )
 {
   TString dbe_label = TString(dbe_path_)+label+suffix;
@@ -126,6 +200,8 @@ MuonGEMRecHitsHarvestor::dqmEndJob(DQMStore::IBooker& ibooker, DQMStore::IGetter
 
   TH1F* sh_eta[2][4];
   TH1F* sh_phi[2][4][3];
+  
+  std::cout << dbe_path_ << std::endl;
   
   for( int i = 0 ; i < 2 ; i++) {
     TString eta_label = TString(dbe_path_)+"track_eta"+s_suffix[i];
@@ -167,6 +243,70 @@ MuonGEMRecHitsHarvestor::dqmEndJob(DQMStore::IBooker& ibooker, DQMStore::IGetter
       }
     }
     else std::cout<<"Can not find eta or phi of all track"<<std::endl;
+  }
+  
+  int i, j;
+  
+  // Making the efficiency plots of trajectory-hit
+  for ( i = 1 ; i <= 29 ; i += 2 ) {
+    for ( j = 1 ; j <= 2 ; j++ ) {
+      TString strChamber = TString::Format("MuonGEMRecHitsV/GEMRecHitsTask/chamber_%i_layer_%i_", i, j);
+      TString strNameDen = strChamber + "th2D_eff";
+      TString strNameNum = strChamber + "recHit_efficiency";
+      
+      TString strNameEff = TString::Format("chamber_%i_layer_%i_efficiency", i, j);
+      
+      TH2F *hDen = (TH2F *)ig.get(strNameDen.Data())->getTH2F()->Clone();
+      TH2F *hNum = (TH2F *)ig.get(strNameNum.Data())->getTH2F()->Clone();
+      
+      TProfile *profileTest = ComputeEff2DForHitEff(hNum, hDen);
+      profileTest->SetName(strNameEff.Data());
+      ibooker.bookProfile(profileTest->GetName(), profileTest);
+    }
+  }
+  
+  for ( i = 1 ; i <= 29 ; i += 2 ) {
+    for ( j = 1 ; j <= 2 ; j++ ) {
+      TString strChamber = TString::Format("MuonGEMRecHitsV/GEMRecHitsTask/chamber_%i_layer_%i_", i, j);
+      TString strNameDen = strChamber + "copad_vfat";
+      TString strNameNum = strChamber + "pad_vfat";
+      
+      TString strNameEff = TString::Format("chamber_%i_layer_%i_copad_efficiency", i, j);
+      
+      TH2F *hDen = (TH2F *)ig.get(strNameDen.Data())->getTH2F()->Clone();
+      TH2F *hNum = (TH2F *)ig.get(strNameNum.Data())->getTH2F()->Clone();
+      
+      TH2F *profileTest = ComputeEff2DForCopad(hNum, hDen);
+      profileTest->SetName(strNameEff.Data());
+      ibooker.book2D(profileTest->GetName(), profileTest);
+    }
+  }
+  
+  for ( i = 1 ; i <= 29 ; i += 2 ) {
+    for ( j = 1 ; j <= 2 ; j++ ) {
+      TString strChamber = TString::Format("MuonGEMRecHitsV/GEMRecHitsTask/chamber_%i_layer_%i_", i, j);
+      TString strNameDen = strChamber + "pad_vfat";
+      TString strNameNum = strChamber + "recHit_efficiency";
+      
+      TString strNameEff = TString::Format("chamber_%i_layer_%i_matched_efficiency", i, j);
+      
+      TH2F *hDen = (TH2F *)ig.get(strNameDen.Data())->getTH2F()->Clone();
+      TH2F *hNum = (TH2F *)ig.get(strNameNum.Data())->getTH2F()->Clone();
+      
+      TH2F *profileTest = ComputeEff2DForCopad(hNum, hDen);
+      profileTest->SetName(strNameEff.Data());
+      ibooker.book2D(profileTest->GetName(), profileTest);
+    }
+  }
+  
+  TH1F *histRH2 = ig.get("MuonGEMRecHitsV/GEMRecHitsTask/rh2_chamber")->getTH1F();
+  TH1F *histRH3 = ig.get("MuonGEMRecHitsV/GEMRecHitsTask/rh3_chamber")->getTH1F();
+  TH1F *histRHeff = ig.get("MuonGEMRecHitsV/GEMRecHitsTask/rh_eff_ch")->getTH1F();
+  
+  for ( i = 1 ; i <= 30 ; i++ ) {
+    float fDen = histRH2->GetBinContent(i);
+    float fNum = histRH3->GetBinContent(i);
+    histRHeff->SetBinContent(i, fNum / fDen);
   }
 }
 
