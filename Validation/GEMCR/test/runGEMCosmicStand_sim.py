@@ -28,9 +28,6 @@ options.register("idxJob","-1",
 
 options.parseArguments()
 
-# Insert Cosmic Stand topology: A , B , C , P5, P40
-geomType = 'A'
-
 # Insert the type 0 , S , L of the superchambers in 15 positions: frontal view, 90 deg rotated
 SuperChType = ['L','L','L','L','L',\
                'L','L','L','L','L',\
@@ -83,7 +80,7 @@ for i in range(len(SuperChType)):
     column_row = '_c%d_r%d' % ((i/5)+1, i%5+1)
     if SuperChType[i]=='L' : size = 'L'
     if SuperChType[i]=='S' : size = 'S'
-    if SuperChType[i]!='0' : geomFile = 'Geometry/MuonCommonData/data/cosmic1/geom'+geomType+'/gem11'+size+column_row+'.xml'
+    if SuperChType[i]!='0' : geomFile = 'Geometry/MuonCommonData/data/cosmic1/gem11'+size+column_row+'.xml'
     if SuperChType[i]!='0' : process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
 
 # Config importation & settings
@@ -139,8 +136,8 @@ process.generator = cms.EDProducer("FlatRandomPtGunProducer",
         MaxPhi = cms.double(-3.141592),
         MinTheta = cms.double(0.0),
         MaxTheta = cms.double(1.570796),
-        #IsThetaFlat = cms.bool(False), # If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
-        IsThetaFlat = cms.bool(True),
+        IsThetaFlat = cms.bool(False), # If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
+        #IsThetaFlat = cms.bool(True),
         PartID = cms.vint32(-13)
     ),
     Verbosity = cms.untracked.int32(0),
@@ -256,7 +253,7 @@ process.TFileService = cms.Service("TFileService",
 process.generation_step = cms.Path(process.generator+process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.digitisation_step = cms.Path(process.pdigi)
-process.reconstruction_step    = cms.Path(process.gemLocalReco+process.GEMCosmicMuonForQC8)
+process.reconstruction_step = cms.Path(process.gemLocalReco+process.GEMCosmicMuonForQC8)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)

@@ -26,8 +26,6 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include <TFile.h>
 #include <TTree.h>
-//#include <TGraph2D.h>
-
 
 typedef struct tagGPSeed {
   GlobalPoint P1;
@@ -49,100 +47,18 @@ public:
   std::vector<std::string> SuperChamType;
   std::vector<double> vecChamType;
   bool makeTrack, isMC;
-
-  //static void line(double t, double *p, double &x, double &y, double &z);
-  //static double distance2(double x,double y,double z, double *p);
-  //static void SumDistance2(int &, double *, double & sum, double * par, int );
-  //static TGraph2D *gr;
 private:
   const GEMGeometry* GEMGeometry_;
-  std::vector<MonitorElement*> gem_chamber_x_y;
-  std::vector<MonitorElement*> gem_chamber_cl_size;
-  std::vector<MonitorElement*> gem_chamber_bx;
-  std::vector<MonitorElement*> gem_chamber_pad_vfat;
-  std::vector<MonitorElement*> gem_chamber_copad_vfat;
-  std::vector<MonitorElement*> gem_chamber_pad_vfat_withmul;
-  std::vector<MonitorElement*> gem_chamber_copad_vfat_withmul;
-  std::vector<MonitorElement*> gem_chamber_tr2D_eff;
-  std::vector<MonitorElement*> gem_chamber_th2D_eff;
-  std::vector<MonitorElement*> gem_chamber_trxroll_eff;
-  std::vector<MonitorElement*> gem_chamber_thxroll_eff;
-  std::vector<MonitorElement*> gem_chamber_trxy_eff;
-  std::vector<MonitorElement*> gem_chamber_thxy_eff;
-  std::vector<MonitorElement*> gem_chamber_residual;
-  std::vector<MonitorElement*> gem_chamber_residualX1DSim;
-  std::vector<MonitorElement*> gem_chamber_residualY1DSim;
-  std::vector<MonitorElement*> gem_chamber_local_x;
-  std::vector<MonitorElement*> gem_chamber_digi_digi;
-  std::vector<MonitorElement*> gem_chamber_digi_recHit;
-  std::vector<MonitorElement*> gem_chamber_digi_CLS;
-  std::vector<MonitorElement*> gem_chamber_hitMul;
-  std::vector<MonitorElement*> gem_chamber_vfatHitMul;
-  std::vector<MonitorElement*> gem_chamber_stripHitMul;
-  std::vector<MonitorElement*> gem_chamber_bestChi2;
-  std::vector<MonitorElement*> gem_chamber_track;
-  
-  std::vector<MonitorElement*> gem_chamber_th2D_eff_scint;
-  std::vector<MonitorElement*> gem_chamber_thxroll_eff_scint;
-  std::vector<MonitorElement*> gem_chamber_thxy_eff_scint;
-  
-  std::vector<MonitorElement*> gem_chamber_tr2D_eff_scint;
-  std::vector<MonitorElement*> gem_chamber_trxroll_eff_scint;
-  std::vector<MonitorElement*> gem_chamber_trxy_eff_scint;
-  std::vector<MonitorElement*> gem_chamber_local_x_scint;
-  std::vector<MonitorElement*> gem_chamber_residual_scint;
-  MonitorElement* rh3_chamber_scint;
-
-
-  MonitorElement* gemcr_g;
-  MonitorElement* gemcrGen_g;
-  MonitorElement* gemcrTr_g;
-  MonitorElement* gemcrCf_g;
-  MonitorElement* gemcrTrScint_g;
-  MonitorElement* gemcrCfScint_g;
-  MonitorElement* gem_cls_tot;
-  MonitorElement* gem_bx_tot;
-  MonitorElement* tr_size;
-  MonitorElement* tr_hit_size;
-  MonitorElement* tr_chamber;
-  MonitorElement* th_chamber;
-  MonitorElement* rh_chamber;
-  MonitorElement* rh1_chamber;
-  MonitorElement* rh2_chamber;
-  MonitorElement* rh3_chamber;
-  MonitorElement* trajectoryh;
-  MonitorElement* events_withtraj;
-  MonitorElement* firedMul;
-  MonitorElement* firedChamber;
-  MonitorElement* scinUpperHit;
-  MonitorElement* scinLowerHit;
-  MonitorElement* scinUpperRecHit;
-  MonitorElement* scinLowerRecHit;
-  MonitorElement* resXSim;
-  MonitorElement* resXByErrSim;
-  MonitorElement* resYByErrSim;
-  MonitorElement* hitXErr;
-  MonitorElement* hitYErr;
-  MonitorElement* aftershots;
-  MonitorElement* projtheta_dist_sim;
-  MonitorElement* projtheta_dist_edge_sim;
-  //MonitorElement* diffTrajGenRec;
-  
 
   std::vector<GEMChamber> gemChambers;
   int n_ch;
   MuonServiceProxy* theService;
   CosmicMuonSmoother* theSmoother;
   KFUpdator* theUpdator;
-  edm::EDGetToken InputTagToken_, InputTagToken_RH, InputTagToken_TR, InputTagToken_TS, InputTagToken_TJ, InputTagToken_TI, InputTagToken_TT, InputTagToken_DG, InputTagToken_US;
-  
+  edm::EDGetToken InputTagToken_, InputTagToken_RH, InputTagToken_TR, InputTagToken_TS, InputTagToken_TJ, InputTagToken_TI, InputTagToken_TT, InputTagToken_DG, InputTagToken_US; 
   
   bool isPassedScintillators(GlobalPoint p1, GlobalPoint p2);
-  float CalcWindowWidthX(GPSeed *pVecSeed, GlobalPoint *pPCurr);
-  float CalcWindowWidthY(GPSeed *pVecSeed, GlobalPoint *pPCurr);
-  //int CalcDiffGenRec(GPSeed *pVecSeed, GlobalPoint *pPCurr);
 
-  //created by Jongseok Lee
   TH1D *hev;
   TH3D *hvfatHit_numerator;
   TH3D *hvfatHit_denominator;
@@ -209,7 +125,6 @@ private:
   float floorHitX[maxNfloor];
   float floorHitY[maxNfloor];
   float floorHitZ[maxNfloor];
-  //created by Jongseok Lee
 };
 
 #endif

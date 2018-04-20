@@ -212,7 +212,6 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
     float maxChi2 = 10000000.0;
     int countTR = 0;
     int nIdxBest = -1;
-    int seedIdx[2] = {0,};
 
     for (auto seed : *trajSeeds)
     {
@@ -230,28 +229,6 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
           bestTrajectory = smoothed;
           bestSeed = seed;
           nIdxBest = countTR - 1;
-        }
-        TrajectorySeed::range range = seed.recHits();
-        int nseed = 0;
-        for (edm::OwnVector<TrackingRecHit>::const_iterator rechit = range.first; rechit!=range.second; ++rechit)
-        {
-          GEMDetId hitID(rechit->rawId());
-          seedIdx[nseed] = hitID.chamber()+hitID.layer()-2;
-          nseed++;
-        }
-        if(checkCrossSeeds && nIdxTestCh==14 && ((seedIdx[0]==20 && seedIdx[1]==9) || (seedIdx[0]==0 && seedIdx[1]==29)) )
-        {
-          Trajectory::RecHitContainer smoothedHits = smoothed.recHits();
-          cout<<"nIdxTestCh "<<nIdxTestCh<<", ntrajSeeds "<<countTR<<", seedIdx "<<seedIdx[0]<<" "<<seedIdx[1]<<", Nchi2 "<<dProbChiNDF<<", nmu WO tch "<<muRecHits.size()<<", nrecHits of trajectory "<<smoothedHits.size()<<endl;
-          int nhit=0;
-          for (Trajectory::RecHitContainer::const_iterator recHit = smoothedHits.begin(); recHit != smoothedHits.end(); ++recHit)
-          {
-            GEMDetId hitID((*recHit)->rawId());
-            int chIdx = hitID.chamber()+hitID.layer()-2;
-            GlobalPoint recHitGP = (*recHit)->globalPosition();
-            cout<<"ntrajSeeds "<<countTR<<", nhit "<<nhit<<", chIdx "<<chIdx<<", GP : x "<<recHitGP.x()<<", y "<<recHitGP.y()<<", z "<<recHitGP.z()<<endl;
-            nhit++;
-          }
         }
       }
     }
@@ -354,33 +331,17 @@ int GEMCosmicMuonForQC8::findSeeds(std::vector<TrajectorySeed> *tmptrajectorySee
         uint32_t unChNo2 = detId2.chamber()+detId2.layer()-1;
         
         uint32_t unRoll1 = detId1.roll(), unRoll2 = detId2.roll();
-        uint32_t unDiffRoll = (uint32_t)abs(( (int32_t)unRoll1 ) - ( (int32_t)unRoll2 ));
         
         uint32_t unCol1 = ( unChNo1 - 1 ) / 10, unCol2 = ( unChNo2 - 1 ) / 10;
         uint32_t unDiffCol = (uint32_t)abs(( (int32_t)unCol1 ) - ( (int32_t)unCol2 ));
         
         unInfoSeeds |= ( unDiffCol  ) << QC8FLAG_SEEDINFO_SHIFT_DIFFCOL;
-        unInfoSeeds |= ( unDiffRoll ) << QC8FLAG_SEEDINFO_SHIFT_DIFFROLL;
         
         uint32_t unIsForRef = ( g_vecChamType[ unChNo1 - 1 ] == 3 || g_vecChamType[ unChNo2 - 1 ] == 4 ? 1 : 0 );
         
         if ( unIsForRef == 1 && ( ( unRoll1 == 1 && unRoll2 == 1 ) || ( unRoll1 == 8 && unRoll2 == 8 ) ) )
         {
           unInfoSeeds |= QC8FLAG_SEEDINFO_MASK_REFVERTROLL18;
-        }
-        
-        if ( (g_SuperChamType[ int((unChNo1-1)/2) ] == "L" && unRoll1 == 8) ||
-        	 (g_SuperChamType[ int((unChNo2-1)/2) ] == "L" && unRoll2 == 8) )
-        {
-          uint32_t seedingEight = 1;
-          unInfoSeeds |= ( seedingEight ) << QC8FLAG_SEEDINFO_SHIFT_TOPBOTTOMETA8;
-        }
-        
-        if ( (g_SuperChamType[ int((unChNo1-1)/2) ] == "L" && unRoll1 == 7) &&
-        	 (g_SuperChamType[ int((unChNo2-1)/2) ] == "L" && unRoll2 == 7) )
-        {
-          uint32_t seedingSeven = 1;
-          unInfoSeeds |= ( seedingSeven ) << QC8FLAG_SEEDINFO_SHIFT_TOPBOTTOMETA7;
         }
         
         tmptrajectorySeeds->push_back(seed);
@@ -402,20 +363,14 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   TrajectoryStateOnSurface tsosCurrent = tsos;
   TransientTrackingRecHit::ConstRecHitContainer consRecHits;
 
-  int nIdxTestCh  = testChamber.id().chamber() + testChamber.id().layer() - 2;
   TrajectorySeed::range range = seed.recHits();
-  int seedIdx[2] = {0,};
   int nseed = 0;
   GlobalPoint seedGP[2];
   for (edm::OwnVector<TrackingRecHit>::const_iterator rechit = range.first; rechit!=range.second; ++rechit){
     GEMDetId hitID(rechit->rawId());
-    seedIdx[nseed] = hitID.chamber()+hitID.layer()-2;
     seedGP[nseed] = gemGeom->idToDet((*rechit).rawId())->surface().toGlobal(rechit->localPosition());
     nseed++;
   }
-  bool crossSeeds = false;
-  if( nIdxTestCh==14 && ((seedIdx[0]==20 && seedIdx[1]==9) || (seedIdx[0]==0 && seedIdx[1]==29)) )
-    crossSeeds = true;
   std::map<double,int> rAndhit;
 
   for (auto ch : gemChambers)
@@ -424,7 +379,6 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
     tsosCurrent = theService->propagator("SteppingHelixPropagatorAny")->propagate(tsosCurrent, theService->trackingGeometry()->idToDet(ch.id())->surface());
     if (!tsosCurrent.isValid()) return Trajectory();
     GlobalPoint tsosGP = tsosCurrent.freeTrajectoryState()->position();
-    if(checkCrossSeeds && crossSeeds) cout<<"chID  "<<ch.id().chamber()+ch.id().layer()-2<<", trajHit :	x "<<tsosGP.x()<<", y "<<tsosGP.y()<<", z "<<tsosGP.z()<<endl;
 
     float maxR = 9999;
     int nhit=-1;
@@ -438,7 +392,6 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
       {
         GlobalPoint hitGP = hit->globalPosition();
         double y_err = hit->localPositionError().yy();
-        if(checkCrossSeeds && crossSeeds) cout<<"hitID "<<hitID.chamber()+hitID.layer()-2<<", recHit :	x "<<hitGP.x()<<", y "<<hitGP.y()<<" +- "<<y_err<<", z "<<hitGP.z()<<endl;
         if (fabs(hitGP.x() - tsosGP.x()) > trackResX * MulSigmaOnWindow) continue;
         if (fabs(hitGP.y() - tsosGP.y()) > trackResY * MulSigmaOnWindow * y_err) continue; // global y, local y
         float deltaR = (hitGP - tsosGP).mag();
@@ -462,7 +415,6 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   copy(rAndhit.begin(), rAndhit.end(), back_inserter<vector<pair<double,int>>>(rAndhitV));
   for(unsigned int i=0;i<rAndhitV.size();i++)
   {
-    if(checkCrossSeeds && crossSeeds) cout<<"i "<<i<<", r "<<rAndhitV[i].first<<", nhit "<<rAndhitV[i].second<<endl;
     consRecHits.push_back(muRecHits[rAndhitV[i].second]);
   }
 
@@ -471,8 +423,6 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   if ( fitted.size() <= 0 ) return Trajectory();
   
   Trajectory smoothed = fitted.front();
-  float dProbChiNDF = smoothed.chiSquared()/float(smoothed.ndof());
-  if(checkCrossSeeds && crossSeeds) cout<<"Nchi2 "<<dProbChiNDF<<", chi2 "<<smoothed.chiSquared()<<", ndof "<<smoothed.ndof()<<endl;;
   return fitted.front();
 }
 
