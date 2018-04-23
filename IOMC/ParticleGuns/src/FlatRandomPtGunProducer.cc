@@ -1,6 +1,3 @@
-/*
- *  \author Julia Yarba
- */
 
 #include <ostream>
 
@@ -19,14 +16,10 @@
 using namespace edm;
 using namespace std;
 
-FlatRandomPtGunProducer::FlatRandomPtGunProducer(const ParameterSet& pset) : 
-   BaseFlatGunProducer(pset)
+FlatRandomPtGunProducer::FlatRandomPtGunProducer(const ParameterSet& pset) : BaseFlatGunProducer(pset)
 {
-
-
-   ParameterSet defpset ;
-   ParameterSet pgun_params = 
-      pset.getParameter<ParameterSet>("PGunParameters") ;
+   ParameterSet defpset;
+   ParameterSet pgun_params = pset.getParameter<ParameterSet>("PGunParameters");
   
    fMinPt = pgun_params.getParameter<double>("MinPt");
    fMaxPt = pgun_params.getParameter<double>("MaxPt");
@@ -40,27 +33,26 @@ FlatRandomPtGunProducer::~FlatRandomPtGunProducer()
    // no need to cleanup GenEvent memory - done in HepMCProduct
 }
 
-
 bool myIsMuonPassScint(double dVx, double dVy, double dVz, double dPx, double dPy, double dPz) {
-  // To test the drop-down of efficiency at edges, we can set the cut looser
+
   double ScintilXMin = -1000.0;
   double ScintilXMax =  1000.0;
-  double ScintilZMin =  -605.6;
-  double ScintilZMax =   950.0;
+  double ScintilYMin = -605.6;
+  double ScintilYMax =  950.0;
   
-  double ScintilLowerY = -114.85;
-  double ScintilUpperY = 1540.15;
+  double ScintilLowerZ = -114.85;
+  double ScintilUpperZ = 1540.15;
   
-  double dTLower = ( ScintilLowerY - dVy ) / dPy;  
+  double dTLower = ( ScintilLowerZ - dVz ) / dPz;  
   double dXLower = dVx + dTLower * dPx;
-  double dZLower = dVz + dTLower * dPz;
+  double dYLower = dVy + dTLower * dPy;
   
-  double dTUpper = ( ScintilUpperY - dVy ) / dPy;
+  double dTUpper = ( ScintilUpperZ - dVz ) / dPz;
   double dXUpper = dVx + dTUpper * dPx;
-  double dZUpper = dVz + dTUpper * dPz;
+  double dYUpper = dVy + dTUpper * dPy;
   
-  if (( ScintilXMin <= dXLower && dXLower <= ScintilXMax && ScintilZMin <= dZLower && dZLower <= ScintilZMax ) &&
-      ( ScintilXMin <= dXUpper && dXUpper <= ScintilXMax && ScintilZMin <= dZUpper && dZUpper <= ScintilZMax ))
+  if (( ScintilXMin <= dXLower && dXLower <= ScintilXMax && ScintilYMin <= dYLower && dYLower <= ScintilYMax ) &&
+      ( ScintilXMin <= dXUpper && dXUpper <= ScintilXMax && ScintilYMin <= dYUpper && dYUpper <= ScintilYMax ))
   {
     return true;
   }
@@ -77,12 +69,12 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
    {
       cout << " FlatRandomPtGunProducer : Begin New Event Generation" << endl ; 
    }
-
+   
    fEvt = new HepMC::GenEvent() ;
-  
+   
    double dVx;
-   double dVy = 1540.15; // same Y as the upper scintillator
-   double dVz;
+   double dVy;
+   double dVz = 1540.15; // same Y as the upper scintillator
    HepMC::GenVertex* Vtx = NULL;
 
    // loop over particles
@@ -96,9 +88,8 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
        
        while (j < 10000) // j < 10000 to avoid too long computational time
        {
-
          dVx = CLHEP::RandFlat::shoot(engine, -1000.0, 1000.0) ;
-         dVz = CLHEP::RandFlat::shoot(engine, -605.6, 950.0) ;
+         dVy = CLHEP::RandFlat::shoot(engine, -605.6, 950.0) ;
          
          mom   = CLHEP::RandFlat::shoot(engine, fMinPt, fMaxPt) ;
          phi   = CLHEP::RandFlat::shoot(engine, fMinPhi, fMaxPhi) ;
@@ -120,8 +111,8 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
          }
 
          px     =  mom*sin(theta)*cos(phi) ;
-         pz     =  mom*sin(theta)*sin(phi) ;
-         py     = -mom*cos(theta) ; // with the - sign, the muons are going downwards: falling from the sky
+         py     =  mom*sin(theta)*sin(phi) ;
+         pz     =  mom*cos(theta) ;
 
          if ( myIsMuonPassScint(dVx, dVy, dVz, px, py, pz) == true ) break; // muon passing through both the scintillators => valid: the loop can be stopped
          
@@ -146,15 +137,15 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
        if ( fAddAntiParticle )
        {
           HepMC::FourVector ap(-px,-py,-pz,energy) ;
-		  int APartID = -PartID ;
-		  if ( PartID == 22 || PartID == 23 )
-		  {
-	      	APartID = PartID ;
+	      int APartID = -PartID ;
+	      if ( PartID == 22 || PartID == 23 )
+	      {
+	        APartID = PartID ;
 	      }	  
-	 	  HepMC::GenParticle* APart = new HepMC::GenParticle(ap,APartID,1);
-	  	  APart->suggest_barcode( barcode ) ;
-	  	  barcode++ ;
-	  	  Vtx->add_particle_out(APart) ;
+	      HepMC::GenParticle* APart = new HepMC::GenParticle(ap,APartID,1);
+	      APart->suggest_barcode( barcode ) ;
+	      barcode++ ;
+	      Vtx->add_particle_out(APart) ;
        }
    }
 
@@ -176,7 +167,6 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
     
    if ( fVerbosity > 0 )
    {
-      // for testing purpose only
       cout << " FlatRandomPtGunProducer : Event Generation Done " << endl;
    }
 }
