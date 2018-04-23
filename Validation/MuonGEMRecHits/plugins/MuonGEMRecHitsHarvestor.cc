@@ -109,7 +109,7 @@ TProfile* MuonGEMRecHitsHarvestor::ComputeEff2DForHitEff(TH2F* num, TH2F* denum 
         double temp = nDenum;
         nDenum = nNum;
         nNum = temp;
-        std::cout<<"Alert! specific bin's num is bigger than denum"<<std::endl;
+        // std::cout<<"Alert! specific bin's num is bigger than denum"<<std::endl;
       }
       const double effVal = nNum/nDenum;
       efficHist->SetBinContent(nIdx, effVal);
@@ -178,7 +178,7 @@ void MuonGEMRecHitsHarvestor::ProcessBooking( DQMStore::IBooker& ibooker, DQMSto
     ibooker.bookProfile( profile_sh->GetName(),profile_sh); 
   }
   else {
-    std::cout<<"Can not found histogram of "<<dbe_label<<std::endl; 
+    std::cout<<"Can´t find histogram of "<<dbe_label<<std::endl; 
     if ( track_hist == nullptr) std::cout<<"track not found"<<std::endl;
     if ( sh_hist    == nullptr) std::cout<<"sh_hist not found"<<std::endl;
   }
@@ -210,14 +210,14 @@ MuonGEMRecHitsHarvestor::dqmEndJob(DQMStore::IBooker& ibooker, DQMStore::IGetter
       gem_trk_eta[i] = (TH1F*)ig.get(eta_label.Data())->getTH1F()->Clone();
       gem_trk_eta[i]->Sumw2();
     }
-    else std::cout<<"Can not found track_eta"<<std::endl;
+    else std::cout<<"Can´t find track_eta"<<std::endl;
     for ( int k=0 ; k <3 ; k++) {
       phi_label = TString(dbe_path_.c_str())+"track_phi"+s_suffix[i]+c_suffix[k];
       if ( ig.get(phi_label.Data()) !=nullptr ) {
         gem_trk_phi[i][k] = (TH1F*)ig.get(phi_label.Data())->getTH1F()->Clone();
         gem_trk_phi[i][k]->Sumw2();
       }
-      else std::cout<<"Can not found track_phi"<<std::endl;
+      else std::cout<<"Can´t find track_phi"<<std::endl;
     }
     
     if ( ig.get(eta_label.Data()) != nullptr && ig.get(phi_label.Data()) !=nullptr ) {
@@ -228,7 +228,7 @@ MuonGEMRecHitsHarvestor::dqmEndJob(DQMStore::IBooker& ibooker, DQMStore::IGetter
           sh_eta[i][j] = (TH1F*)ig.get(eta_label.Data())->getTH1F()->Clone();
           sh_eta[i][j]->Sumw2();
         }
-        else std::cout<<"Can not found eta histogram : "<<eta_label<<std::endl;
+        else std::cout<<"Can´t find eta histogram : "<<eta_label<<std::endl;
         ProcessBooking( ibooker, ig, "rh_eta", suffix, gem_trk_eta[i], sh_eta[i][j]); 
         for ( int k= 0 ; k< 3 ; k++) {
           suffix = TString( s_suffix[i])+TString( l_suffix[j]) +TString(c_suffix[k]);
@@ -237,12 +237,12 @@ MuonGEMRecHitsHarvestor::dqmEndJob(DQMStore::IBooker& ibooker, DQMStore::IGetter
            sh_phi[i][j][k] = (TH1F*)ig.get(phi_label.Data())->getTH1F()->Clone();
            sh_phi[i][j][k]->Sumw2();
           }
-          else { std::cout<<"Can not found phi plots : "<<phi_label<<std::endl; continue; }
+          else { std::cout<<"Can´t find phi plots : "<<phi_label<<std::endl; continue; }
           ProcessBooking( ibooker, ig, "rh_phi",suffix, gem_trk_phi[i][k], sh_phi[i][j][k]);
         }
       }
     }
-    else std::cout<<"Can not find eta or phi of all track"<<std::endl;
+    else std::cout<<"Can´t find eta or phi of all track"<<std::endl;
   }
   
   int i, j;
