@@ -78,7 +78,7 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
    HepMC::GenVertex* Vtx = NULL;
 
    // loop over particles
-   //
+
    int barcode = 1 ;
    for (unsigned int ip=0; ip<fPartIDs.size(); ++ip)
    {
@@ -122,7 +122,7 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
        
        int PartID = fPartIDs[ip] ;
        const HepPDT::ParticleData* 
-          PData = fPDGTable->particle(HepPDT::ParticleID(abs(PartID))) ;
+       PData = fPDGTable->particle(HepPDT::ParticleID(abs(PartID))) ;
        double mass   = PData->mass().value() ;
        Vtx = new HepMC::GenVertex(HepMC::FourVector(dVx,dVy,dVz));
 
@@ -170,4 +170,3 @@ void FlatRandomPtGunProducer::produce(Event &e, const EventSetup& es)
       cout << " FlatRandomPtGunProducer : Event Generation Done " << endl;
    }
 }
-

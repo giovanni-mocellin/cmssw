@@ -51,7 +51,11 @@ if len(sys.argv) >= 3:
     listSrc.append(strSrc)
   
   listSrcSort = sorted(listSrc, key = lambda strSrc: int(strSrc.split("_")[ -1 ].split(".")[ 0 ]))
-  for strSrc in listSrcSort:
+  nMaxSrc = len(listSrc)
+  if len(sys.argv) >= 4: nMaxSrc = int(sys.argv[ 3 ])
+  
+  for (i, strSrc) in enumerate(listSrcSort):
+    if i >= nMaxSrc: break
     process.source.fileNames.append("file:" + strDir + "/" + strSrc)
 
 process.options = cms.untracked.PSet(

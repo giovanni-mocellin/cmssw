@@ -13,7 +13,6 @@
 
 <RotationSection label="gembox.xml">
 <Rotation name="RotTypeA" phiX="180*deg" thetaX="90*deg" phiY="90*deg" thetaY="0*deg" phiZ="90*deg" thetaZ="90*deg"/>
-<Rotation name="RotTypeC" phiX="(180 - 2 * 5.06289)*deg" thetaX="90*deg" phiY="90*deg" thetaY="0*deg" phiZ="(90 - 2 * 5.06289)*deg" thetaZ="90*deg"/>
 </RotationSection>
 
 <PosPartSection label="gembox.xml">

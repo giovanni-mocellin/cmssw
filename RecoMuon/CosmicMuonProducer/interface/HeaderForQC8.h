@@ -8,6 +8,3 @@
 #define QC8FLAG_SEEDINFO_SHIFT_DIFFCOL       1
 
 #endif //CosmicMuonProducer_HeaderForQC8_H
-
-
-
