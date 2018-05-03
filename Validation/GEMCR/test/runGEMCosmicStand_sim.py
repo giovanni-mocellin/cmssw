@@ -137,7 +137,6 @@ process.generator = cms.EDProducer("FlatRandomPtGunProducer",
         MinTheta = cms.double(0.0),
         MaxTheta = cms.double(1.570796),
         IsThetaFlat = cms.bool(False), # If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
-        #IsThetaFlat = cms.bool(True),
         PartID = cms.vint32(-13)
     ),
     Verbosity = cms.untracked.int32(0),
@@ -183,12 +182,6 @@ process.MuonServiceProxy.ServiceParameters.Propagators.append('StraightLinePropa
 process.GEMCosmicMuonForQC8 = cms.EDProducer("GEMCosmicMuonForQC8",
                                        process.MuonServiceProxy,
                                        gemRecHitLabel = cms.InputTag("gemRecHits"),
-                                       maxClusterSize = cms.double(runConfig.maxClusterSize),
-                                       minClusterSize = cms.double(runConfig.minClusterSize),
-                                       trackChi2 = cms.double(runConfig.trackChi2),
-                                       trackResX = cms.double(runConfig.trackResX),
-                                       trackResY = cms.double(runConfig.trackResY),
-                                       MulSigmaOnWindow = cms.double(runConfig.MulSigmaOnWindow),
                                        SuperChamberType = cms.vstring(SuperChType),
                                        SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
                                        MuonSmootherParameters = cms.PSet(
@@ -200,49 +193,6 @@ process.GEMCosmicMuonForQC8 = cms.EDProducer("GEMCosmicMuonForQC8",
 process.GEMCosmicMuonForQC8.ServiceParameters.GEMLayers = cms.untracked.bool(True)
 process.GEMCosmicMuonForQC8.ServiceParameters.CSCLayers = cms.untracked.bool(False)
 process.GEMCosmicMuonForQC8.ServiceParameters.RPCLayers = cms.bool(False)
-
-fScale = 1.0
-
-process.gemcrValidation = cms.EDAnalyzer('gemcrValidation',
-    process.MuonServiceProxy,
-    verboseSimHit = cms.untracked.int32(1),
-    simInputLabel = cms.InputTag('g4SimHits',"MuonGEMHits"),
-    # PSimHits_g4SimHits_MuonGEMHits_RECO
-    genVtx = cms.InputTag("generator","unsmeared", "RECO"),
-    # edmHepMCProduct_generator_unsmeared_RECO
-    recHitsInputLabel = cms.InputTag('gemRecHits'),
-    # GEMDetIdGEMRecHitsOwnedRangeMap_gemRecHits__RECO
-    tracksInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    seedInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    trajInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    chNoInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    seedTypeInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    # *_GEMCosmicMuonForQC8_*_RECO
-    genParticleLabel = cms.InputTag('genParticles','','RECO'),
-    # *_genParticles_*_RECO
-    gemDigiLabel = cms.InputTag("muonGEMDigis","","RECO"),
-    # *_*GEMDigis_*_RECO
-    # st1, st2_short, st2_long of xbin, st1,st2_short,st2_long of ybin
-    nBinGlobalZR = cms.untracked.vdouble(200,200,200,150,180,250),
-    # st1 xmin, xmax, st2_short xmin, xmax, st2_long xmin, xmax, st1 ymin, ymax...
-    RangeGlobalZR = cms.untracked.vdouble(564,572,786,794,786,802,110,260,170,350,100,350),
-    maxClusterSize = cms.double(runConfig.maxClusterSize),
-    minClusterSize = cms.double(runConfig.minClusterSize),
-    maxResidual = cms.double(runConfig.maxResidual),
-    makeTrack = cms.bool(runConfig.makeTrack),
-    isMC = cms.bool(True),
-    trackChi2 = cms.double(runConfig.trackChi2),
-    trackResX = cms.double(runConfig.trackResX),
-    trackResY = cms.double(runConfig.trackResY),
-    MulSigmaOnWindow = cms.double(runConfig.MulSigmaOnWindow),
-    SuperChamberType = cms.vstring(SuperChType),
-    SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
-    MuonSmootherParameters = cms.PSet(
-                      PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
-                      PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
-                      RescalingFactor = cms.double(5.0)
-                      ),
-)
 
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string('temp_'+strOutput)
@@ -256,7 +206,6 @@ process.reconstruction_step = cms.Path(process.gemLocalReco+process.GEMCosmicMuo
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
-process.validation_step = cms.Path(process.gemcrValidation)
 process.digitisation_step.remove(process.simMuonME0Digis)
 process.digitisation_step.remove(process.simMuonME0ReDigis)
 process.digitisation_step.remove(process.simEcalTriggerPrimitiveDigis)
@@ -274,7 +223,6 @@ process.digitisation_step.remove(process.simMuonDTDigis)
 process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,
                                 process.digitisation_step,
                                 process.reconstruction_step,
-                                process.validation_step,
                                 process.endjob_step,
                                 process.FEVTDEBUGHLToutput_step,
                                 )
