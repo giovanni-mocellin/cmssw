@@ -68,7 +68,6 @@ GEMCosmicMuonForQC8::GEMCosmicMuonForQC8(const edm::ParameterSet& ps) : iev(0) {
   printf("End of GEMCosmicMuonForQC8::GEMCosmicMuonForQC8() at %s\n", asctime(localtime(&rawTime)));
 }
 
-
 void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 {
   theService->update(setup);
@@ -116,6 +115,23 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 
   if (muRecHits.size() < 4) return;
 
+  float* totRes = new float[30][8]; // Variable for the sum of the residuals in X [30-chambers][8-etaPartitions]
+  float* resX = new float[30][8]; // Variable for the residuals in X [30-chambers][8-etaPartitions]
+
+  for (int i=0; i<30; i++) {
+    for (int j=0; j<8; j++) {
+      resX[i][j] = 0.0;
+    }
+  }
+
+  int iteration = 0; // Here we will implement the loop while(min(dx)>0.01){}
+
+  for (int i=0; i<30; i++) {
+    for (int j=0; j<8; j++) {
+      resX[i][j] = -9999.;
+    }
+  }
+
   vector<TrajectorySeed> trajSeedsBody;
   std::vector<TrajectorySeed> *trajSeeds = &trajSeedsBody;
   findSeeds(trajSeeds, muRecHits);
@@ -144,7 +160,38 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
   if (!bestTrajectory.isValid()) return;
   if (maxChi2 > 3) return;
 
-    
+  PTrajectoryStateOnDet ptsd(bestSeed.startingState());
+  DetId did(ptsd.detId());
+  const BoundPlane& bp = theService->trackingGeometry()->idToDet(did)->surface();
+  TrajectoryStateOnSurface tsos = trajectoryStateTransform::transientState(ptsd,&bp,&*theService->magneticField());
+  TrajectoryStateOnSurface tsosCurrent = tsos;
+
+  for (auto ch : gemChambers)
+  {
+    std::shared_ptr<MuonTransientTrackingRecHit> tmpRecHit;
+    tsosCurrent = theService->propagator("SteppingHelixPropagatorAny")->propagate(tsosCurrent, theService->trackingGeometry()->idToDet(ch.id())->surface());
+    if (!tsosCurrent.isValid()) return Trajectory();
+    GlobalPoint tsosGP = tsosCurrent.freeTrajectoryState()->position();
+
+    float maxR = 9999.;
+
+    for (auto hit : muRecHits)
+    {
+      GEMDetId hitID(hit->rawId());
+      if (hitID.chamberId() == ch.id() )
+      {
+        GlobalPoint hitGP = hit->globalPosition();
+        if (fabs(hitGP.x() - tsosGP.x()) > 3) continue;
+        if (fabs(hitGP.y() - tsosGP.y()) > 30) continue;
+        float deltaR = (hitGP - tsosGP).mag();
+        if (deltaR < maxR)
+        {
+          maxR = deltaR;
+          resX[ch.id().chamber() + ch.id().layer() + 1][etaaaaaaaaaaaa] = hitGP.x() - tsosGP.x(); // QUI MANCA IL CALCOLO DI ETA, CHE ME LO VADO A PESCARE NELL'ALTRO FILE CACCA.CC
+        }
+      }
+    }
+  }
 }
 
 
@@ -215,10 +262,10 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
     if (!tsosCurrent.isValid()) return Trajectory();
     GlobalPoint tsosGP = tsosCurrent.freeTrajectoryState()->position();
 
-    float maxR = 9999;
+    float maxR = 9999.;
     int nhit=-1;
     int tmpNhit=-1;
-    double tmpR=-1;
+    double tmpR=-1.;
     for (auto hit : muRecHits)
     {
       nhit++;
