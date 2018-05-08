@@ -72,14 +72,14 @@ GEMCosmicMuonForQC8::GEMCosmicMuonForQC8(const edm::ParameterSet& ps) : iev(0) {
 void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 {
   theService->update(setup);
-  
+
   edm::ESHandle<GEMGeometry> gemg;
   setup.get<MuonGeometryRecord>().get(gemg);
   const GEMGeometry* mgeom = &*gemg;
   gemGeom = &*gemg;
-  
+
   vector<GEMChamber> gemChambers;
-  
+
   const std::vector<const GEMSuperChamber*>& superChambers_ = mgeom->superChambers();
   for (auto sch : superChambers_)
   {
@@ -89,22 +89,22 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
       gemChambers.push_back(*sch->chamber(l+1));
     }
   }
-  
+
   edm::Handle<GEMRecHitCollection> gemRecHits;
   ev.getByToken(theGEMRecHitToken,gemRecHits);
-  
+
   if (gemRecHits->size() < 4) return;
 
   MuonTransientTrackingRecHit::MuonRecHitContainer muRecHits;
   MuonTransientTrackingRecHit::MuonRecHitContainer seedRecHits;
-  
+
   for (auto ch : gemChambers)
   {
     for (auto etaPart : ch.etaPartitions())
     {
       GEMDetId etaPartID = etaPart->id();
       GEMRecHitCollection::range range = gemRecHits->get(etaPartID);
-      
+
       for (GEMRecHitCollection::const_iterator rechit = range.first; rechit!=range.second; ++rechit)
       {
         const GeomDet* geomDet(etaPart);
@@ -113,25 +113,25 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
       }
     }
   }
-  
+
   if (muRecHits.size() < 4) return;
-  
+
   vector<TrajectorySeed> trajSeedsBody;
   std::vector<TrajectorySeed> *trajSeeds = &trajSeedsBody;
   findSeeds(trajSeeds, muRecHits);
   Trajectory bestTrajectory;
   TrajectorySeed bestSeed;
-  
+
   float maxChi2 = 10000000.0;
-  
+
   for (auto seed : *trajSeeds)
   {
     Trajectory smoothed = makeTrajectory(seed, muRecHits, gemChambers);
-    
+
     if (smoothed.isValid())
     {
       float dProbChiNDF = smoothed.chiSquared()/float(smoothed.ndof());
-      
+
       if (fabs(maxChi2-1) > fabs(dProbChiNDF-1))
       {
         maxChi2 = dProbChiNDF;
@@ -140,11 +140,11 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
       }
     }
   }
-  
+
   if (!bestTrajectory.isValid()) return;
   if (maxChi2 > 3) return;
-  
-  
+
+    
 }
 
 
@@ -160,25 +160,25 @@ int GEMCosmicMuonForQC8::findSeeds(std::vector<TrajectorySeed> *tmptrajectorySee
         GlobalVector segDirGV(hit2->globalPosition().x() - hit1->globalPosition().x(),
                               hit2->globalPosition().y() - hit1->globalPosition().y(),
                               hit2->globalPosition().z() - hit1->globalPosition().z());
-        
+
         segDirGV *=10;
         LocalVector segDir = hit1->det()->toLocal(segDirGV);
-        
+
         int charge= 1;
         LocalTrajectoryParameters param(segPos, segDir, charge);
-        
+
         AlgebraicSymMatrix mat(5,0);
         mat = hit1->parametersError().similarityT( hit1->projectionMatrix() );
         LocalTrajectoryError error(asSMatrix<5>(mat));
-        
+
         TrajectoryStateOnSurface tsos(param, error, hit1->det()->surface(), &*theService->magneticField());
         uint32_t id = hit1->rawId();
         PTrajectoryStateOnDet const & seedTSOS = trajectoryStateTransform::persistentState(tsos, id);
-        
+
         edm::OwnVector<TrackingRecHit> seedHits;
         seedHits.push_back(hit1->hit()->clone());
         seedHits.push_back(hit2->hit()->clone());
-        
+
         TrajectorySeed seed(seedTSOS,seedHits,alongMomentum);
         tmptrajectorySeeds->push_back(seed);
       }
@@ -196,7 +196,7 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   TrajectoryStateOnSurface tsos = trajectoryStateTransform::transientState(ptsd1,&bp,&*theService->magneticField());
   TrajectoryStateOnSurface tsosCurrent = tsos;
   TransientTrackingRecHit::ConstRecHitContainer consRecHits;
-  
+
   TrajectorySeed::range range = seed.recHits();
   int nseed = 0;
   GlobalPoint seedGP[2];
@@ -207,14 +207,14 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
     nseed++;
   }
   std::map<double,int> rAndhit;
-  
+
   for (auto ch : gemChambers)
   {
     std::shared_ptr<MuonTransientTrackingRecHit> tmpRecHit;
     tsosCurrent = theService->propagator("SteppingHelixPropagatorAny")->propagate(tsosCurrent, theService->trackingGeometry()->idToDet(ch.id())->surface());
     if (!tsosCurrent.isValid()) return Trajectory();
     GlobalPoint tsosGP = tsosCurrent.freeTrajectoryState()->position();
-    
+
     float maxR = 9999;
     int nhit=-1;
     int tmpNhit=-1;
@@ -243,7 +243,7 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
       rAndhit[tmpR] = tmpNhit;
     }
   }
-  
+
   if (rAndhit.size() < 5) return Trajectory();
   vector<pair<double,int>> rAndhitV;
   copy(rAndhit.begin(), rAndhit.end(), back_inserter<vector<pair<double,int>>>(rAndhitV));
@@ -251,15 +251,14 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
   {
     consRecHits.push_back(muRecHits[rAndhitV[i].second]);
   }
-  
+
   if (consRecHits.size() < 5) return Trajectory();
   vector<Trajectory> fitted = theSmoother->trajectories(seed, consRecHits, tsos);
   if ( fitted.size() <= 0 ) return Trajectory();
-  
+
   Trajectory smoothed = fitted.front();
   return fitted.front();
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(GEMCosmicMuonForQC8);
-
