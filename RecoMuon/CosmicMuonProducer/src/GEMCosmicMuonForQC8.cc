@@ -176,8 +176,6 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
           const BoundPlane& bproll = theService->trackingGeometry()->idToDet(ch.etaPartition(r)->id())->surface();
           Local3DPoint rtlp = bproll.toLocal(hitGP);
 
-          cout << Roll << " " << rtlp.y() << " " << ch.etaPartition(Roll)->centreOfStrip(1).y() << endl;
-
           if(minDely > abs(rtlp.y()))
           {
             minDely = abs(rtlp.y());
@@ -186,10 +184,16 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
         }
         if (Roll == 0) continue;
 
+        cout << Roll << " " << rtlp.y() << " " << ch.etaPartition(Roll)->centreOfStrip(1).y() << endl;
+
         resX[chNumber-1][Roll-1] -> Fill(hitGP.x() - tsosGP.x());
       }
     }
   }
+
+  TCanvas *cnv = new TCanvas("cnv", "Plot",950,730);
+  resX[0][0] -> Draw();
+  resX[0][0] -> Update();
 }
 
 
