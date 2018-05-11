@@ -56,19 +56,6 @@ public:
   void produce(edm::Event&, const edm::EventSetup&) override;
   std::vector<std::string> g_SuperChamType;
   vector<double> g_vecChamType;
-  /// Alignment Parameters
-  TH1F * resX[30][8];
-  char * histname = new char[10];
-  for (Int_t i = 0 ; i < 30 ; i++)
-  {
-    for (Int_t j = 0 ; j < 8 ; i++)
-    {
-      sprintf(histname, "h_resX_%d_%u",i,j);
-      resX[i][j] = new TH1F(histname,"",100,-5,5);
-    }
-  }
-  float dx = 0.0;
-  float rz = 0.0;
 private:
   int iev; // events through
   edm::EDGetTokenT<GEMRecHitCollection> theGEMRecHitToken;
@@ -169,6 +156,21 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 
   if (!bestTrajectory.isValid()) return;
   if (maxChi2 > 3) return;
+
+  /// Alignment section STARTS HERE!!!!!
+
+  TH1F * resX[30][8];
+  char * histname = new char[10];
+  for (Int_t i = 0 ; i < 30 ; i++)
+  {
+    for (Int_t j = 0 ; j < 8 ; i++)
+    {
+      sprintf(histname, "h_resX_%d_%u",i,j);
+      resX[i][j] = new TH1F(histname,"",100,-5,5);
+    }
+  }
+  float dx = 0.0;
+  float rz = 0.0;
 
   PTrajectoryStateOnDet ptsd(bestSeed.startingState());
   DetId did(ptsd.detId());
