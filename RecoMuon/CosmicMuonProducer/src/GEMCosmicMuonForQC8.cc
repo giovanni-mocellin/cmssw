@@ -42,6 +42,10 @@ public:
   void produce(edm::Event&, const edm::EventSetup&) override;
   std::vector<std::string> g_SuperChamType;
   vector<double> g_vecChamType;
+  /// Alignment Parameters
+  TH1F * resX[30][8] = new TH1F("resX","resX",100,-5,5);
+  dx = 0.0;
+  rz = 0.0;
 private:
   int iev; // events through
   edm::EDGetTokenT<GEMRecHitCollection> theGEMRecHitToken;
@@ -115,23 +119,6 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 
   if (muRecHits.size() < 4) return;
 
-  float* totRes = new float[30][8]; // Variable for the sum of the residuals in X [30-chambers][8-etaPartitions]
-  float* resX = new float[30][8]; // Variable for the residuals in X [30-chambers][8-etaPartitions]
-
-  for (int i=0; i<30; i++) {
-    for (int j=0; j<8; j++) {
-      resX[i][j] = 0.0;
-    }
-  }
-
-  int iteration = 0; // Here we will implement the loop while(min(dx)>0.01){}
-
-  for (int i=0; i<30; i++) {
-    for (int j=0; j<8; j++) {
-      resX[i][j] = -9999.;
-    }
-  }
-
   vector<TrajectorySeed> trajSeedsBody;
   std::vector<TrajectorySeed> *trajSeeds = &trajSeedsBody;
   findSeeds(trajSeeds, muRecHits);
@@ -168,27 +155,38 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
 
   for (auto ch : gemChambers)
   {
-    std::shared_ptr<MuonTransientTrackingRecHit> tmpRecHit;
     tsosCurrent = theService->propagator("SteppingHelixPropagatorAny")->propagate(tsosCurrent, theService->trackingGeometry()->idToDet(ch.id())->surface());
-    if (!tsosCurrent.isValid()) return Trajectory();
+    if (!tsosCurrent.isValid()) continue;
     GlobalPoint tsosGP = tsosCurrent.freeTrajectoryState()->position();
 
-    float maxR = 9999.;
-
-    for (auto hit : muRecHits)
+    for (auto hit : bestTrajectory.hits())
     {
       GEMDetId hitID(hit->rawId());
       if (hitID.chamberId() == ch.id() )
       {
         GlobalPoint hitGP = hit->globalPosition();
-        if (fabs(hitGP.x() - tsosGP.x()) > 3) continue;
-        if (fabs(hitGP.y() - tsosGP.y()) > 30) continue;
-        float deltaR = (hitGP - tsosGP).mag();
-        if (deltaR < maxR)
+
+        int chNumber = ch.id().chamber() + ch.id().layer() - 1;
+
+        int n_roll = ch.nEtaPartitions();
+        double minDely = 50.;
+        int Roll = 0;
+        for (int r = 1 ; r <= n_roll ; r++)
         {
-          maxR = deltaR;
-          resX[ch.id().chamber() + ch.id().layer() + 1][etaaaaaaaaaaaa] = hitGP.x() - tsosGP.x(); // QUI MANCA IL CALCOLO DI ETA, CHE ME LO VADO A PESCARE NELL'ALTRO FILE CACCA.CC
+          const BoundPlane& bproll = theService->trackingGeometry()->idToDet(ch.etaPartition(r)->id())->surface();
+          Local3DPoint rtlp = bproll.toLocal(hitGP);
+
+          cout << Roll << " " << rtlp.y() << " " << ch.etaPartition(Roll)->centreOfStrip(1).y() << endl;
+
+          if(minDely > abs(rtlp.y()))
+          {
+            minDely = abs(rtlp.y());
+            Roll = r;
+          }
         }
+        if (Roll == 0) continue;
+
+        resX[chNumber-1][Roll-1] -> Fill(hitGP.x() - tsosGP.x());
       }
     }
   }
