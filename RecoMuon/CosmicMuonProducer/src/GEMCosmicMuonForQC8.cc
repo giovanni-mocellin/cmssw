@@ -30,6 +30,20 @@
 
 #include "Geometry/Records/interface/MuonGeometryRecord.h"
 
+#include <iostream>
+#include <iomanip>
+#include <string.h>
+#include <vector>
+#include "TH1.h"
+#include "TH2D.h"
+#include "TH2.h"
+#include "TH3F.h"
+#include "TF1.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TCanvas.h"
+#include "TMath.h"
+
 using namespace std;
 
 class GEMCosmicMuonForQC8 : public edm::stream::EDProducer<> {
@@ -44,8 +58,8 @@ public:
   vector<double> g_vecChamType;
   /// Alignment Parameters
   TH1F * resX[30][8] = new TH1F("resX","resX",100,-5,5);
-  dx = 0.0;
-  rz = 0.0;
+  float dx = 0.0;
+  float rz = 0.0;
 private:
   int iev; // events through
   edm::EDGetTokenT<GEMRecHitCollection> theGEMRecHitToken;
