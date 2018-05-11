@@ -57,7 +57,16 @@ public:
   std::vector<std::string> g_SuperChamType;
   vector<double> g_vecChamType;
   /// Alignment Parameters
-  TH1F * resX[30][8] = new TH1F("resX","resX",100,-5,5);
+  TH1F * resX[30][8];
+  char * histname = new char[10];
+  for (Int_t i = 0 ; i < 30 ; i++)
+  {
+    for (Int_t j = 0 ; j < 8 ; i++)
+    {
+      sprintf(histname, "h_resX_%d_%u",i,j);
+      resX[i][j] = new TH1F(histname,"",100,-5,5);
+    }
+  }
   float dx = 0.0;
   float rz = 0.0;
 private:
