@@ -1,5 +1,6 @@
-<library file="*.cc" name="GEMCosmicMuonStandPlugin">
+<library file="*.cc" name="ValidationGEMCosmicMuonStandPlugin">
   <use name="FWCore/Framework"/>
+  <use name="Validation/GEMCosmicMuonStand"/>
   <use name="Validation/MuonGEMHits"/>
   <use name="Validation/MuonGEMRecHits"/>
   <use name="DQMServices/Core"/>
