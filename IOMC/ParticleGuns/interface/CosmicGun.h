@@ -29,10 +29,7 @@ namespace edm
     
     double            fMinPt   ;
     double            fMaxPt   ;
-    double           fMinEta ;
-    double           fMaxEta ;
 
   };
-  DEFINE_FWK_MODULE(CosmicGun) ;  
 }
 #endif

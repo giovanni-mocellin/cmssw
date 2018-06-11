@@ -214,9 +214,3 @@ process.simMuonGEMDigis.averageNoiseRate = cms.double(0.0)
 process.simMuonGEMDigis.doBkgNoise = cms.bool(False)
 process.simMuonGEMDigis.doNoiseCLS = cms.bool(False)
 process.simMuonGEMDigis.simulateElectronBkg = cms.bool(False)
-
-
-#process.SteppingHelixPropagatorAny.debug = cms.bool(True)
-#process.SteppingHelixPropagatorAny.sendLogWarning = cms.bool(True)
-#process.SteppingHelixPropagatorAny.useInTeslaFromMagField = cms.bool(False)
-#process.SteppingHelixPropagatorAny.useMagVolumes = cms.bool(False)
