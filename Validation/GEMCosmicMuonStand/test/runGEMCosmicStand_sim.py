@@ -137,8 +137,8 @@ process.generator = cms.EDProducer("CosmicGun",
         MaxPt = cms.double(100.01),
         MinPhi = cms.double(3.141592),
         MaxPhi = cms.double(-3.141592),
-        MinTheta = cms.double(0.0),
-        MaxTheta = cms.double(1.570796),
+        MinTheta = cms.double(1.570796),
+        MaxTheta = cms.double(3.141592),
         IsThetaFlat = cms.bool(False), # If 'True': theta distribution is flat. If 'False': theta distribution is a cos^2
         PartID = cms.vint32(-13)
     ),
@@ -253,15 +253,10 @@ process.TFileService = cms.Service("TFileService",
 
 process.rawDataCollector.RawCollectionList = cms.VInputTag(cms.InputTag("gemPacker"))
 # Path and EndPath definitions
-process.genParticles.src = cms.InputTag("generator:unsmeared")
-process.g4SimHits.HepMCProductLabel = cms.InputTag("generator:unsmeared")
-process.g4SimHits.Generator.HepMCProductLabel = cms.InputTag("generator:unsmeared")
-process.generation_step = cms.Path(process.generator+process.genParticles)
+process.generation_step = cms.Path(process.generator+process.pgen)
 process.simulation_step = cms.Path(process.psim)
-process.digi2raw_step = cms.Path(process.gemPacker+process.rawDataCollector)
-process.raw2digi_step = cms.Path(process.muonGEMDigis)
-process.digitisation_step = cms.Path(process.randomEngineStateProducer+process.mix+process.simMuonGEMDigis+process.gemLocalReco)
-process.reconstruction_step = cms.Path(process.GEMCosmicMuonForQC8)
+process.digitisation_step = cms.Path(process.mix+process.simMuonGEMDigis)
+process.reconstruction_step = cms.Path(process.gemPacker+process.rawDataCollector+process.muonGEMDigis+process.gemLocalReco+process.GEMCosmicMuonForQC8)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
@@ -282,18 +277,19 @@ process.schedule = cms.Schedule(process.generation_step,
 								process.genfiltersummary_step,
 								process.simulation_step,
                                 process.digitisation_step,
-                                process.digi2raw_step,
-                                process.raw2digi_step,
                                 process.reconstruction_step,
                                 process.validation_step,
                                 process.endjob_step,
                                 process.FEVTDEBUGHLToutput_step,
                                 )
 
-process.RandomNumberGeneratorService.simMuonGEMDigis = cms.PSet(
-    initialSeed = cms.untracked.uint32( ( nIdxJob + 1 + 1350000) ),
+process.RandomNumberGeneratorService.generator = cms.PSet(
+    initialSeed = cms.untracked.uint32( ( nIdxJob + 1 ) + options.runNum*10000),
     engineName = cms.untracked.string('HepJamesRandom')
 )
+process.RandomNumberGeneratorService.simMuonGEMDigis = process.RandomNumberGeneratorService.generator
+process.RandomNumberGeneratorService.VtxSmeared = process.RandomNumberGeneratorService.generator
+process.RandomNumberGeneratorService.g4SimHits = process.RandomNumberGeneratorService.generator
 
 process.gemSegments.maxRecHitsInCluster = cms.int32(10)
 process.gemSegments.minHitsPerSegment = cms.uint32(3)
