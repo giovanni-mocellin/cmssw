@@ -1,6 +1,6 @@
 {
 
-TString run = "001";
+TString run = "111";
 int drawOn=0;
 int printOn=0;
 int calc_eff_vfat_On=1;
@@ -9,10 +9,10 @@ int setMinimumOn=1;
 int makeTreeOn=1;
 int cal_eff_from_tree_On=0;
 
-TString srcDir = "/afs/cern.ch/work/g/gmocelli/PhD/gemcrs/src/Validation/GEMCosmicMuonStand/test";
-TString savePngDir = "/afs/cern.ch/work/g/gmocelli/PhD/gemcrs/src/Validation/GEMCosmicMuonStand/test";
+TString srcDir = "/afs/cern.ch/work/g/gmocelli/PhD";
+TString savePngDir = "/afs/cern.ch/work/g/gmocelli/PhD";
 TString filename = "out";
-TFile *f = new TFile(srcDir+"/res_1/"+filename+".root");
+TFile *f = new TFile(srcDir+"/res_"+run+"/"+filename+".root");
 
 const int maxNchamber = 15;
 const int maxNlayer = 30;
