@@ -75,7 +75,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('EventFilter.GEMRawToDigi.gemPacker_cfi')
 process.load('EventFilter.RawDataCollector.rawDataCollector_cfi')
 process.load('EventFilter.GEMRawToDigi.muonGEMDigis_cfi')
-process.load('SimMuon.GEMDigitizer.muonGEMDigi_cff')
+process.load('SimMuon.GEMCosmicMuon.muonGEMDigi_cff')
 process.load('RecoLocalMuon.GEMRecHit.gemLocalReco_cff')
 
 # DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND
@@ -302,7 +302,8 @@ process.gemSegments.preClustering = cms.bool(False)
 process.gemSegments.preClusteringUseChaining = cms.bool(False)
 
 process.simMuonGEMDigis.averageEfficiency = cms.double(0.98)
-process.simMuonGEMDigis.averageNoiseRate = cms.double(0.0)
+process.simMuonGEMDigis.averageNoiseRate = cms.double(0.01)
+process.simMuonGEMDigis.simulateIntrinsicNoise = cms.bool(True)
 process.simMuonGEMDigis.doBkgNoise = cms.bool(False)
 process.simMuonGEMDigis.doNoiseCLS = cms.bool(False)
 process.simMuonGEMDigis.simulateElectronBkg = cms.bool(False)
