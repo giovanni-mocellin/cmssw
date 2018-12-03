@@ -161,7 +161,7 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
     if ( g_vecChamType[ nIdxTestCh ] == 2 ) {nUpType = 4;}
     if ( g_vecChamType[ nIdxTestCh ] == 1 ) {nDnType = 3;}
     
-    int TCN = 0; //number of hitted chamber without tch
+    int TCN = 0; // Number of hitted chambers, not including the test chamber
     for (auto ch : gemChambers)
     {
       if (tch == ch) continue;
@@ -387,7 +387,7 @@ Trajectory GEMCosmicMuonForQC8::makeTrajectory(TrajectorySeed seed, MuonTransien
         GlobalPoint hitGP = hit->globalPosition();
         double y_err = hit->localPositionError().yy();
         if (fabs(hitGP.x() - tsosGP.x()) > trackResX * MulSigmaOnWindow) continue;
-        if (fabs(hitGP.y() - tsosGP.y()) > trackResY * MulSigmaOnWindow * y_err) continue; // global y, local y
+        if (fabs(hitGP.y() - tsosGP.y()) > trackResY * MulSigmaOnWindow * y_err) continue;
         float deltaR = (hitGP - tsosGP).mag();
         if (maxR > deltaR)
         {
