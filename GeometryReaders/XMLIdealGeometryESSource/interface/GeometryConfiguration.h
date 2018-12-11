@@ -30,6 +30,9 @@ class GeometryConfiguration: public DDLDocumentProvider {
   /// Return a list of files as a vector of strings.
   const std::vector < std::string >  & getFileList(void) const override;
 
+  /// Allow addition of a file name
+  void addFile(const std::string &rel_fname);
+
   /// Return a list of urls as a vector of strings.
   /**
      The EDM should not allow URLs because of provenance.

@@ -8,4 +8,6 @@ int main()
   testSerialization<std::vector<GEMELMap::GEMVFatMap>>();
   testSerialization<GEMELMap::GEMStripMap>();
   testSerialization<std::vector<GEMELMap::GEMStripMap>>();
+
+  testSerialization<GEMQC8Conf>();
 }

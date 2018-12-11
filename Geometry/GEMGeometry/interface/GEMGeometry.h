@@ -51,8 +51,10 @@ class GEMGeometry : public TrackingGeometry {
   // Return the pointer to the GeomDet corresponding to a given DetId
   const GeomDet* idToDet(DetId) const override;
 
-
   //---- Extension of the interface
+
+  // Return to theMap
+  const mapIdToDet& getIdToDetMap() const { return theMap; }
 
   /// Return a vector of all GEM regions
   const std::vector<const GEMRegion*>& regions() const;

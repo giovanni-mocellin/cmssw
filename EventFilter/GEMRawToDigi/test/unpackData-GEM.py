@@ -160,14 +160,14 @@ process.tmtFilter.mpList = cms.untracked.vint32(options.mps)
 # dump raw data
 process.dumpRaw = cms.EDAnalyzer( 
     "DumpFEDRawDataProduct",
-    token = cms.untracked.InputTag("rawDataCollector"),
-    feds = cms.untracked.vint32 ( 1467 ),
+    label = cms.untracked.string("rawDataCollector"),
+    feds = cms.untracked.vint32 ( 1466, 1467, 1468 ),
     dumpPayload = cms.untracked.bool ( options.dumpRaw )
 )
 
 # raw to digi
 process.load('EventFilter.GEMRawToDigi.muonGEMDigis_cfi')
-process.load('EventFilter.GEMRawToDigi.GEMSQLiteCabling_cfi')
+#process.load('EventFilter.GEMRawToDigi.GEMSQLiteCabling_cfi')
 process.muonGEMDigis.InputLabel = cms.InputTag('rawDataCollector')
 process.muonGEMDigis.useDBEMap = True
 
@@ -185,12 +185,19 @@ process.gemRecHits = cms.EDProducer("GEMRecHitProducer",
 )
 
 
+process.reader_elmap = cms.EDAnalyzer( "GEMELMapRcdReader",
+       dumpFileName = cms.untracked.string( "dumpELMap-from-ALCADB.out" )
+)
+
+
+
 # Path and EndPath definitions
 process.path = cms.Path(
     #process.validationEventFilter
     process.dumpRaw
     +process.muonGEMDigis
-    +process.gemRecHits
+    #+process.reader_elmap
+    #+process.gemRecHits
 )
 
 # enable validation event filtering

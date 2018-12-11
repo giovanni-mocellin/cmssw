@@ -1,23 +1,31 @@
 #ifndef CondFormats_GEMObjects_GEMELMap_h
 #define CondFormats_GEMObjects_GEMELMap_h
 
+#ifndef noFileInPath_H
 #include "CondFormats/Serialization/interface/Serializable.h"
+#endif
+
 #include <string>
 #include <vector>
+#include <iostream>
 
 class GEMROmap;
 
 class GEMELMap {
  public:
   GEMELMap();
+  GEMELMap(const GEMELMap *ptr);
   explicit GEMELMap(const std::string & version);
 
   virtual ~GEMELMap();
 
   const std::string & version() const;
+#ifndef noFileInPath
   void convert(GEMROmap & romap);
   void convertDummy(GEMROmap & romap);
+#endif
 
+  void print(std::ostream &out = std::cout, int detailed=0, int checkArrays=0) const;
   struct GEMVFatMap {
     int VFATmapTypeId;
     std::vector<int> vfat_position;
@@ -31,6 +39,9 @@ class GEMELMap {
     std::vector<uint16_t> gebId;
     std::vector<int> sec; 
 
+    unsigned int size() const { return vfat_position.size(); }
+    void printLast(std::ostream &out = std::cout, int printEOL=1) const;
+
     COND_SERIALIZABLE;
   };
   struct GEMStripMap {
@@ -38,6 +49,10 @@ class GEMELMap {
     std::vector<int> vfatCh;
     std::vector<int> vfatStrip;
  
+    unsigned int size() const { return vfatType.size(); }
+    int areIdentical(const GEMELMap::GEMStripMap &mp, int printDiff=0) const;
+    void printLast(std::ostream &out = std::cout, int printEOL=1) const;
+
     COND_SERIALIZABLE;
   };
 
@@ -51,6 +66,7 @@ class GEMELMap {
   
  public:
   // size of ID bits
+  static const int vfatTypeV3_ = 11;     // ID size from VFat
   static const int chipIdBits_ = 12;     // ID size from VFat
   static const int chipIdMask_ = 0xfff;  // chipId mask for 12 bits
   static const int gebIdBits_  = 5;      // ID size from GEB
@@ -60,5 +76,7 @@ class GEMELMap {
   static const int maxVFatGE21_= 6;      // vFat per eta partition in GE21
   static const int maxChan_    = 128;    // channels per vFat
   static const int amcBX_      = 25;     // amc BX to get strip bx
+  static const int maxEtaPartition_ = 8; // etaPartitions in chamber
+
 };
 #endif // GEMELMap_H
