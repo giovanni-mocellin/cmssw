@@ -78,11 +78,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('EventFilter.GEMRawToDigi.gemPacker_cfi')
 process.load('EventFilter.RawDataCollector.rawDataCollector_cfi')
 process.load('EventFilter.GEMRawToDigi.muonGEMDigis_cfi')
-<<<<<<< HEAD
-process.load('SimMuon.GEMCosmicMuon.muonGEMDigi_cff')
-=======
 process.load('SimMuon.GEMDigitizer.muonGEMDigi_cff')
->>>>>>> giovanni-mocellin/QC8Analysis_10_3_0
 process.load('RecoLocalMuon.GEMRecHit.gemLocalReco_cff')
 
 # DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND

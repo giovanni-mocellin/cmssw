@@ -128,26 +128,24 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-process.load('Geometry.GEMGeometry.GeometryGEMCosmicStandDB_cff')
+# DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND
+for i in xrange(len(SuperChType)):
+    column_row = '_c%d_r%d' % ((i/5)+1, i%5+1)
+    if SuperChType[i]=='L' : size = 'L'
+    if SuperChType[i]=='S' : size = 'S'
+    if SuperChType[i]!='0' :
+    	geomFile = 'Validation/GEMCosmicMuonStand/data/gem11'+size+column_row+'.xml'
+    	print(geomFile)
+    if SuperChType[i]!='0' :
+    	process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
+    	print('-> Appended')
 
 # For debug purposes - use what is already in GEM DB
-process.GEMQC8ConfESSource.WriteDummy = cms.untracked.int32(-2) # -1 -- P5 chambers, -2 -- special case
-process.GEMQC8ConfESSource.runNumber = cms.int32( options.runNum )
-process.GEMQC8ConfESSource.printValues = cms.untracked.bool( False )
-process.GEMQC8ConfESSource.OnlyConfDef = cms.untracked.int32( 0 )
-process.myPrefer = cms.ESPrefer('GEMQC8ConfESSource')
-
-# DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND
-#for i in xrange(len(SuperChType)):
-#    column_row = '_c%d_r%d' % ((i/5)+1, i%5+1)
-#    if SuperChType[i]=='L' : size = 'L'
-#    if SuperChType[i]=='S' : size = 'S'
-#    if SuperChType[i]!='0' :
-#    	geomFile = 'Validation/GEMCosmicMuonStand/data/gem11'+size+column_row+'.xml'
-#    	print(geomFile)
-#    if SuperChType[i]!='0' :
-#    	process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
-#    	print('-> Appended')
+#process.GEMQC8ConfESSource.WriteDummy = cms.untracked.int32(-2) # -1 -- P5 chambers, -2 -- special case
+#process.GEMQC8ConfESSource.runNumber = cms.int32( options.runNum )
+#process.GEMQC8ConfESSource.printValues = cms.untracked.bool( False )
+#process.GEMQC8ConfESSource.OnlyConfDef = cms.untracked.int32( 0 )
+#process.myPrefer = cms.ESPrefer('GEMQC8ConfESSource')
 
 # Input source
 if (options.localMode) :
@@ -301,8 +299,8 @@ process.TFileService = cms.Service("TFileService",
 # Path and EndPath definitions
 process.rawTOhits_step = cms.Path(process.dumpRaw+process.muonGEMDigis+process.gemRecHits)
 process.reconstruction_step = cms.Path(process.GEMCosmicMuonForQC8)
-process.validation_step = cms.Path(process.gemcrValidation)
 process.endjob_step = cms.EndPath(process.endOfProcess)
+process.validation_step = cms.Path(process.gemcrValidation)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.rawTOhits_step,

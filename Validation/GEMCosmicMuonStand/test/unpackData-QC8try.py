@@ -2,14 +2,9 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: SingleMuPt100_cfi -s GEN,SIM,DIGI,L1,DIGI2RAW,RAW2DIGI,L1Reco,RECO --conditions auto:run2_mc --magField 38T_PostLS1 --datatier GEN-SIM --geometry GEMCosmicStand --eventcontent FEVTDEBUGHLT --era phase2_muon -n 100 --fileout out_reco.root
-import datetime
-print datetime.datetime.now()
+# with command line options: SingleElectronPt10_cfi.py -s GEN,SIM,DIGI,L1 --pileup=NoPileUp --geometry DB --conditions=auto:startup -n 1 --no_exec
 import FWCore.ParameterSet.Config as cms
-import configureRun_cfi as runConfig
-from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('RECO',eras.phase2_muon)
 
 # options
 import FWCore.ParameterSet.VarParsing as VarParsing
@@ -87,44 +82,33 @@ options.register('runNum',
 
 options.parseArguments()
 
-# The superchambers in the 15 slots
-SuperChType = runConfig.StandConfiguration
 
-print(SuperChType)
+pname="Raw2Digi"
+if (options.process!=""):
+    pname=options.process
+#process = cms.Process(pname)
 
-# Calculation of SuperChSeedingLayers from SuperChType
-SuperChSeedingLayers = []
+#from Configuration.StandardSequences.Eras import eras
+#process = cms.Process(pname, eras.Run2_2017, eras.run2_GEM_2017)
+from Configuration.StandardSequences.Eras import eras
 
-for i in range (0,30):
-	SuperChSeedingLayers.append(0)
+process = cms.Process('RECO',eras.Run2_2017)
+#process = cms.Process('RECO',eras.Run2_2017,eras.run2_GEM_2017)
 
-for j in range (0,3):
-	for i in range (5*j,5*(j+1)):
-		if (SuperChType[i]!='0'):
-			SuperChSeedingLayers[i*2]=1
-			SuperChSeedingLayers[i*2+1]=3
-			break
-	for i in range (5*(j+1)-1,5*j-1,-1):
-		if (SuperChType[i]!='0'):
-			SuperChSeedingLayers[i*2]=4
-			SuperChSeedingLayers[i*2+1]=2
-			break
-			
-print(SuperChSeedingLayers)
-
-# import configurations
 process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.RecoSim_cff')
+#process.load('Configuration.StandardSequences.AlCaRecoStreams_cff')
+
+
+# import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 #process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 #process.load('Configuration.Geometry.GeometryDB_cff')
-process.load('Geometry.GEMGeometry.GeometryGEMCosmicStand_cff')
 process.load('Configuration.Geometry.GeometryExtended2017Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -135,19 +119,12 @@ process.GEMQC8ConfESSource.WriteDummy = cms.untracked.int32(-2) # -1 -- P5 chamb
 process.GEMQC8ConfESSource.runNumber = cms.int32( options.runNum )
 process.GEMQC8ConfESSource.printValues = cms.untracked.bool( False )
 process.GEMQC8ConfESSource.OnlyConfDef = cms.untracked.int32( 0 )
+#process.myPrefer = cms.ESPrefer('DDCompactView','GEMQC8ConfESSource')
 process.myPrefer = cms.ESPrefer('GEMQC8ConfESSource')
 
-# DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND
-#for i in xrange(len(SuperChType)):
-#    column_row = '_c%d_r%d' % ((i/5)+1, i%5+1)
-#    if SuperChType[i]=='L' : size = 'L'
-#    if SuperChType[i]=='S' : size = 'S'
-#    if SuperChType[i]!='0' :
-#    	geomFile = 'Validation/GEMCosmicMuonStand/data/gem11'+size+column_row+'.xml'
-#    	print(geomFile)
-#    if SuperChType[i]!='0' :
-#    	process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
-#    	print('-> Appended')
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32(options.maxEvents)
+)
 
 # Input source
 if (options.localMode) :
@@ -180,18 +157,28 @@ process.options = cms.untracked.PSet(
     SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
 
+
 # Additional output definition
-strOutput = runConfig.OutputFileName
-process.load('RecoMuon.TrackingTools.MuonServiceProxy_cff')
+# TTree output file
+process.load("CommonTools.UtilAlgos.TFileService_cfi")
 
 # enable debug message logging for our modules
+#process.MessageLogger.categories.append('L1TCaloEvents')
+
 if (options.dumpRaw):
     process.MessageLogger.infos.placeholder = cms.untracked.bool(False)
     process.MessageLogger.infos.INFO = cms.untracked.PSet(limit = cms.untracked.int32(0))
 
 if (options.debug):
+#    process.MessageLogger.debugModules = cms.untracked.vstring('L1TRawToDigi:caloStage2Digis', 'MP7BufferDumpToRaw:stage2MPRaw', 'MP7BufferDumpToRaw:stage2DemuxRaw')
     process.MessageLogger.debugModules = cms.untracked.vstring('*')
     process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
+
+
+# Other statements
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2017_realistic', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:startup', '')
 
 # validation event filter
 process.load('EventFilter.L1TRawToDigi.validationEventFilter_cfi')
@@ -238,97 +225,68 @@ process.reader_elmap = cms.EDAnalyzer( "GEMELMapRcdReader",
   dumpFileName = cms.untracked.string( "dumpELMap-from-qc8spec.out" )
   #dumpFileName = cms.untracked.string( "" ) # no dump
 )
-    
-# Reconstruction of muon track
 
-process.MuonServiceProxy.ServiceParameters.Propagators.append('StraightLinePropagator')
-
-process.GEMCosmicMuonForQC8 = cms.EDProducer("GEMCosmicMuonForQC8",
-                                       process.MuonServiceProxy,
-                                       gemRecHitLabel = cms.InputTag("gemRecHits"),
-                                       maxClusterSize = cms.double(runConfig.maxClusterSize),
-                                       minClusterSize = cms.double(runConfig.minClusterSize),
-                                       trackChi2 = cms.double(runConfig.trackChi2),
-                                       trackResX = cms.double(runConfig.trackResX),
-                                       trackResY = cms.double(runConfig.trackResY),
-                                       MulSigmaOnWindow = cms.double(runConfig.MulSigmaOnWindow),
-                                       SuperChamberType = cms.vstring(SuperChType),
-                                       SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
-                                       MuonSmootherParameters = cms.PSet(
-                                           PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
-                                           PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
-                                           RescalingFactor = cms.double(5.0)
-                                           ),
-                                       )
-process.GEMCosmicMuonForQC8.ServiceParameters.GEMLayers = cms.untracked.bool(True)
-process.GEMCosmicMuonForQC8.ServiceParameters.CSCLayers = cms.untracked.bool(False)
-process.GEMCosmicMuonForQC8.ServiceParameters.RPCLayers = cms.bool(False)
-
-fScale = 1.0
-
-process.gemcrValidation = cms.EDProducer('gemcrValidation',
-    process.MuonServiceProxy,
-    verboseSimHit = cms.untracked.int32(1),
-    simInputLabel = cms.InputTag('g4SimHits',"MuonGEMHits"),
-    genVtx = cms.InputTag("generator","unsmeared", "RECO"),
-    recHitsInputLabel = cms.InputTag('gemRecHits'),
-    tracksInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    seedInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    trajInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    chNoInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    seedTypeInputLabel = cms.InputTag('GEMCosmicMuonForQC8','','RECO'),
-    genParticleLabel = cms.InputTag('genParticles','','RECO'),
-    gemDigiLabel = cms.InputTag("muonGEMDigis","","RECO"),
-    nBinGlobalZR = cms.untracked.vdouble(200,200,200,150,180,250),
-    RangeGlobalZR = cms.untracked.vdouble(564,572,786,794,786,802,110,260,170,350,100,350),
-    maxClusterSize = cms.double(runConfig.maxClusterSize),
-    minClusterSize = cms.double(runConfig.minClusterSize),
-    maxResidual = cms.double(runConfig.maxResidual),
-    isMC = cms.bool(True),
-    SuperChamberType = cms.vstring(SuperChType),
-    SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
-    MuonSmootherParameters = cms.PSet(
-                      PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
-                      PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
-                      RescalingFactor = cms.double(5.0)
-                      )
-)
-
-process.TFileService = cms.Service("TFileService",
-    							   fileName = cms.string('temp_'+strOutput)
-								   )
+process.load("DQM.GEM.GEMDQM_cff")
+process.load("DQM.Integration.config.environment_cfi")
+process.dqmEnv.subSystemFolder = "GEM"
+process.dqmEnv.eventInfoFolder = "EventInfo"
+process.dqmSaver.path = ""
+process.dqmSaver.tag = "GEM"
 
 # Path and EndPath definitions
-process.rawTOhits_step = cms.Path(process.dumpRaw+process.muonGEMDigis+process.gemRecHits)
-process.reconstruction_step = cms.Path(process.GEMCosmicMuonForQC8)
-process.validation_step = cms.Path(process.gemcrValidation)
-process.endjob_step = cms.EndPath(process.endOfProcess)
+process.path = cms.Path(
+    #process.validationEventFilter
+    process.dumpRaw
+    +process.muonGEMDigis
+    #+process.reader_elmap
+    #+process.reader_qc8conf
+    +process.gemRecHits
+    +process.GEMDQM
+)
 
-# Schedule definition
-process.schedule = cms.Schedule(process.rawTOhits_step,
-								process.reconstruction_step,
-                                process.validation_step,
-                                process.endjob_step
-                                )
-                                
+process.end_path = cms.EndPath(
+  process.dqmEnv +
+  process.dqmSaver
+)
+
+process.schedule = cms.Schedule(
+  process.path,
+  process.end_path
+)
+
+
 # enable validation event filtering
 if (not options.valEvents):
-    process.rawTOhits_step.remove(process.validationEventFilter)
+    process.path.remove(process.validationEventFilter)
 
 # enable validation event filtering
 if (len(options.mps)==0):
-    process.rawTOhits_step.remove(process.tmtFilter)
+    process.path.remove(process.tmtFilter)
 
 # enable RAW printout
 if (not options.dumpRaw):
-    process.rawTOhits_step.remove(process.dumpRaw)
+    process.path.remove(process.dumpRaw)
 
-process.gemSegments.maxRecHitsInCluster = cms.int32(10)
-process.gemSegments.minHitsPerSegment = cms.uint32(3)
-process.gemSegments.clusterOnlySameBXRecHits = cms.bool(True)
-process.gemSegments.dEtaChainBoxMax = cms.double(1.05)
-process.gemSegments.dPhiChainBoxMax = cms.double(1.12)
-process.gemSegments.dXclusBoxMax = cms.double(10.0)
-process.gemSegments.dYclusBoxMax = cms.double(50.0)
-process.gemSegments.preClustering = cms.bool(False)
-process.gemSegments.preClusteringUseChaining = cms.bool(False)
+# optional EDM file
+if (options.edm):
+    process.output = cms.OutputModule(
+        "PoolOutputModule",
+        outputCommands = cms.untracked.vstring("keep *"),
+        SelectEvents = cms.untracked.PSet(
+            SelectEvents = cms.vstring('path')
+        ),
+        fileName = cms.untracked.string('gem_EDM-qc8spec.root')
+    )
+
+    process.out = cms.EndPath(
+        process.output
+    )
+
+
+# print ESModules
+for name, module in process.es_sources_().iteritems():
+    if 'GEM' in name:
+        print "ESModules> provider:%s '%s'" % ( name, module.type_() )
+for name, module in process.es_producers_().iteritems():
+    if 'GEM' in name:
+        print "ESModules> provider:%s '%s'" % ( name, module.type_() )
