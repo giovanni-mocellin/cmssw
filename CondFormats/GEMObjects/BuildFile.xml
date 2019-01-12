@@ -3,6 +3,7 @@
 <use   name="DataFormats/MuonDetId"/>
 <use   name="FWCore/MessageLogger"/>
 <use   name="FWCore/Utilities"/>
+<use   name="FWCore/ParameterSet"/>
 <use   name="CondFormats/Serialization"/>
 <export>
   <lib   name="1"/>

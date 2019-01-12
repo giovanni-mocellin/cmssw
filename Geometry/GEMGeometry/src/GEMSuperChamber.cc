@@ -2,7 +2,7 @@
 #include "Geometry/GEMGeometry/interface/GEMChamber.h"
 
 GEMSuperChamber::GEMSuperChamber(GEMDetId id, const ReferenceCountingPointer<BoundPlane> & plane) :
-  GeomDet(plane), detId_(id)
+  GeomDet(plane), detId_(id), chambers_(), detIds_()
 {
   setDetId(id);
 }
@@ -13,12 +13,17 @@ GEMDetId GEMSuperChamber::id() const {
   return detId_;
 }
 
+const std::vector<GEMDetId>& GEMSuperChamber::ids() const {
+  return detIds_;
+}
+
 bool GEMSuperChamber::operator==(const GEMSuperChamber& sch) const {
   return this->id()==sch.id();
 }
 
 void GEMSuperChamber::add(const GEMChamber* ch) {
   chambers_.emplace_back(ch);
+  detIds_.emplace_back(ch->id());
 }
 
 std::vector<const GeomDet*> GEMSuperChamber::components() const {

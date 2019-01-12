@@ -38,6 +38,15 @@ const std::vector < std::string >  & GeometryConfiguration::getFileList(void) co
   return files_;
 }
 
+/// Allow addition of a file name
+void GeometryConfiguration::addFile(const std::string &rel_fname)
+{
+  // copy statements from the constructor
+  edm::FileInPath fp(rel_fname);
+  files_.emplace_back(fp.fullPath());
+  emptyStrings_.emplace_back("");
+}
+
 /// Return a list of urls as a vector of strings.
 /**
    The EDM should not allow URLs because of provenance.
