@@ -1,0 +1,6 @@
+<connectionlist>
+<connection name="oracle://INT2R/CMS_GEM_MUON_VIEW">
+  <parameter name="user" value="CMS_GEM_APPUSER_R" />
+  <parameter name="password" value="GEM_Reader_2015" />
+</connection>
+</connectionlist>

@@ -2,6 +2,7 @@
 #define CondFormats_GEMObjects_GEMROmap_h
 #include "DataFormats/MuonDetId/interface/GEMDetId.h"
 #include <map>
+#include <iostream>
 
 class GEMROmap{
  public:
@@ -28,11 +29,11 @@ class GEMROmap{
   struct dCoord{
     int vfatType;
     GEMDetId gemDetId;
-    int iPhi;
+    int locPhi;
     bool operator < (const dCoord& r) const{
       if (vfatType == r.vfatType){
         if (gemDetId == r.gemDetId){
-	  return iPhi < r.iPhi;
+	  return locPhi < r.locPhi;
         }
 	else{
           return gemDetId < r.gemDetId;
@@ -84,6 +85,9 @@ class GEMROmap{
  
   const channelNum& hitPosition(const stripNum& s) const {return stChMap_.at(s);}
   const stripNum& hitPosition(const channelNum& c) const {return chStMap_.at(c);}
+
+  void printElDetMap(std::ostream&) const;
+  void printDetElMap(std::ostream&) const;
 
  private:
   std::map<eCoord,dCoord> roMapED_;
