@@ -16,7 +16,7 @@ options.register("runNum",1,
                  VarParsing.VarParsing.varType.int,
                  "Run number")
                  
-options.register("eventsPerJob",2000,
+options.register("eventsPerJob",10000,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "The number of events (in each file)")
@@ -32,15 +32,35 @@ options.parseArguments()
 SuperChType = ['L','L','L','L','L',\
                'L','L','L','L','L',\
                'L','L','L','L','L']
+               #'S','S','S','S','S']          
+               #'L','L','L','L','L']          
+
+# Calculation of SuperChSeedingLayers from SuperChType
+SuperChSeedingLayers = []
+
+for i in range (0,30):
+	SuperChSeedingLayers.append(0)
+
+for j in range (0,3):
+	for i in range (5*j,5*(j+1)):
+		if (SuperChType[i]!='0'):
+			SuperChSeedingLayers[i*2]=1
+			SuperChSeedingLayers[i*2+1]=3
+			break
+	for i in range (5*(j+1)-1,5*j-1,-1):
+		if (SuperChType[i]!='0'):
+			SuperChSeedingLayers[i*2]=4
+			SuperChSeedingLayers[i*2+1]=2
+			break
 			
 # Alignment of chambers
-trueDx = [0.4,-0.1,-0.2,-0.5,0.2,\
-          -0.4,0.1,0.3,-0.3,0.2,\
-          0.1,-0.1,0.1,0.3,-0.4] # cm
+trueDx = [0,0,0,0,0,\
+          0,0,0,0,0,\
+          0,0,0,0,0] # cm
 
-trueRz = [-0.8,-0.2,-0.3,0.3,-0.3,\
-          -0.1,-0.5,0.1,0.2,-0.2,\
-          0.5,0.7,-0.1,-0.3,0.6] # degrees
+trueRz = [0,0,0,0,0,\
+          0,0,0,0,0,\
+          0,0,0,0,0] # degree
 
 # First step
 shiftX = [0,0,0,0,0,\
@@ -50,6 +70,7 @@ shiftX = [0,0,0,0,0,\
 rotationZ = [0,0,0,0,0,\
              0,0,0,0,0,\
              0,0,0,0,0]
+
 
 from Configuration.StandardSequences.Eras import eras
 
@@ -75,7 +96,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('EventFilter.GEMRawToDigi.gemPacker_cfi')
 process.load('EventFilter.RawDataCollector.rawDataCollector_cfi')
 process.load('EventFilter.GEMRawToDigi.muonGEMDigis_cfi')
-process.load('SimMuon.GEMDigitizer.muonGEMDigi_cff')
+process.load('SimMuon.GEMCosmicMuon.muonGEMDigi_cff')
 process.load('RecoLocalMuon.GEMRecHit.gemLocalReco_cff')
 
 # DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND
@@ -85,6 +106,7 @@ for i in range(len(SuperChType)):
     if SuperChType[i]=='S' : size = 'S'
     if SuperChType[i]!='0' : geomFile = 'Geometry/MuonCommonData/data/GEMQC8/gem11'+size+column_row+'.xml'
     if SuperChType[i]!='0' : process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
+    #if i!='13' : process.XMLIdealGeometryESSource.geomXMLFiles.append(geomFile)
 
 # Config importation & settings
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.eventsPerJob))
@@ -92,6 +114,7 @@ import configureRun_cfi as runConfig
 nIdxJob = int(options.idxJob)
 strOutput = "out_reco_MC.root" if nIdxJob >= 0 else runConfig.OutputFileName
 if nIdxJob < 0: nIdxJob = 0
+strOutput = "out_reco_MC_"+str(options.runNum)+"_"+str(nIdxJob)+".root"
 
 # Input source
 process.source = cms.Source("EmptySource", 
@@ -193,6 +216,7 @@ process.AlignmentTrackRecoQC8 = cms.EDProducer("AlignmentTrackRecoQC8",
                                        trackResY = cms.double(runConfig.trackResY),
                                        MulSigmaOnWindow = cms.double(runConfig.MulSigmaOnWindow),
                                        SuperChamberType = cms.vstring(SuperChType),
+                                       SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
                                        MuonSmootherParameters = cms.PSet(
                                            PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
                                            PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
@@ -237,12 +261,14 @@ process.AlignmentValidationQC8 = cms.EDProducer('AlignmentValidationQC8',
     maxClusterSize = cms.double(runConfig.maxClusterSize),
     minClusterSize = cms.double(runConfig.minClusterSize),
     maxResidual = cms.double(runConfig.maxResidual),
+    makeTrack = cms.bool(runConfig.makeTrack),
     isMC = cms.bool(True),
     trackChi2 = cms.double(runConfig.trackChi2),
     trackResX = cms.double(runConfig.trackResX),
     trackResY = cms.double(runConfig.trackResY),
     MulSigmaOnWindow = cms.double(runConfig.MulSigmaOnWindow),
     SuperChamberType = cms.vstring(SuperChType),
+    SuperChamberSeedingLayers = cms.vdouble(SuperChSeedingLayers),
     MuonSmootherParameters = cms.PSet(
                       PropagatorAlong = cms.string('SteppingHelixPropagatorAny'),
                       PropagatorOpposite = cms.string('SteppingHelixPropagatorAny'),
@@ -281,8 +307,8 @@ process.digitisation_step.remove(process.simMuonDTDigis)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.generation_step,
-								process.genfiltersummary_step,
-								process.simulation_step,
+				process.genfiltersummary_step,
+				process.simulation_step,
                                 process.digitisation_step,
                                 process.reconstruction_step,
                                 process.validation_step,
@@ -310,7 +336,8 @@ process.gemSegments.preClusteringUseChaining = cms.bool(False)
 
 process.simMuonGEMDigis.averageEfficiency = cms.double(0.98)
 process.simMuonGEMDigis.averageNoiseRate = cms.double(0.0)
-process.simMuonGEMDigis.simulateIntrinsicNoise = cms.bool(False)
+process.simMuonGEMDigis.simulateIntrinsicNoise = cms.bool(True)
 process.simMuonGEMDigis.doBkgNoise = cms.bool(False)
 process.simMuonGEMDigis.doNoiseCLS = cms.bool(False)
 process.simMuonGEMDigis.simulateElectronBkg = cms.bool(False)
+
