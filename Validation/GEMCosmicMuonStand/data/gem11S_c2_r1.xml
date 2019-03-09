@@ -3,7 +3,7 @@
     
     <ConstantsSection label="gembox.xml" eval="true">
         <Constant name="layers"       value="5"/>
-        <Constant name="dxSC"         value="56.0*cm"/>
+        <Constant name="dxSC"         value="0.0*cm"/>
         <Constant name="dySC"         value="30.0*cm"/>
         <Constant name="dzSC"         value="23.0*cm"/>
         <Constant name="separationSC" value="3.47*cm"/>
@@ -21,13 +21,13 @@
     
     <PosPartSection label="gembox.xml">
         
-        <PosPart copyNumber="1">
+        <PosPart copyNumber="11">
             <rParent name="gembox:GEMBox"/>
             <rChild name="gem11:GEMBox11S"/>
             <rRotation name="RotationSrz" />
             <Translation x="[dxSC]+[dx]" y="[dySC]" z="[dzSC]" />
         </PosPart>
-        <PosPart copyNumber="2">
+        <PosPart copyNumber="12">
             <rParent name="gembox:GEMBox"/>
             <rChild name="gem11:GEMBox11S"/>
             <rRotation name="RotationSrz" />
