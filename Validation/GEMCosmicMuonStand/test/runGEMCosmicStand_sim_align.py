@@ -32,8 +32,6 @@ options.parseArguments()
 SuperChType = ['L','L','L','L','L',\
                'L','L','L','L','L',\
                'L','L','L','L','L']
-               #'S','S','S','S','S']          
-               #'L','L','L','L','L']          
 
 # Calculation of SuperChSeedingLayers from SuperChType
 SuperChSeedingLayers = []
@@ -96,7 +94,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('EventFilter.GEMRawToDigi.gemPacker_cfi')
 process.load('EventFilter.RawDataCollector.rawDataCollector_cfi')
 process.load('EventFilter.GEMRawToDigi.muonGEMDigis_cfi')
-process.load('SimMuon.GEMCosmicMuon.muonGEMDigi_cff')
+process.load('SimMuon.GEMDigitizer.muonGEMDigi_cff')
 process.load('RecoLocalMuon.GEMRecHit.gemLocalReco_cff')
 
 # DEFINITION OF THE SUPERCHAMBERS INSIDE THE STAND

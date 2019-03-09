@@ -223,7 +223,7 @@ void gemcrValidation::analyze(const edm::Event& e, const edm::EventSetup& iSetup
       const GEMDigiCollection::Range& range = (*gemdgIt).second;
       for ( auto digi = range.first; digi != range.second; ++digi )
       {
-        digiStrips->Fill(digi->strip(),gemId.roll(),findIndex(gemId.chamberId()));
+        digiStrips->Fill(digi->strip(),gemId.roll(),(gemId.chamberId().chamber()-1));
       }
     }
   }
