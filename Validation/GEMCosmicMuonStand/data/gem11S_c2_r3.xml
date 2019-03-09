@@ -4,7 +4,7 @@
     <ConstantsSection label="gembox.xml" eval="true">
         <Constant name="layers"       value="5"/>
         <Constant name="dxSC"         value="0.0*cm"/>
-        <Constant name="dySC"         value="22.0*cm"/>
+        <Constant name="dySC"         value="30.0*cm"/>
         <Constant name="dzSC"         value="69.0*cm"/>
         <Constant name="separationSC" value="3.47*cm"/>
         <Constant name="dyBox"        value="150*cm"/>

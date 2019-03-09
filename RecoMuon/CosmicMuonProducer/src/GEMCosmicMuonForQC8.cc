@@ -169,7 +169,7 @@ void GEMCosmicMuonForQC8::produce(edm::Event& ev, const edm::EventSetup& setup)
       for (auto etaPart : ch.etaPartitions())
       {
         GEMDetId etaPartID = etaPart->id();
-        GEMRecHitCollection::range range = gemRecHits->get(etaPartID);   
+        GEMRecHitCollection::range range = gemRecHits->get(etaPartID);
 
         for (GEMRecHitCollection::const_iterator rechit = range.first; rechit!=range.second; ++rechit)
         {
