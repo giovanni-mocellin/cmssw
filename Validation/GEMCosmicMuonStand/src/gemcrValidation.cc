@@ -129,16 +129,9 @@ void gemcrValidation::bookHistograms(DQMStore::IBooker & ibooker, edm::Run const
   printf("End of gemcrValidation::bookHistograms() at %s\n", asctime(localtime(&rawTime)));
 }
 
-int gemcrValidation::findIndex(GEMDetId id_) {
-  int index=-1;
-  for ( int c=0 ; c<n_ch ; c++ )
-  {
-    if ( gemChambers[c].id().chamber() == id_.chamber() && gemChambers[c].id().layer() == id_.layer() )
-    {
-      index = c; // index from 0 to 29
-    }
-  }
-  return index;
+int gemcrValidation::findIndex(GEMDetId id_)
+{
+  return id_.chamberId().chamber()+id_.chamberId().layer()-2;
 }
 
 int gemcrValidation::findVFAT(float x, float a, float b) {
@@ -223,7 +216,7 @@ void gemcrValidation::analyze(const edm::Event& e, const edm::EventSetup& iSetup
       const GEMDigiCollection::Range& range = (*gemdgIt).second;
       for ( auto digi = range.first; digi != range.second; ++digi )
       {
-        digiStrips->Fill(digi->strip(),gemId.roll(),(gemId.chamberId().chamber()-1));
+        digiStrips->Fill(digi->strip(),gemId.roll(),(gemId.chamberId().chamber()+gemId.chamberId().layer()-2));
       }
     }
   }
