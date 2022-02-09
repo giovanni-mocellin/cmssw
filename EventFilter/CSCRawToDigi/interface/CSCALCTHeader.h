@@ -254,6 +254,8 @@ public:
   }
 
   void add(const std::vector<CSCALCTDigi> &digis);
+  /// Add Run3 ALCT HMT shower bits
+  void addShower(const std::vector<CSCShowerDigi> &digis);
 
   boost::dynamic_bitset<> pack();
 
