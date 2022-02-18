@@ -75,7 +75,7 @@ options.register('unpackerLabel',
                  VarParsing.VarParsing.varType.string,
                  "Label for the GEM unpacker RAW input collection")
 options.register('useB904Data',
-                 False,
+                 True,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.bool)
 
@@ -141,10 +141,16 @@ if (options.debug):
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '112X_dataRun3_Prompt_v5', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
 ## for the time being the mapping does not work with the data label. Use MC instead
 if options.useB904Data:
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+    process.GlobalTag.toGet = cms.VPSet(
+            cms.PSet(record = cms.string("GEMeMapRcd"),
+                     tag = cms.string("GEMeMapB904Data"),
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_Coffin_short_ch2.db")
+                    )
+    )
+    process.muonGEMDigis.useDBEMap = True
 
 # dump raw data
 process.dumpRaw = cms.EDAnalyzer(
