@@ -119,6 +119,13 @@ if useB904Data:
       if options.unpackGEM:
             process.muonCSCDigis.useGEMs = True
       ## GEM
+      process.GlobalTag.toGet = cms.VPSet(
+            cms.PSet(record = cms.string("GEMeMapRcd"),
+                     tag = cms.string("GEMeMapB904Data"),
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_Coffin_short_ch2.db")
+                    )
+      )
+      process.muonGEMDigis.useDBEMap = True
       process.muonGEMDigis.InputLabel = "rawDataCollectorGEM"
 
 ## l1 emulator
