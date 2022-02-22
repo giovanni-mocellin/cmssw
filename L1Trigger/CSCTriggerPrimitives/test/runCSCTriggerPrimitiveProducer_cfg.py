@@ -162,7 +162,7 @@ if options.dqmGEM:
             process.l1tdeGEMTPG.data = "emtfStage2Digis"
       ## GEM pad clusters from the CSC TPG
       else:
-            process.l1tdeGEMTPG.data = "muonCSCDigis"
+            process.l1tdeGEMTPG.data = "muonCSCDigis:MuonGEMPadDigiCluster"
       ## GEM pad clusters from the GEM TPG
       process.l1tdeGEMTPG.emul = "simMuonGEMPadDigiClusters"
 
