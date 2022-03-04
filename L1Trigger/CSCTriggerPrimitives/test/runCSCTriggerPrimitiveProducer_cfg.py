@@ -32,6 +32,10 @@ options.register("useB904ME21", False, VarParsing.multiplicity.singleton, VarPar
                  "Set to True when using B904 ME2/1 data (also works for ME3/1 and ME4/1).")
 options.register("useB904ME234s2", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using B904 ME1/1 data (also works for MEX/2 and ME1/3).")
+options.register('useB904GE11Long',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+                 "Set to True when using data from GE1/1 Long super chamber in B904.")
+options.register('useB904GE11Short',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+                 "Set to True when using data from GE1/1 Short super chamber in B904.")
 options.register("run3", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using Run-3 data.")
 options.register("runCCLUTOTMB", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
@@ -118,7 +122,22 @@ if useB904Data:
       process.muonCSCDigis.InputObjects = "rawDataCollectorCSC"
       if options.unpackGEM:
             process.muonCSCDigis.useGEMs = True
-      ## GEM
+            ## GEM mapping for b904 GEM-CSC integration stand
+      if options.useB904GE11Long:
+          process.GlobalTag.toGet = cms.VPSet(
+                  cms.PSet(record = cms.string("GEMeMapRcd"),
+                           tag = cms.string("GEMeMapB904Data"),
+                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Even_Long.db")
+                          )
+          )
+      if options.useB904GE11Short:
+          process.GlobalTag.toGet = cms.VPSet(
+                  cms.PSet(record = cms.string("GEMeMapRcd"),
+                           tag = cms.string("GEMeMapB904Data"),
+                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Odd_Short.db")
+                          )
+          )
+      process.muonGEMDigis.useDBEMap = True
       process.muonGEMDigis.InputLabel = "rawDataCollectorGEM"
 
 ## l1 emulator
@@ -155,7 +174,7 @@ if options.dqmGEM:
             process.l1tdeGEMTPG.data = "emtfStage2Digis"
       ## GEM pad clusters from the CSC TPG
       else:
-            process.l1tdeGEMTPG.data = "muonCSCDigis"
+            process.l1tdeGEMTPG.data = "muonCSCDigis:MuonGEMPadDigiCluster"
       ## GEM pad clusters from the GEM TPG
       process.l1tdeGEMTPG.emul = "simMuonGEMPadDigiClusters"
 

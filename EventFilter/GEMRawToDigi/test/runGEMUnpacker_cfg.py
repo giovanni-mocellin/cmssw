@@ -74,10 +74,16 @@ options.register('unpackerLabel',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Label for the GEM unpacker RAW input collection")
-options.register('useB904Data',
+options.register('useB904GE11Long',
                  False,
                  VarParsing.VarParsing.multiplicity.singleton,
-                 VarParsing.VarParsing.varType.bool)
+                 VarParsing.VarParsing.varType.bool,
+                 "Set to True when using data from GE1/1 Long super chamber in B904.")
+options.register('useB904GE11Short',
+                 False,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.bool,
+                 "Set to True when using data from GE1/1 Short super chamber in B904.")
 
 options.parseArguments()
 
@@ -141,10 +147,26 @@ if (options.debug):
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '112X_dataRun3_Prompt_v5', '')
-## for the time being the mapping does not work with the data label. Use MC instead
-if options.useB904Data:
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+
+# Mapping for b904 GEM-CSC integration stand
+if options.useB904GE11Long:
+    process.GlobalTag.toGet = cms.VPSet(
+            cms.PSet(record = cms.string("GEMeMapRcd"),
+                     tag = cms.string("GEMeMapB904Data"),
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Even_Long.db")
+                    )
+    )
+    process.muonGEMDigis.useDBEMap = True
+
+if options.useB904GE11Short:
+    process.GlobalTag.toGet = cms.VPSet(
+            cms.PSet(record = cms.string("GEMeMapRcd"),
+                     tag = cms.string("GEMeMapB904Data"),
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Odd_Short.db")
+                    )
+    )
+    process.muonGEMDigis.useDBEMap = True
 
 # dump raw data
 process.dumpRaw = cms.EDAnalyzer(
