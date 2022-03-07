@@ -130,6 +130,7 @@ if useB904Data:
                            connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Even_Long.db")
                           )
           )
+          process.muonCSCDigis.B904GE11Long = True
       if options.useB904GE11Short:
           process.GlobalTag.toGet = cms.VPSet(
                   cms.PSet(record = cms.string("GEMeMapRcd"),
@@ -137,6 +138,7 @@ if useB904Data:
                            connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Odd_Short.db")
                           )
           )
+          process.muonCSCDigis.B904GE11Short = True
       process.muonGEMDigis.useDBEMap = True
       process.muonGEMDigis.InputLabel = "rawDataCollectorGEM"
 

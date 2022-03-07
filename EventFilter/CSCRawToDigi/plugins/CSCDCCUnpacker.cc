@@ -102,7 +102,7 @@ private:
   unsigned int errorMask, examinerMask;
   bool instantiateDQM;
 
-  bool disableMappingCheck, b904Setup;
+  bool disableMappingCheck, b904Setup, b904GE11Long, b904GE11Short;
 
   CSCMonitorInterface* monitor;
 
@@ -140,6 +140,8 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   disableMappingCheck = pset.getUntrackedParameter<bool>("DisableMappingCheck", false);
   // Make aware the unpacker that B904 test setup is used (disable mapping inconsistency check)
   b904Setup = pset.getUntrackedParameter<bool>("B904Setup", false);
+  b904GE11Long = pset.getUntrackedParameter<bool>("B904GE11Long", false);
+  b904GE11Short = pset.getUntrackedParameter<bool>("B904GE11Short", false);
 
   /// Visualization of raw data
   visualFEDInspect = pset.getUntrackedParameter<bool>("VisualFEDInspect", false);
@@ -223,9 +225,13 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.addUntracked<bool>("VisualFEDShort", false)->setComment("# Visualization of raw data in corrupted events");
   desc.addUntracked<bool>("FormatedEventDump", false);
   desc.addUntracked<bool>("SuppressZeroLCT", true);
-  desc.addUntracked<bool>("DisableMappingCheck", false)
-      ->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
-  desc.addUntracked<bool>("B904Setup", false)->setComment("# Make the unpacker aware of B904 test setup configuration");
+  desc.addUntracked<bool>("DisableMappingCheck", false)->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
+  desc.addUntracked<bool>("B904Setup", false)
+      ->setComment("# Make the unpacker aware of B904 test setup configuration");
+  desc.addUntracked<bool>("B904GE11Long", false)
+      ->setComment("# Set even slot number for ME1/1 chamber when GE1/1 long type used in B904 test setup");
+  desc.addUntracked<bool>("B904GE11Short", false)
+      ->setComment("# Set odd slot number for ME1/1 chamber when GE1/1 short type used in B904 test setup");
   descriptions.add("muonCSCDCCUnpacker", desc);
   descriptions.setComment(" This is the generic cfi file for CSC unpacking");
 }
@@ -458,6 +464,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
             ///first process chamber-wide digis such as LCT
             int vmecrate = cscData[iCSC].dmbHeader()->crateID();
             int dmb = cscData[iCSC].dmbHeader()->dmbID();
+
+            if (b904GE11Long) {vmecrate = 1; dmb = 3;} // Set manually the slot number for an even chamber (ME+1/1/02)
+            if (b904GE11Short) {vmecrate = 1; dmb = 2;} // Set manually the slot number for an odd chamber (ME+1/1/01)
 
             int icfeb = 0;   /// default value for all digis not related to cfebs
             int ilayer = 0;  /// layer=0 flags entire chamber
