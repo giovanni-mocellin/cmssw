@@ -16,10 +16,10 @@ CSCGEMMatcher::CSCGEMMatcher(
   maxDeltaBXALCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXALCTGEM");
   maxDeltaBXCLCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXCLCTGEM");
 
-  matchWithHS_ = tmbParams.getParameter<bool>("matchWithHS");
-
   maxDeltaHsEven_ = tmbParams.getParameter<unsigned>("maxDeltaHsEven");
   maxDeltaHsOdd_ = tmbParams.getParameter<unsigned>("maxDeltaHsOdd");
+
+  matchCLCTpropagation_ = tmbParams.getParameter<unsigned>("matchCLCTpropagation");
 
   if (station_ == 1) {
     maxDeltaHsEvenME1a_ = tmbParams.getParameter<unsigned>("maxDeltaHsEvenME1a");
@@ -35,48 +35,50 @@ void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME11ILT* conf) { l
 void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME21ILT* conf) { lookupTableME21ILT_ = conf; }
 
 unsigned CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const {
-  // difference in 1/8-strip number
-  const unsigned diff = std::abs(int(clct.getKeyStrip(8)) - int(cluster.getKeyStrip(8)));
+  const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
-  unsigned slope = 0;
+  unsigned eighthStripDiff;
+  eighthStripDiff = isME1a ? std::abs(clct.getKeyStrip(8) - cluster.getKeyStripME1a(8))
+                           : std::abs(clct.getKeyStrip(8) - cluster.getKeyStrip(8));
 
-  // need LUT to convert differences in 1/8-strips between GEM and CSC to slope
+  unsigned slope = -1;
+
   if (station_ == 2) {
     if (isEven_) {
       if (cluster.id().layer() == 1)
-        slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_even(diff);
+        slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_even(eighthStripDiff);
       else
-        slope = lookupTableME21ILT_->es_diff_slope_L2_ME21_even(diff);
+        slope = lookupTableME21ILT_->es_diff_slope_L2_ME21_even(eighthStripDiff);
     } else {
       if (cluster.id().layer() == 1)
-        slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_odd(diff);
+        slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_odd(eighthStripDiff);
       else
-        slope = lookupTableME21ILT_->es_diff_slope_L2_ME21_odd(diff);
+        slope = lookupTableME21ILT_->es_diff_slope_L2_ME21_odd(eighthStripDiff);
     }
   } else if (station_ == 1) {
-    if (clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B) {  //is in ME1a
+    if (isME1a) {  //is in ME1a
       if (isEven_) {
         if (cluster.id().layer() == 1)
-          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1a_even(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1a_even(eighthStripDiff);
         else
-          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1a_even(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1a_even(eighthStripDiff);
       } else {
         if (cluster.id().layer() == 1)
-          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1a_odd(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1a_odd(eighthStripDiff);
         else
-          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1a_odd(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1a_odd(eighthStripDiff);
       }
     } else {
       if (isEven_) {
         if (cluster.id().layer() == 1)
-          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1b_even(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1b_even(eighthStripDiff);
         else
-          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1b_even(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1b_even(eighthStripDiff);
       } else {
         if (cluster.id().layer() == 1)
-          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1b_odd(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L1_ME1b_odd(eighthStripDiff);
         else
-          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1b_odd(diff);
+          slope = lookupTableME11ILT_->es_diff_slope_L2_ME1b_odd(eighthStripDiff);
       }
     }
   }
@@ -163,95 +165,50 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
 
   // select clusters matched by 1/2-strip or 1/8-strip
   for (const auto& cl : clusters) {
-    const bool isMatched(matchWithHS_ ? matchedClusterLocHS(clct, cl) : matchedClusterLocES(clct, cl));
-    if (isMatched) {
+    if (matchedClusterLocES(clct, cl)) {
       output.push_back(cl);
     }
   }
 }
 
-// match by 1/2-strip
-bool CSCGEMMatcher::matchedClusterLocHS(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const {
-  const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
-
-  unsigned halfStripDiff = std::abs(int(clct.getKeyStrip(2)) - int(cluster.getKeyStrip(2)));
-  if (isME1a) {
-    halfStripDiff = std::abs(int(clct.getKeyStrip(2)) - int(cluster.getKeyStripME1a(2)));
-  }
-
-  // 98% acceptance cuts
-  unsigned halfStripCut;
-  if (isEven_) {
-    if (isME1a)
-      halfStripCut = maxDeltaHsEvenME1a_;
-    else
-      halfStripCut = maxDeltaHsEven_;
-  } else {
-    if (isME1a)
-      halfStripCut = maxDeltaHsOddME1a_;
-    else
-      halfStripCut = maxDeltaHsOdd_;
-  }
-  // 10 degree chamber is ~0.18 radian wide
-  // 98% acceptance for clusters in odd/even chambers for muons with 5 GeV
-  // {5, 0.02123785, 0.00928431}
-  // This corresponds to 0.12 and 0.052 fractions of the chamber
-  // or 16 and 7 half-strips
-
-  // 20 degree chamber is ~0.35 radian wide
-  // 98% acceptance for clusters in odd/even chambers for muons with 5 GeV
-  // {5, 0.01095490, 0.00631625},
-  // This corresponds to 0.031 and 0.018 fractions of the chamber
-  // or 5 and 3 half-strips
-
-  return halfStripDiff <= halfStripCut;
-}
-
 // match by 1/8-strip
 bool CSCGEMMatcher::matchedClusterLocES(const CSCCLCTDigi& clct, const GEMInternalCluster& cl) const {
-  // key 1/8-strip
-  int key_es = -1;
+  const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
-  //modification of DeltaStrip by CLCT slope
-  int SlopeShift = 0;
-  uint16_t baseSlope = 0;
-  if (mitigateSlopeByCosi_)
-    baseSlope = mitigatedSlopeByConsistency(clct);
-  else
-    baseSlope = clct.getSlope();
-  int clctSlope = pow(-1, clct.getBend()) * baseSlope;
+  int cl_es = isME1a ? cl.getKeyStripME1a(8) : cl.getKeyStrip(8);
 
-  // for coincidences or single clusters in L1
-  if (cl.isCoincidence() or cl.id().layer() == 1) {
-    key_es = cl.layer1_middle_es();
-    if (station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B)
-      key_es = cl.layer1_middle_es_me1a();
+  unsigned eighthStripDiff = std::abs(clct.getKeyStrip(8) - cl_es);
 
-    //set SlopeShift for L1 or Copad case
-    SlopeShift =
-        CSCGEMSlopeCorrector(true, clctSlope);  // fixed to facing detectors, must be determined at motherboard level
+  unsigned eighthStripCut;
+  if (isEven_) {
+    eighthStripCut = 4 * (isME1a ? maxDeltaHsEvenME1a_ : maxDeltaHsEven_); // Cut in 1/8 = 4 * cut in 1/2
+  } else {
+    eighthStripCut = 4 * (isME1a ? maxDeltaHsOddME1a_ : maxDeltaHsOdd_); // Cut in 1/8 = 4 * cut in 1/2
   }
 
-  // for single clusters in L2
-  else if (cl.id().layer() == 2) {
-    key_es = cl.layer2_middle_es();
-    if (station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B)
-      key_es = cl.layer2_middle_es_me1a();
+  bool match = eighthStripDiff <= eighthStripCut;
 
-    //set SlopeShift for L2 case
-    SlopeShift =
-        CSCGEMSlopeCorrector(false, clctSlope);  // fixed to facing detectors, must be determined at motherboard level
+  if (matchCLCTpropagation_) { //modification of DeltaStrip by CLCT slope
+    int SlopeShift = 0;
+    uint16_t baseSlope = -1;
+    baseSlope =  mitigateSlopeByCosi_ ? mitigatedSlopeByConsistency(clct) : clct.getSlope();
 
+    int clctSlope = pow(-1, clct.getBend()) * baseSlope;
+
+    if (cl.isCoincidence() or cl.id().layer() == 1) { //set SlopeShift for L1 or Copad case
+      SlopeShift = CSCGEMSlopeCorrector(true, clctSlope);
+    } else if (cl.id().layer() == 2) { // set SlopeShift for L2 case
+      SlopeShift = CSCGEMSlopeCorrector(false, clctSlope);
+    } else {
+      edm::LogWarning("CSCGEMMatcher") << "cluster.id().layer =" << cl.id().layer() << " out of acceptable range 1-2!";
+    }
+
+    eighthStripCut = int(eighthStripCut / 2.); // This is totally arbitrary... FIX IT ONCE BETTER KNOWN!
+
+    match = std::abs(clct.getKeyStrip(8) - cl_es + SlopeShift) <= eighthStripCut;
   }
-
-  else
-    edm::LogWarning("CSCGEMMatcher") << "cluster.id().layer =" << cl.id().layer() << " out of acceptable range 1-2!";
-
-  // matching by 1/8-strip
-  // determine matching window by chamber, assuming facing chambers only are processed
-  int window = chamber_ % 2 == 0 ? 20 : 40;
-
-  return std::abs(clct.getKeyStrip(8) - key_es + SlopeShift) < window;
+  
+  return match;
 }
 
 void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,

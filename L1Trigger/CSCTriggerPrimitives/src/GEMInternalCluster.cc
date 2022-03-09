@@ -35,22 +35,6 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id,
   layer2_min_wg_ = -1;
   layer2_max_wg_ = -1;
 
-  layer1_first_hs_ = -1;
-  layer2_first_hs_ = -1;
-  layer1_last_hs_ = -1;
-  layer2_last_hs_ = -1;
-
-  layer1_first_hs_me1a_ = -1;
-  layer2_first_hs_me1a_ = -1;
-  layer1_last_hs_me1a_ = -1;
-  layer2_last_hs_me1a_ = -1;
-
-  layer1_middle_hs_ = -1;
-  layer2_middle_hs_ = -1;
-
-  layer1_middle_hs_me1a_ = -1;
-  layer2_middle_hs_me1a_ = -1;
-
   layer1_first_es_ = -1;
   layer2_first_es_ = -1;
   layer1_last_es_ = -1;
@@ -77,22 +61,6 @@ GEMInternalCluster::GEMInternalCluster() {
   layer1_max_wg_ = -1;
   layer2_min_wg_ = -1;
   layer2_max_wg_ = -1;
-
-  layer1_first_hs_ = -1;
-  layer2_first_hs_ = -1;
-  layer1_last_hs_ = -1;
-  layer2_last_hs_ = -1;
-
-  layer1_first_hs_me1a_ = -1;
-  layer2_first_hs_me1a_ = -1;
-  layer1_last_hs_me1a_ = -1;
-  layer2_last_hs_me1a_ = -1;
-
-  layer1_middle_hs_ = -1;
-  layer2_middle_hs_ = -1;
-
-  layer1_middle_hs_me1a_ = -1;
-  layer2_middle_hs_me1a_ = -1;
 
   layer1_first_es_ = -1;
   layer2_first_es_ = -1;
@@ -142,41 +110,35 @@ int GEMInternalCluster::max_wg() const {
 }
 
 uint16_t GEMInternalCluster::getKeyStrip(int n) const {
-  // case for half-strips
-  if (n == 2) {
-    if (id_.layer() == 1) {
-      return (layer1_first_hs_ + layer1_last_hs_) / 2.;
-    } else {
-      return (layer2_first_hs_ + layer2_last_hs_) / 2.;
-    }
-  }
-
-  // case for 1/8-strips
-  else {
+  if (n == 8) {
     if (id_.layer() == 1) {
       return (layer1_first_es_ + layer1_last_es_) / 2.;
     } else {
       return (layer2_first_es_ + layer2_last_es_) / 2.;
     }
   }
+  else { // Half Strip units
+    if (id_.layer() == 1) {
+      return (layer1_first_es_ + layer1_last_es_) / 8.;
+    } else {
+      return (layer2_first_es_ + layer2_last_es_) / 8.;
+    }
+  }
 }
 
 uint16_t GEMInternalCluster::getKeyStripME1a(int n) const {
-  // case for half-strips
-  if (n == 2) {
-    if (id_.layer() == 1) {
-      return (layer1_first_hs_me1a_ + layer1_last_hs_me1a_) / 2.;
-    } else {
-      return (layer2_first_hs_me1a_ + layer2_last_hs_me1a_) / 2.;
-    }
-  }
-
-  // case for 1/8-strips
-  else {
+  if (n == 8) {
     if (id_.layer() == 1) {
       return (layer1_first_es_me1a_ + layer1_last_es_me1a_) / 2.;
     } else {
       return (layer2_first_es_me1a_ + layer2_last_es_me1a_) / 2.;
+    }
+  }
+  else { // Half Strip units
+    if (id_.layer() == 1) {
+      return (layer1_first_es_me1a_ + layer1_last_es_me1a_) / 8.;
+    } else {
+      return (layer2_first_es_me1a_ + layer2_last_es_me1a_) / 8.;
     }
   }
 }
