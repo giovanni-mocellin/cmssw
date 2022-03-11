@@ -19,7 +19,7 @@ CSCGEMMatcher::CSCGEMMatcher(
   maxDeltaHsEven_ = tmbParams.getParameter<unsigned>("maxDeltaHsEven");
   maxDeltaHsOdd_ = tmbParams.getParameter<unsigned>("maxDeltaHsOdd");
 
-  matchCLCTpropagation_ = tmbParams.getParameter<unsigned>("matchCLCTpropagation");
+  matchCLCTpropagation_ = tmbParams.getParameter<bool>("matchCLCTpropagation");
 
   if (station_ == 1) {
     maxDeltaHsEvenME1a_ = tmbParams.getParameter<unsigned>("maxDeltaHsEvenME1a");
@@ -207,7 +207,7 @@ bool CSCGEMMatcher::matchedClusterLocES(const CSCCLCTDigi& clct, const GEMIntern
 
     match = std::abs(clct.getKeyStrip(8) - cl_es + SlopeShift) <= eighthStripCut;
   }
-  
+
   return match;
 }
 
