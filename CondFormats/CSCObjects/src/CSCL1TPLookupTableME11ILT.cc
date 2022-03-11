@@ -44,36 +44,20 @@ void CSCL1TPLookupTableME11ILT::set_GEM_pad_CSC_es_ME1b_odd(t_lut lut) { GEM_pad
 
 void CSCL1TPLookupTableME11ILT::set_GEM_pad_CSC_es_ME1a_odd(t_lut lut) { GEM_pad_CSC_es_ME1a_odd_ = std::move(lut); }
 
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L1_CSC_min_wg_ME11_even(t_lut lut) {
-  GEM_roll_L1_CSC_min_wg_ME11_even_ = std::move(lut);
+void CSCL1TPLookupTableME11ILT::set_GEM_roll_CSC_min_wg_ME11_even(t_lut lut) {
+  GEM_roll_CSC_min_wg_ME11_even_ = std::move(lut);
 }
 
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L1_CSC_max_wg_ME11_even(t_lut lut) {
-  GEM_roll_L1_CSC_max_wg_ME11_even_ = std::move(lut);
+void CSCL1TPLookupTableME11ILT::set_GEM_roll_CSC_max_wg_ME11_even(t_lut lut) {
+  GEM_roll_CSC_max_wg_ME11_even_ = std::move(lut);
 }
 
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L1_CSC_min_wg_ME11_odd(t_lut lut) {
-  GEM_roll_L1_CSC_min_wg_ME11_odd_ = std::move(lut);
+void CSCL1TPLookupTableME11ILT::set_GEM_roll_CSC_min_wg_ME11_odd(t_lut lut) {
+  GEM_roll_CSC_min_wg_ME11_odd_ = std::move(lut);
 }
 
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L1_CSC_max_wg_ME11_odd(t_lut lut) {
-  GEM_roll_L1_CSC_max_wg_ME11_odd_ = std::move(lut);
-}
-
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L2_CSC_min_wg_ME11_even(t_lut lut) {
-  GEM_roll_L2_CSC_min_wg_ME11_even_ = std::move(lut);
-}
-
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L2_CSC_max_wg_ME11_even(t_lut lut) {
-  GEM_roll_L2_CSC_max_wg_ME11_even_ = std::move(lut);
-}
-
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L2_CSC_min_wg_ME11_odd(t_lut lut) {
-  GEM_roll_L2_CSC_min_wg_ME11_odd_ = std::move(lut);
-}
-
-void CSCL1TPLookupTableME11ILT::set_GEM_roll_L2_CSC_max_wg_ME11_odd(t_lut lut) {
-  GEM_roll_L2_CSC_max_wg_ME11_odd_ = std::move(lut);
+void CSCL1TPLookupTableME11ILT::set_GEM_roll_CSC_max_wg_ME11_odd(t_lut lut) {
+  GEM_roll_CSC_max_wg_ME11_odd_ = std::move(lut);
 }
 
 // GEM-CSC trigger: slope correction
@@ -173,36 +157,20 @@ unsigned CSCL1TPLookupTableME11ILT::GEM_pad_CSC_es_ME1a_odd(unsigned pad) const 
   return GEM_pad_CSC_es_ME1a_odd_.at(pad);
 }
 
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L1_CSC_min_wg_ME11_even(unsigned roll) const {
-  return GEM_roll_L1_CSC_min_wg_ME11_even_[roll];
+unsigned CSCL1TPLookupTableME11ILT::GEM_roll_CSC_min_wg_ME11_even(unsigned roll) const {
+  return GEM_roll_CSC_min_wg_ME11_even_[roll];
 }
 
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L1_CSC_max_wg_ME11_even(unsigned roll) const {
-  return GEM_roll_L1_CSC_max_wg_ME11_even_[roll];
+unsigned CSCL1TPLookupTableME11ILT::GEM_roll_CSC_max_wg_ME11_even(unsigned roll) const {
+  return GEM_roll_CSC_max_wg_ME11_even_[roll];
 }
 
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L1_CSC_min_wg_ME11_odd(unsigned roll) const {
-  return GEM_roll_L1_CSC_min_wg_ME11_odd_[roll];
+unsigned CSCL1TPLookupTableME11ILT::GEM_roll_CSC_min_wg_ME11_odd(unsigned roll) const {
+  return GEM_roll_CSC_min_wg_ME11_odd_[roll];
 }
 
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L1_CSC_max_wg_ME11_odd(unsigned roll) const {
-  return GEM_roll_L1_CSC_max_wg_ME11_odd_[roll];
-}
-
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L2_CSC_min_wg_ME11_even(unsigned roll) const {
-  return GEM_roll_L2_CSC_min_wg_ME11_even_[roll];
-}
-
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L2_CSC_max_wg_ME11_even(unsigned roll) const {
-  return GEM_roll_L2_CSC_max_wg_ME11_even_[roll];
-}
-
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L2_CSC_min_wg_ME11_odd(unsigned roll) const {
-  return GEM_roll_L2_CSC_min_wg_ME11_odd_[roll];
-}
-
-unsigned CSCL1TPLookupTableME11ILT::GEM_roll_L2_CSC_max_wg_ME11_odd(unsigned roll) const {
-  return GEM_roll_L2_CSC_max_wg_ME11_odd_[roll];
+unsigned CSCL1TPLookupTableME11ILT::GEM_roll_CSC_max_wg_ME11_odd(unsigned roll) const {
+  return GEM_roll_CSC_max_wg_ME11_odd_[roll];
 }
 
 // GEM-CSC trigger: slope correction

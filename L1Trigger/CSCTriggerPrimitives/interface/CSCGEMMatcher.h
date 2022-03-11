@@ -126,6 +126,8 @@ private:
   unsigned maxDeltaBXALCTGEM_;
   unsigned maxDeltaBXCLCTGEM_;
 
+  bool matchCLCTpropagation_;
+
   // Matching interval in Half Strips (less bits to deal with in FW), but then used as Eighth Strips (es=hs*4)
   unsigned maxDeltaHsEven_;
   unsigned maxDeltaHsOdd_;
