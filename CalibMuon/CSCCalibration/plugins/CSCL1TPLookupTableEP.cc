@@ -145,8 +145,8 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
 
   lut->set_GEM_roll_CSC_min_wg_ME11_even(std::move(GEM_roll_CSC_min_wg_ME11_even_));
   lut->set_GEM_roll_CSC_min_wg_ME11_odd(std::move(GEM_roll_CSC_min_wg_ME11_odd_));
-  lut->set_GEM_roll_CSC_min_wg_ME11_even(std::move(GEM_roll_CSC_min_wg_ME11_even_));
-  lut->set_GEM_roll_CSC_min_wg_ME11_odd(std::move(GEM_roll_CSC_min_wg_ME11_odd_));
+  lut->set_GEM_roll_CSC_max_wg_ME11_even(std::move(GEM_roll_CSC_max_wg_ME11_even_));
+  lut->set_GEM_roll_CSC_max_wg_ME11_odd(std::move(GEM_roll_CSC_max_wg_ME11_odd_));
 
   // GEM-CSC trigger: slope correction
   lut->set_CSC_slope_cosi_2to1_L1_ME11_even(std::move(CSC_slope_cosi_2to1_L1_ME11_even_));
