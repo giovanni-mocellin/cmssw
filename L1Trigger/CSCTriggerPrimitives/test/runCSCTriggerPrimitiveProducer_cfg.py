@@ -32,10 +32,14 @@ options.register("useB904ME21", False, VarParsing.multiplicity.singleton, VarPar
                  "Set to True when using B904 ME2/1 data (also works for ME3/1 and ME4/1).")
 options.register("useB904ME234s2", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using B904 ME1/1 data (also works for MEX/2 and ME1/3).")
-options.register('useB904GE11Long',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
-                 "Set to True when using data from GE1/1 Long super chamber in B904.")
+options.register('useB904PositiveEndcap',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+                 "Set to True when using data from ME1/1 set as Positive Endcap chamber in B904.")
+options.register('useB904NegativeEndcap',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+                 "Set to True when using data from ME1/1 set as Negative Endcap chamber in B904.")
 options.register('useB904GE11Short',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
                  "Set to True when using data from GE1/1 Short super chamber in B904.")
+options.register('useB904GE11Long',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+                 "Set to True when using data from GE1/1 Long super chamber in B904.")
 options.register("run3", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using Run-3 data.")
 options.register("runCCLUTOTMB", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
@@ -120,14 +124,21 @@ if useB904Data:
       process.muonCSCDigis.DisableMappingCheck = True
       process.muonCSCDigis.B904Setup = True
       process.muonCSCDigis.InputObjects = "rawDataCollectorCSC"
+
+      if options.useB904PositiveEndcap:
+          process.muonCSCDigis.B904PositiveEndcap = True
+      if options.useB904NegativeEndcap:
+          process.muonCSCDigis.B904NegativeEndcap = True
+
       if options.unpackGEM:
-            process.muonCSCDigis.useGEMs = True
-            ## GEM mapping for b904 GEM-CSC integration stand
+          process.muonCSCDigis.useGEMs = True
+
+      ## GEM mapping for b904 GEM-CSC integration stand
       if options.useB904GE11Long:
           process.GlobalTag.toGet = cms.VPSet(
                   cms.PSet(record = cms.string("GEMeMapRcd"),
                            tag = cms.string("GEMeMapB904Data"),
-                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Even_Long.db")
+                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Even.db")
                           )
           )
           process.muonCSCDigis.B904GE11Long = True
@@ -135,12 +146,14 @@ if useB904Data:
           process.GlobalTag.toGet = cms.VPSet(
                   cms.PSet(record = cms.string("GEMeMapRcd"),
                            tag = cms.string("GEMeMapB904Data"),
-                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Odd_Short.db")
+                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Odd.db")
                           )
           )
           process.muonCSCDigis.B904GE11Short = True
       process.muonGEMDigis.useDBEMap = True
       process.muonGEMDigis.InputLabel = "rawDataCollectorGEM"
+      process.muonGEMDigis.fedIdStart = 1478
+      process.muonGEMDigis.fedIdEnd = 1478
 
 ## l1 emulator
 l1csc = process.cscTriggerPrimitiveDigis

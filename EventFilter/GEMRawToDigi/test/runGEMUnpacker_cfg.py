@@ -154,7 +154,7 @@ if options.useB904GE11Long:
     process.GlobalTag.toGet = cms.VPSet(
             cms.PSet(record = cms.string("GEMeMapRcd"),
                      tag = cms.string("GEMeMapB904Data"),
-                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Even_Long.db")
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Even.db")
                     )
     )
     process.muonGEMDigis.useDBEMap = True
@@ -163,7 +163,7 @@ if options.useB904GE11Short:
     process.GlobalTag.toGet = cms.VPSet(
             cms.PSet(record = cms.string("GEMeMapRcd"),
                      tag = cms.string("GEMeMapB904Data"),
-                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_b904_Odd_Short.db")
+                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Odd.db")
                     )
     )
     process.muonGEMDigis.useDBEMap = True
@@ -184,6 +184,8 @@ process.output = cms.OutputModule(
 )
 
 process.muonGEMDigis.InputLabel = options.unpackerLabel
+process.muonGEMDigis.fedIdStart = options.feds[0]
+process.muonGEMDigis.fedIdEnd = options.feds[-1]
 process.simMuonGEMPadDigis.InputCollection = 'muonGEMDigis'
 
 ## schedule and path definition
