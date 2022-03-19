@@ -67,9 +67,6 @@ public:
                            const GEMInternalClusters& clusters,
                            GEMInternalClusters& selected) const;
 
-  // match by 1/2-strip
-  bool matchedClusterLocHS(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
-
   // match by 1/8-strip
   bool matchedClusterLocES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
 
@@ -129,8 +126,9 @@ private:
   unsigned maxDeltaBXALCTGEM_;
   unsigned maxDeltaBXCLCTGEM_;
 
-  bool matchWithHS_;
+  bool matchCLCTpropagation_;
 
+  // Matching interval in Half Strips (less bits to deal with in FW), but then used as Eighth Strips (es=hs*4)
   unsigned maxDeltaHsEven_;
   unsigned maxDeltaHsOdd_;
   unsigned maxDeltaHsEvenME1a_;

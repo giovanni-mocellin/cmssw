@@ -102,7 +102,7 @@ private:
   unsigned int errorMask, examinerMask;
   bool instantiateDQM;
 
-  bool disableMappingCheck, b904Setup;
+  bool disableMappingCheck, b904Setup, b904PositiveEndcap, b904NegativeEndcap, b904GE11Long, b904GE11Short;
 
   CSCMonitorInterface* monitor;
 
@@ -140,6 +140,10 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   disableMappingCheck = pset.getUntrackedParameter<bool>("DisableMappingCheck", false);
   // Make aware the unpacker that B904 test setup is used (disable mapping inconsistency check)
   b904Setup = pset.getUntrackedParameter<bool>("B904Setup", false);
+  b904PositiveEndcap = pset.getUntrackedParameter<bool>("B904PositiveEndcap", false);
+  b904NegativeEndcap = pset.getUntrackedParameter<bool>("B904NegativeEndcap", false);
+  b904GE11Short = pset.getUntrackedParameter<bool>("B904GE11Short", false);
+  b904GE11Long = pset.getUntrackedParameter<bool>("B904GE11Long", false);
 
   /// Visualization of raw data
   visualFEDInspect = pset.getUntrackedParameter<bool>("VisualFEDInspect", false);
@@ -183,6 +187,9 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
 
   if (useCSCShowers_) {
     produces<CSCShowerDigiCollection>("MuonCSCShowerDigi");
+    produces<CSCShowerDigiCollection>("MuonCSCShowerDigiAnode");
+    produces<CSCShowerDigiCollection>("MuonCSCShowerDigiCathode");
+    produces<CSCShowerDigiCollection>("MuonCSCShowerDigiAnodeALCT");
   }
 
   //CSCAnodeData::setDebug(debug);
@@ -214,8 +221,8 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.add<bool>("UnpackStatusDigis", false)->setComment("# Unpack general status digis?");
   desc.add<bool>("UseFormatStatus", true)->setComment("# Unpack FormatStatus digi?");
   desc.add<bool>("useRPCs", false)->setComment("Unpack RPC data");
-  desc.add<bool>("useGEMs", false)->setComment("Unpack GEM trigger data");
-  desc.add<bool>("useCSCShowers", false)->setComment("Unpack CSCShower trigger data");
+  desc.add<bool>("useGEMs", true)->setComment("Unpack GEM trigger data");
+  desc.add<bool>("useCSCShowers", true)->setComment("Unpack CSCShower trigger data");
   desc.addUntracked<bool>("Debug", false)->setComment("# Turn on lots of output");
   desc.addUntracked<bool>("PrintEventNumber", false);
   desc.addUntracked<bool>("runDQM", false);
@@ -223,9 +230,12 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.addUntracked<bool>("VisualFEDShort", false)->setComment("# Visualization of raw data in corrupted events");
   desc.addUntracked<bool>("FormatedEventDump", false);
   desc.addUntracked<bool>("SuppressZeroLCT", true);
-  desc.addUntracked<bool>("DisableMappingCheck", false)
-      ->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
-  desc.addUntracked<bool>("B904Setup", false)->setComment("# Make the unpacker aware of B904 test setup configuration");
+  desc.addUntracked<bool>("DisableMappingCheck", false)->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
+  desc.addUntracked<bool>("B904Setup", false) ->setComment("# Make the unpacker aware of B904 test setup configuration");
+  desc.addUntracked<bool>("B904PositiveEndcap", false) ->setComment("# Set positive endcap for ME1/1 chamber used in B904 test setup");
+  desc.addUntracked<bool>("B904NegativeEndcap", false) ->setComment("# Set negative endcap for ME1/1 chamber used in B904 test setup");
+  desc.addUntracked<bool>("B904GE11Long", false) ->setComment("# Set even slot number for ME1/1 chamber when GE1/1 long type used in B904 test setup");
+  desc.addUntracked<bool>("B904GE11Short", false) ->setComment("# Set odd slot number for ME1/1 chamber when GE1/1 short type used in B904 test setup");
   descriptions.add("muonCSCDCCUnpacker", desc);
   descriptions.setComment(" This is the generic cfi file for CSC unpacking");
 }
@@ -268,7 +278,14 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
 
   auto gemProduct = std::make_unique<GEMPadDigiClusterCollection>();
 
-  auto showerProduct = std::make_unique<CSCShowerDigiCollection>();
+  auto lctShowerProduct =
+      std::make_unique<CSCShowerDigiCollection>();  // HMT shower objects from OTMB/MPC LCT trigger data frames
+  auto anodeShowerProductOTMB =
+      std::make_unique<CSCShowerDigiCollection>();  // anode HMT shower objects from (O)TMB header data (matched at OTMB)
+  auto cathodeShowerProductOTMB =
+      std::make_unique<CSCShowerDigiCollection>();  // cathode HMT shower objects from (O)TMB header data
+  auto anodeShowerProductALCT = std::make_unique<
+      CSCShowerDigiCollection>();  // anode HMT shower objects from ALCT data (vector of HMT shower objects per ALCT BX)
 
   // If set selective unpacking mode
   // hardcoded examiner mask below to check for DCC and DDU level errors will be used first
@@ -459,6 +476,11 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
             int vmecrate = cscData[iCSC].dmbHeader()->crateID();
             int dmb = cscData[iCSC].dmbHeader()->dmbID();
 
+            if (b904PositiveEndcap) {vmecrate = 1; dmb = 3;} // Set manually the VME crate number for ME+1/1/02 (default = even chamber)
+            if (b904NegativeEndcap) {vmecrate = 31; dmb = 3;} // Set manually the VME crate number for ME-1/1/02 (default = even chamber)
+            if (b904GE11Short) dmb = 2; // Set manually the DMB slot number for ME+-1/1/01
+            if (b904GE11Long) dmb = 3; // Set manually the DMB slot number for ME+-1/1/02
+
             int icfeb = 0;   /// default value for all digis not related to cfebs
             int ilayer = 0;  /// layer=0 flags entire chamber
 
@@ -519,6 +541,14 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                 alctProduct->move(std::make_pair(alctDigis_0.begin(), alctDigis_0.end()), layer);
               } else
                 alctProduct->move(std::make_pair(alctDigis.begin(), alctDigis.end()), layer);
+
+              /// fill Run3 anode HMT Shower digis
+              /// anode shower digis vector per ALCT BX from ALCT data
+              if (useCSCShowers_) {
+                std::vector<CSCShowerDigi> anodeShowerDigisALCT = cscData[iCSC].alctHeader()->alctShowerDigis();
+                anodeShowerProductALCT->move(std::make_pair(anodeShowerDigisALCT.begin(), anodeShowerDigisALCT.end()),
+                                             layer);
+              }
             }
 
             ///check tmb data integrity
@@ -562,13 +592,33 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               } else
                 clctProduct->move(std::make_pair(clctDigis.begin(), clctDigis.end()), layer);
 
-              /// fill Run3 HMT Shower digi
+              /// fill Run3 HMT Shower digis
               if (useCSCShowers_) {
-                CSCShowerDigi showerDigi = cscData[iCSC].tmbHeader()->showerDigi(layer.rawId());
-                if (showerDigi.isValid()) {
-                  std::vector<CSCShowerDigi> showerDigis;
-                  showerDigis.push_back(showerDigi);
-                  showerProduct->move(std::make_pair(showerDigis.begin(), showerDigis.end()), layer);
+                /// (O)TMB Shower digi sent to MPC LCT trigger data
+                CSCShowerDigi lctShowerDigi = cscData[iCSC].tmbHeader()->showerDigi(layer.rawId());
+                if (lctShowerDigi.isValid()) {
+                  std::vector<CSCShowerDigi> lctShowerDigis;
+                  lctShowerDigis.push_back(lctShowerDigi);
+                  lctShowerProduct->move(std::make_pair(lctShowerDigis.begin(), lctShowerDigis.end()), layer);
+                }
+
+                /// anode shower digis from OTMB header data
+                CSCShowerDigi anodeShowerDigiOTMB = cscData[iCSC].tmbHeader()->anodeShowerDigi(layer.rawId());
+                ;
+                if (anodeShowerDigiOTMB.isValid()) {
+                  std::vector<CSCShowerDigi> anodeShowerDigis;
+                  anodeShowerDigis.push_back(anodeShowerDigiOTMB);
+                  anodeShowerProductOTMB->move(std::make_pair(anodeShowerDigis.begin(), anodeShowerDigis.end()), layer);
+                }
+
+                /// cathode shower digis from OTMB header data
+                CSCShowerDigi cathodeShowerDigiOTMB = cscData[iCSC].tmbHeader()->cathodeShowerDigi(layer.rawId());
+                ;
+                if (cathodeShowerDigiOTMB.isValid()) {
+                  std::vector<CSCShowerDigi> cathodeShowerDigis;
+                  cathodeShowerDigis.push_back(cathodeShowerDigiOTMB);
+                  cathodeShowerProductOTMB->move(std::make_pair(cathodeShowerDigis.begin(), cathodeShowerDigis.end()),
+                                                 layer);
                 }
               }
 
@@ -703,7 +753,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
     e.put(std::move(gemProduct), "MuonGEMPadDigiCluster");
   }
   if (useCSCShowers_) {
-    e.put(std::move(showerProduct), "MuonCSCShowerDigi");
+    e.put(std::move(lctShowerProduct), "MuonCSCShowerDigi");
+    e.put(std::move(anodeShowerProductOTMB), "MuonCSCShowerDigiAnode");
+    e.put(std::move(cathodeShowerProductOTMB), "MuonCSCShowerDigiCathode");
+    e.put(std::move(anodeShowerProductALCT), "MuonCSCShowerDigiAnodeALCT");
   }
   if (printEventNumber)
     LogTrace("CSCDCCUnpacker|CSCRawToDigi") << "[CSCDCCUnpacker]: " << numOfEvents << " events processed ";

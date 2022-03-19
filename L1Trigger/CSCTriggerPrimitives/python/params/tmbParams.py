@@ -58,11 +58,9 @@ tmbPhase2GEM = tmbPhase2.clone(
     # matching to GEM clusters in time
     maxDeltaBXALCTGEM = cms.uint32(1),
     maxDeltaBXCLCTGEM = cms.uint32(2),
-    # True: use the half-strip coordinate to match
-    # GEM with CSC TPs
-    # False: use the eighth-strip coordinate + CCLUT slope
-    # to match GEM with CSC TPs
-    matchWithHS = cms.bool(True),
+    # Set to True for matching CLCT and GEM clusters by "propagating"
+    # CLCT slope to GEM. Otherwise, just matching keystrip positions
+    matchCLCTpropagation = cms.bool(False),
     # efficiency recovery switches
     dropLowQualityALCTsNoGEMs = cms.bool(False),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
@@ -72,7 +70,7 @@ tmbPhase2GEM = tmbPhase2.clone(
     buildLCTfromCLCTandGEM = cms.bool(True),
     # assign GEM-CSC bending angle. Works only for
     # Run-3 GEM-CSC TPs.
-    assignGEMCSCBending = cms.bool(False),
+    assignGEMCSCBending = cms.bool(True),
     # whether to drop GEMs that were matched to ALCTs or CLCTs
     # in this BX, and not use them in the following BX
     tmbDropUsedGems = cms.bool(False),
@@ -83,16 +81,16 @@ tmbPhase2GEM = tmbPhase2.clone(
     # the slope of CLCTs with high, meaning inconsistent,
     # values of cosi (consistency of slope indicator)
     # to optimize GEM-CSC slope correction
-    mitigateSlopeByCosi = cms.bool(True),
+    mitigateSlopeByCosi = cms.bool(False),
 )
 
 # to be used by ME11 chambers with GEM-CSC ILT
 tmbPhase2GE11 = tmbPhase2GEM.clone(
-    # matching to GEM clusters with half-strips
-    maxDeltaHsEven = cms.uint32(7),
-    maxDeltaHsOdd = cms.uint32(16),
-    maxDeltaHsEvenME1a = cms.uint32(5),
-    maxDeltaHsOddME1a = cms.uint32(12),
+    # matching windows for CLCT-GEM clusters in half strip units
+    maxDeltaHsEven = cms.uint32(12),
+    maxDeltaHsOdd = cms.uint32(20),
+    maxDeltaHsEvenME1a = cms.uint32(12),
+    maxDeltaHsOddME1a = cms.uint32(20),
     # efficiency recovery switches
     dropLowQualityCLCTsNoGEMs_ME1a = cms.bool(True),
     buildLCTfromALCTandGEM_ME1a = cms.bool(True),

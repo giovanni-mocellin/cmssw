@@ -13,25 +13,15 @@ public:
   typedef std::vector<unsigned> t_lut;
 
   // setters
-  void set_GEM_pad_CSC_hs_ME1b_even(t_lut lut);
-  void set_GEM_pad_CSC_hs_ME1a_even(t_lut lut);
-  void set_GEM_pad_CSC_hs_ME1b_odd(t_lut lut);
-  void set_GEM_pad_CSC_hs_ME1a_odd(t_lut lut);
-
   void set_GEM_pad_CSC_es_ME1b_even(t_lut lut);
   void set_GEM_pad_CSC_es_ME1a_even(t_lut lut);
   void set_GEM_pad_CSC_es_ME1b_odd(t_lut lut);
   void set_GEM_pad_CSC_es_ME1a_odd(t_lut lut);
 
-  void set_GEM_roll_L1_CSC_min_wg_ME11_even(t_lut lut);
-  void set_GEM_roll_L1_CSC_max_wg_ME11_even(t_lut lut);
-  void set_GEM_roll_L1_CSC_min_wg_ME11_odd(t_lut lut);
-  void set_GEM_roll_L1_CSC_max_wg_ME11_odd(t_lut lut);
-
-  void set_GEM_roll_L2_CSC_min_wg_ME11_even(t_lut lut);
-  void set_GEM_roll_L2_CSC_max_wg_ME11_even(t_lut lut);
-  void set_GEM_roll_L2_CSC_min_wg_ME11_odd(t_lut lut);
-  void set_GEM_roll_L2_CSC_max_wg_ME11_odd(t_lut lut);
+  void set_GEM_roll_CSC_min_wg_ME11_even(t_lut lut);
+  void set_GEM_roll_CSC_max_wg_ME11_even(t_lut lut);
+  void set_GEM_roll_CSC_min_wg_ME11_odd(t_lut lut);
+  void set_GEM_roll_CSC_max_wg_ME11_odd(t_lut lut);
 
   // GEM-CSC trigger: slope correction
   void set_CSC_slope_cosi_2to1_L1_ME11_even(t_lut lut);
@@ -59,25 +49,15 @@ public:
   void set_es_diff_slope_L2_ME1b_odd(t_lut lut);
 
   // getters
-  unsigned GEM_pad_CSC_hs_ME1b_even(unsigned pad) const;
-  unsigned GEM_pad_CSC_hs_ME1a_even(unsigned pad) const;
-  unsigned GEM_pad_CSC_hs_ME1b_odd(unsigned pad) const;
-  unsigned GEM_pad_CSC_hs_ME1a_odd(unsigned pad) const;
-
   unsigned GEM_pad_CSC_es_ME1b_even(unsigned pad) const;
   unsigned GEM_pad_CSC_es_ME1a_even(unsigned pad) const;
   unsigned GEM_pad_CSC_es_ME1b_odd(unsigned pad) const;
   unsigned GEM_pad_CSC_es_ME1a_odd(unsigned pad) const;
 
-  unsigned GEM_roll_L1_CSC_min_wg_ME11_even(unsigned roll) const;
-  unsigned GEM_roll_L1_CSC_max_wg_ME11_even(unsigned roll) const;
-  unsigned GEM_roll_L1_CSC_min_wg_ME11_odd(unsigned roll) const;
-  unsigned GEM_roll_L1_CSC_max_wg_ME11_odd(unsigned roll) const;
-
-  unsigned GEM_roll_L2_CSC_min_wg_ME11_even(unsigned roll) const;
-  unsigned GEM_roll_L2_CSC_max_wg_ME11_even(unsigned roll) const;
-  unsigned GEM_roll_L2_CSC_min_wg_ME11_odd(unsigned roll) const;
-  unsigned GEM_roll_L2_CSC_max_wg_ME11_odd(unsigned roll) const;
+  unsigned GEM_roll_CSC_min_wg_ME11_even(unsigned roll) const;
+  unsigned GEM_roll_CSC_max_wg_ME11_even(unsigned roll) const;
+  unsigned GEM_roll_CSC_min_wg_ME11_odd(unsigned roll) const;
+  unsigned GEM_roll_CSC_max_wg_ME11_odd(unsigned roll) const;
 
   // GEM-CSC trigger: slope correction
   unsigned CSC_slope_cosi_2to1_L1_ME11_even(unsigned channel) const;
@@ -106,25 +86,15 @@ public:
   unsigned es_diff_slope_L2_ME1b_odd(unsigned es_diff) const;
 
 private:
-  t_lut GEM_pad_CSC_hs_ME1b_even_;
-  t_lut GEM_pad_CSC_hs_ME1a_even_;
-  t_lut GEM_pad_CSC_hs_ME1b_odd_;
-  t_lut GEM_pad_CSC_hs_ME1a_odd_;
-
   t_lut GEM_pad_CSC_es_ME1b_even_;
   t_lut GEM_pad_CSC_es_ME1a_even_;
   t_lut GEM_pad_CSC_es_ME1b_odd_;
   t_lut GEM_pad_CSC_es_ME1a_odd_;
 
-  t_lut GEM_roll_L1_CSC_min_wg_ME11_even_;
-  t_lut GEM_roll_L1_CSC_max_wg_ME11_even_;
-  t_lut GEM_roll_L1_CSC_min_wg_ME11_odd_;
-  t_lut GEM_roll_L1_CSC_max_wg_ME11_odd_;
-
-  t_lut GEM_roll_L2_CSC_min_wg_ME11_even_;
-  t_lut GEM_roll_L2_CSC_max_wg_ME11_even_;
-  t_lut GEM_roll_L2_CSC_min_wg_ME11_odd_;
-  t_lut GEM_roll_L2_CSC_max_wg_ME11_odd_;
+  t_lut GEM_roll_CSC_min_wg_ME11_even_;
+  t_lut GEM_roll_CSC_max_wg_ME11_even_;
+  t_lut GEM_roll_CSC_min_wg_ME11_odd_;
+  t_lut GEM_roll_CSC_max_wg_ME11_odd_;
 
   t_lut CSC_slope_cosi_2to1_L1_ME11_even_;
   t_lut CSC_slope_cosi_2to1_L1_ME11_odd_;

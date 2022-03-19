@@ -207,54 +207,6 @@ void GEMClusterProcessor::doCoordinateConversion() {
       const int layer1_first_pad = cluster.layer1_pad();
       const int layer1_last_pad = layer1_first_pad + cluster.layer1_size() - 1;
 
-      // calculate the 1/2-strip
-      int layer1_pad_to_first_hs = -1;
-      int layer1_pad_to_last_hs = -1;
-      int layer1_pad_to_first_hs_me1a = -1;
-      int layer1_pad_to_last_hs_me1a = -1;
-
-      // ME1/1
-      if (station_ == 1) {
-        if (isEven_) {
-          // ME1/b
-          layer1_pad_to_first_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_even(layer1_first_pad);
-          layer1_pad_to_last_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_even(layer1_last_pad);
-          // ME1/a
-          layer1_pad_to_first_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_even(layer1_first_pad);
-          layer1_pad_to_last_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_even(layer1_last_pad);
-        } else {
-          // ME1/b
-          layer1_pad_to_first_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_odd(layer1_first_pad);
-          layer1_pad_to_last_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_odd(layer1_last_pad);
-          // ME1/a
-          layer1_pad_to_first_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_odd(layer1_first_pad);
-          layer1_pad_to_last_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_odd(layer1_last_pad);
-        }
-      }
-      // ME2/1
-      if (station_ == 2) {
-        if (isEven_) {
-          layer1_pad_to_first_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_even(layer1_first_pad);
-          layer1_pad_to_last_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_even(layer1_last_pad);
-        } else {
-          layer1_pad_to_first_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_odd(layer1_first_pad);
-          layer1_pad_to_last_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_odd(layer1_last_pad);
-        }
-      }
-      // middle 1/2-strip
-      int layer1_middle_hs = 0.5 * (layer1_pad_to_first_hs + layer1_pad_to_last_hs);
-      int layer1_middle_hs_me1a = 0.5 * (layer1_pad_to_first_hs_me1a + layer1_pad_to_last_hs_me1a);
-
-      // set the values
-      cluster.set_layer1_first_hs(layer1_pad_to_first_hs);
-      cluster.set_layer1_last_hs(layer1_pad_to_last_hs);
-      cluster.set_layer1_middle_hs(layer1_middle_hs);
-
-      if (station_ == 1) {
-        cluster.set_layer1_first_hs_me1a(layer1_pad_to_first_hs_me1a);
-        cluster.set_layer1_last_hs_me1a(layer1_pad_to_last_hs_me1a);
-        cluster.set_layer1_middle_hs_me1a(layer1_middle_hs_me1a);
-      }
       // calculate the 1/8-strips
       int layer1_pad_to_first_es = -1;
       int layer1_pad_to_last_es = -1;
@@ -291,8 +243,8 @@ void GEMClusterProcessor::doCoordinateConversion() {
         }
       }
       // middle 1/8-strip
-      int layer1_middle_es = 0.5 * (layer1_pad_to_first_es + layer1_pad_to_last_es);
-      int layer1_middle_es_me1a = 0.5 * (layer1_pad_to_first_es_me1a + layer1_pad_to_last_es_me1a);
+      int layer1_middle_es = (layer1_pad_to_first_es + layer1_pad_to_last_es) / 2.;
+      int layer1_middle_es_me1a = (layer1_pad_to_first_es_me1a + layer1_pad_to_last_es_me1a) / 2.;
 
       cluster.set_layer1_first_es(layer1_pad_to_first_es);
       cluster.set_layer1_last_es(layer1_pad_to_last_es);
@@ -314,11 +266,11 @@ void GEMClusterProcessor::doCoordinateConversion() {
       // ME1/1
       if (station_ == 1) {
         if (isEven_) {
-          roll_l1_to_min_wg = lookupTableME11ILT_->GEM_roll_L1_CSC_min_wg_ME11_even(roll);
-          roll_l1_to_max_wg = lookupTableME11ILT_->GEM_roll_L1_CSC_max_wg_ME11_even(roll);
+          roll_l1_to_min_wg = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_even(roll);
+          roll_l1_to_max_wg = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_even(roll);
         } else {
-          roll_l1_to_min_wg = lookupTableME11ILT_->GEM_roll_L1_CSC_min_wg_ME11_odd(roll);
-          roll_l1_to_max_wg = lookupTableME11ILT_->GEM_roll_L1_CSC_max_wg_ME11_odd(roll);
+          roll_l1_to_min_wg = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_odd(roll);
+          roll_l1_to_max_wg = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_odd(roll);
         }
       }
 
@@ -343,53 +295,6 @@ void GEMClusterProcessor::doCoordinateConversion() {
       const int layer2_first_pad = cluster.layer2_pad();
       const int layer2_last_pad = layer2_first_pad + cluster.layer2_size() - 1;
 
-      // calculate the 1/2-strip
-      int layer2_pad_to_first_hs = -1;
-      int layer2_pad_to_last_hs = -1;
-      int layer2_pad_to_first_hs_me1a = -1;
-      int layer2_pad_to_last_hs_me1a = -1;
-
-      if (station_ == 1) {
-        if (isEven_) {
-          // ME1/b
-          layer2_pad_to_first_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_even(layer2_first_pad);
-          layer2_pad_to_last_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_even(layer2_last_pad);
-          // ME1/a
-          layer2_pad_to_first_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_even(layer2_first_pad);
-          layer2_pad_to_last_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_even(layer2_last_pad);
-        } else {
-          // ME1/b
-          layer2_pad_to_first_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_odd(layer2_first_pad);
-          layer2_pad_to_last_hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_odd(layer2_last_pad);
-          // ME1/a
-          layer2_pad_to_first_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_odd(layer2_first_pad);
-          layer2_pad_to_last_hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_odd(layer2_last_pad);
-        }
-      }
-      // ME2/1
-      if (station_ == 2) {
-        if (isEven_) {
-          layer2_pad_to_first_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_even(layer2_first_pad);
-          layer2_pad_to_last_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_even(layer2_last_pad);
-        } else {
-          layer2_pad_to_first_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_odd(layer2_first_pad);
-          layer2_pad_to_last_hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_odd(layer2_last_pad);
-        }
-      }
-      // middle 1/2-strip
-      int layer2_middle_hs = 0.5 * (layer2_pad_to_first_hs + layer2_pad_to_last_hs);
-      int layer2_middle_hs_me1a = 0.5 * (layer2_pad_to_first_hs_me1a + layer2_pad_to_last_hs_me1a);
-
-      // set the values
-      cluster.set_layer2_first_hs(layer2_pad_to_first_hs);
-      cluster.set_layer2_last_hs(layer2_pad_to_last_hs);
-      cluster.set_layer2_middle_hs(layer2_middle_hs);
-
-      if (station_ == 1) {
-        cluster.set_layer2_first_hs_me1a(layer2_pad_to_first_hs_me1a);
-        cluster.set_layer2_last_hs_me1a(layer2_pad_to_last_hs_me1a);
-        cluster.set_layer2_middle_hs_me1a(layer2_middle_hs_me1a);
-      }
       // calculate the 1/8-strips
       int layer2_pad_to_first_es = -1;
       int layer2_pad_to_last_es = -1;
@@ -426,8 +331,8 @@ void GEMClusterProcessor::doCoordinateConversion() {
         }
       }
       // middle 1/8-strip
-      int layer2_middle_es = 0.5 * (layer2_pad_to_first_es + layer2_pad_to_last_es);
-      int layer2_middle_es_me1a = 0.5 * (layer2_pad_to_first_es_me1a + layer2_pad_to_last_es_me1a);
+      int layer2_middle_es = int((layer2_pad_to_first_es + layer2_pad_to_last_es) / 2.0);
+      int layer2_middle_es_me1a = int((layer2_pad_to_first_es_me1a + layer2_pad_to_last_es_me1a) / 2.0);
 
       cluster.set_layer2_first_es(layer2_pad_to_first_es);
       cluster.set_layer2_last_es(layer2_pad_to_last_es);
@@ -450,11 +355,11 @@ void GEMClusterProcessor::doCoordinateConversion() {
     // ME1/1
     if (station_ == 1) {
       if (isEven_) {
-        roll_l2_to_min_wg = lookupTableME11ILT_->GEM_roll_L2_CSC_min_wg_ME11_even(roll);
-        roll_l2_to_max_wg = lookupTableME11ILT_->GEM_roll_L2_CSC_max_wg_ME11_even(roll);
+        roll_l2_to_min_wg = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_even(roll);
+        roll_l2_to_max_wg = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_even(roll);
       } else {
-        roll_l2_to_min_wg = lookupTableME11ILT_->GEM_roll_L2_CSC_min_wg_ME11_odd(roll);
-        roll_l2_to_max_wg = lookupTableME11ILT_->GEM_roll_L2_CSC_max_wg_ME11_odd(roll);
+        roll_l2_to_min_wg = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_odd(roll);
+        roll_l2_to_max_wg = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_odd(roll);
       }
     }
 

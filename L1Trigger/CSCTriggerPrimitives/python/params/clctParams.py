@@ -53,7 +53,7 @@ clctPhase2 = clctPhase1.clone(
 # provided there is at least one matching GEM cluster. This cluster matching
 # is done in the CSCGEMMatcher
 clctPhase2GEM = clctPhase2.clone(
-    clctNplanesHitPattern = 3
+    clctNplanesHitPattern = 4
 )
 
 clctPSets = cms.PSet(

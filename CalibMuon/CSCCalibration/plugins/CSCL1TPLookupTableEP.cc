@@ -84,9 +84,6 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
   std::unique_ptr<CSCL1TPLookupTableME11ILT> lut = std::make_unique<CSCL1TPLookupTableME11ILT>();
 
   // get the text files
-  std::vector<std::string> padToHsME1aFiles_ = pset_.getParameter<std::vector<std::string>>("padToHsME1aFiles");
-  std::vector<std::string> padToHsME1bFiles_ = pset_.getParameter<std::vector<std::string>>("padToHsME1bFiles");
-
   std::vector<std::string> padToEsME1aFiles_ = pset_.getParameter<std::vector<std::string>>("padToEsME1aFiles");
   std::vector<std::string> padToEsME1bFiles_ = pset_.getParameter<std::vector<std::string>>("padToEsME1bFiles");
 
@@ -105,25 +102,15 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
       pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME1bFiles");
 
   // read the text files and extract the data
-  auto GEM_pad_CSC_hs_ME1a_even_ = load(padToHsME1aFiles_[0]);
-  auto GEM_pad_CSC_hs_ME1a_odd_ = load(padToHsME1aFiles_[1]);
-  auto GEM_pad_CSC_hs_ME1b_even_ = load(padToHsME1bFiles_[0]);
-  auto GEM_pad_CSC_hs_ME1b_odd_ = load(padToHsME1bFiles_[1]);
-
   auto GEM_pad_CSC_es_ME1a_even_ = load(padToEsME1aFiles_[0]);
   auto GEM_pad_CSC_es_ME1a_odd_ = load(padToEsME1aFiles_[1]);
   auto GEM_pad_CSC_es_ME1b_even_ = load(padToEsME1bFiles_[0]);
   auto GEM_pad_CSC_es_ME1b_odd_ = load(padToEsME1bFiles_[1]);
 
-  auto GEM_roll_L1_CSC_min_wg_ME11_even_ = load(rollToMinWgME11Files_[0]);
-  auto GEM_roll_L1_CSC_min_wg_ME11_odd_ = load(rollToMinWgME11Files_[1]);
-  auto GEM_roll_L2_CSC_min_wg_ME11_even_ = load(rollToMinWgME11Files_[2]);
-  auto GEM_roll_L2_CSC_min_wg_ME11_odd_ = load(rollToMinWgME11Files_[3]);
-
-  auto GEM_roll_L1_CSC_max_wg_ME11_even_ = load(rollToMaxWgME11Files_[0]);
-  auto GEM_roll_L1_CSC_max_wg_ME11_odd_ = load(rollToMaxWgME11Files_[1]);
-  auto GEM_roll_L2_CSC_max_wg_ME11_even_ = load(rollToMaxWgME11Files_[2]);
-  auto GEM_roll_L2_CSC_max_wg_ME11_odd_ = load(rollToMaxWgME11Files_[3]);
+  auto GEM_roll_CSC_min_wg_ME11_even_ = load(rollToMinWgME11Files_[0]);
+  auto GEM_roll_CSC_min_wg_ME11_odd_ = load(rollToMinWgME11Files_[1]);
+  auto GEM_roll_CSC_max_wg_ME11_even_ = load(rollToMaxWgME11Files_[0]);
+  auto GEM_roll_CSC_max_wg_ME11_odd_ = load(rollToMaxWgME11Files_[1]);
 
   auto CSC_slope_cosi_2to1_L1_ME11_even_ = load(gemCscSlopeCosiFiles_[0]);
   auto CSC_slope_cosi_2to1_L1_ME11_odd_ = load(gemCscSlopeCosiFiles_[1]);
@@ -151,25 +138,15 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
   auto es_diff_slope_L2_ME1b_odd_ = load(esDiffToSlopeME1bFiles_[3]);
 
   // set the data in the LUT object
-  lut->set_GEM_pad_CSC_hs_ME1b_even(std::move(GEM_pad_CSC_hs_ME1b_even_));
-  lut->set_GEM_pad_CSC_hs_ME1a_even(std::move(GEM_pad_CSC_hs_ME1a_even_));
-  lut->set_GEM_pad_CSC_hs_ME1b_odd(std::move(GEM_pad_CSC_hs_ME1b_odd_));
-  lut->set_GEM_pad_CSC_hs_ME1a_odd(std::move(GEM_pad_CSC_hs_ME1a_odd_));
-
   lut->set_GEM_pad_CSC_es_ME1b_even(std::move(GEM_pad_CSC_es_ME1b_even_));
   lut->set_GEM_pad_CSC_es_ME1a_even(std::move(GEM_pad_CSC_es_ME1a_even_));
   lut->set_GEM_pad_CSC_es_ME1b_odd(std::move(GEM_pad_CSC_es_ME1b_odd_));
   lut->set_GEM_pad_CSC_es_ME1a_odd(std::move(GEM_pad_CSC_es_ME1a_odd_));
 
-  lut->set_GEM_roll_L1_CSC_min_wg_ME11_even(std::move(GEM_roll_L1_CSC_min_wg_ME11_even_));
-  lut->set_GEM_roll_L1_CSC_max_wg_ME11_even(std::move(GEM_roll_L1_CSC_max_wg_ME11_even_));
-  lut->set_GEM_roll_L1_CSC_min_wg_ME11_odd(std::move(GEM_roll_L1_CSC_min_wg_ME11_odd_));
-  lut->set_GEM_roll_L1_CSC_max_wg_ME11_odd(std::move(GEM_roll_L1_CSC_max_wg_ME11_odd_));
-
-  lut->set_GEM_roll_L2_CSC_min_wg_ME11_even(std::move(GEM_roll_L2_CSC_min_wg_ME11_even_));
-  lut->set_GEM_roll_L2_CSC_max_wg_ME11_even(std::move(GEM_roll_L2_CSC_max_wg_ME11_even_));
-  lut->set_GEM_roll_L2_CSC_min_wg_ME11_odd(std::move(GEM_roll_L2_CSC_min_wg_ME11_odd_));
-  lut->set_GEM_roll_L2_CSC_max_wg_ME11_odd(std::move(GEM_roll_L2_CSC_max_wg_ME11_odd_));
+  lut->set_GEM_roll_CSC_min_wg_ME11_even(std::move(GEM_roll_CSC_min_wg_ME11_even_));
+  lut->set_GEM_roll_CSC_min_wg_ME11_odd(std::move(GEM_roll_CSC_min_wg_ME11_odd_));
+  lut->set_GEM_roll_CSC_max_wg_ME11_even(std::move(GEM_roll_CSC_max_wg_ME11_even_));
+  lut->set_GEM_roll_CSC_max_wg_ME11_odd(std::move(GEM_roll_CSC_max_wg_ME11_odd_));
 
   // GEM-CSC trigger: slope correction
   lut->set_CSC_slope_cosi_2to1_L1_ME11_even(std::move(CSC_slope_cosi_2to1_L1_ME11_even_));
@@ -189,13 +166,13 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
 
   // GEM-CSC trigger: 1/8-strip difference to slope
   lut->set_es_diff_slope_L1_ME1a_even(std::move(es_diff_slope_L1_ME1a_even_));
-  lut->set_es_diff_slope_L2_ME1a_even(std::move(es_diff_slope_L2_ME1a_even_));
   lut->set_es_diff_slope_L1_ME1a_odd(std::move(es_diff_slope_L1_ME1a_odd_));
+  lut->set_es_diff_slope_L2_ME1a_even(std::move(es_diff_slope_L2_ME1a_even_));
   lut->set_es_diff_slope_L2_ME1a_odd(std::move(es_diff_slope_L2_ME1a_odd_));
 
   lut->set_es_diff_slope_L1_ME1b_even(std::move(es_diff_slope_L1_ME1b_even_));
-  lut->set_es_diff_slope_L2_ME1b_even(std::move(es_diff_slope_L2_ME1b_even_));
   lut->set_es_diff_slope_L1_ME1b_odd(std::move(es_diff_slope_L1_ME1b_odd_));
+  lut->set_es_diff_slope_L2_ME1b_even(std::move(es_diff_slope_L2_ME1b_even_));
   lut->set_es_diff_slope_L2_ME1b_odd(std::move(es_diff_slope_L2_ME1b_odd_));
 
   return lut;
@@ -206,7 +183,6 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   std::unique_ptr<CSCL1TPLookupTableME21ILT> lut = std::make_unique<CSCL1TPLookupTableME21ILT>();
 
   // get the text files
-  std::vector<std::string> padToHsME21Files_ = pset_.getParameter<std::vector<std::string>>("padToHsME21Files");
   std::vector<std::string> padToEsME21Files_ = pset_.getParameter<std::vector<std::string>>("padToEsME21Files");
 
   std::vector<std::string> rollToMaxWgME21Files_ = pset_.getParameter<std::vector<std::string>>("rollToMaxWgME21Files");
@@ -216,9 +192,6 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
       pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME21Files");
 
   // read the text files and extract the data
-  auto GEM_pad_CSC_hs_ME21_even_ = load(padToHsME21Files_[0]);
-  auto GEM_pad_CSC_hs_ME21_odd_ = load(padToHsME21Files_[1]);
-
   auto GEM_pad_CSC_es_ME21_even_ = load(padToEsME21Files_[0]);
   auto GEM_pad_CSC_es_ME21_odd_ = load(padToEsME21Files_[1]);
 
@@ -238,9 +211,6 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   auto es_diff_slope_L2_ME21_odd_ = load(esDiffToSlopeME21Files_[3]);
 
   // set the data in the LUT object
-  lut->set_GEM_pad_CSC_hs_ME21_even(std::move(GEM_pad_CSC_hs_ME21_even_));
-  lut->set_GEM_pad_CSC_hs_ME21_odd(std::move(GEM_pad_CSC_hs_ME21_odd_));
-
   lut->set_GEM_pad_CSC_es_ME21_even(std::move(GEM_pad_CSC_es_ME21_even_));
   lut->set_GEM_pad_CSC_es_ME21_odd(std::move(GEM_pad_CSC_es_ME21_odd_));
 

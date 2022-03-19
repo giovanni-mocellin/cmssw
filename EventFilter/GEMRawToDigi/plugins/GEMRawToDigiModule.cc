@@ -157,7 +157,7 @@ void GEMRawToDigiModule::produce(edm::StreamID iID, edm::Event& iEvent, edm::Eve
         if (keepDAQStatus_) {
           outAMCStatus.get()->insertDigi(fedId, st_amc);
         }
-        continue;
+        //continue;
       }
 
       uint16_t amcBx = amc.bunchCrossing();
