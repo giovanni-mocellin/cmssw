@@ -35,7 +35,7 @@ public:
   void setESLookupTables(const CSCL1TPLookupTableME21ILT* conf);
 
   // calculate the bending angle
-  unsigned calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
+  int calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
 
   // match by BX
 
@@ -68,7 +68,7 @@ public:
                            GEMInternalClusters& selected) const;
 
   // match by 1/8-strip
-  bool matchedClusterLocES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
+  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
 
   // coincidences or single clusters
   void matchingClustersLoc(const CSCALCTDigi& alct,
@@ -115,7 +115,7 @@ private:
   uint16_t mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) const;
 
   // calculate slope correction
-  int CSCGEMSlopeCorrector(const bool isL1orCopad, const int cscSlope) const;
+  int CSCGEMSlopeCorrector(const bool isME1a, const int cscSlope) const;
 
   unsigned endcap_;
   unsigned station_;

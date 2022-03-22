@@ -218,18 +218,18 @@ void GEMClusterProcessor::doCoordinateConversion() {
       if (station_ == 1) {
         if (isEven_) {
           // ME1/b
-          layer1_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_even(layer1_first_pad);
-          layer1_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_even(layer1_last_pad);
+          layer1_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_even(layer1_first_pad);
+          layer1_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_even(layer1_last_pad);
           // ME1/a
-          layer1_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_even(layer1_first_pad);
-          layer1_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_even(layer1_last_pad);
+          layer1_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_even(layer1_first_pad);
+          layer1_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_even(layer1_last_pad);
         } else {
           // ME1/b
-          layer1_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_odd(layer1_first_pad);
-          layer1_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_odd(layer1_last_pad);
+          layer1_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_odd(layer1_first_pad);
+          layer1_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_odd(layer1_last_pad);
           // ME1/a
-          layer1_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_odd(layer1_first_pad);
-          layer1_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_odd(layer1_last_pad);
+          layer1_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_odd(layer1_first_pad);
+          layer1_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_odd(layer1_last_pad);
         }
       }
       // ME2/1
@@ -305,18 +305,18 @@ void GEMClusterProcessor::doCoordinateConversion() {
       if (station_ == 1) {
         if (isEven_) {
           // ME1/b
-          layer2_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_even(layer2_first_pad);
-          layer2_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_even(layer2_last_pad);
+          layer2_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_even(layer2_first_pad);
+          layer2_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_even(layer2_last_pad);
           // ME1/a
-          layer2_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_even(layer2_first_pad);
-          layer2_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_even(layer2_last_pad);
+          layer2_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_even(layer2_first_pad);
+          layer2_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_even(layer2_last_pad);
         } else {
           // ME1/b
-          layer2_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_odd(layer2_first_pad);
-          layer2_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_odd(layer2_last_pad);
+          layer2_pad_to_first_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_odd(layer2_first_pad);
+          layer2_pad_to_last_es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_odd(layer2_last_pad);
           // ME1/a
-          layer2_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_odd(layer2_first_pad);
-          layer2_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_odd(layer2_last_pad);
+          layer2_pad_to_first_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_odd(layer2_first_pad);
+          layer2_pad_to_last_es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_odd(layer2_last_pad);
         }
       }
 
