@@ -526,7 +526,7 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
   thisLCT.setBX(alct.getBX());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_){ //calculate new slope from strip difference between CLCT and associated GEM
+    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
       int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(std::signbit(slope));
@@ -562,7 +562,7 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCCLCTDigi& clct,
   thisLCT.setBX(gem.bx());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_){ //calculate new slope from strip difference between CLCT and associated GEM
+    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
     int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(pow(-1, std::signbit(slope)));

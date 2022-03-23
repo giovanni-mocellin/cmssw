@@ -43,21 +43,27 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
   const unsigned eighthStripDiff = abs(SignedEighthStripDiff); //LUTs consider only absolute change
 
   //use LUTs to determine absolute slope, default 0
-  int slope = 0;
+  int slopeShift = 0;
   if (station_ == 2) {
-    if (isEven_) slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_even(eighthStripDiff);
-    else         slope = lookupTableME21ILT_->es_diff_slope_L1_ME21_odd(eighthStripDiff);
+    if (isEven_) slopeShift = lookupTableME21ILT_->es_diff_slope_L1_ME21_even(eighthStripDiff);
+    else         slopeShift = lookupTableME21ILT_->es_diff_slope_L1_ME21_odd(eighthStripDiff);
   } else if (station_ == 1) {
     if (isME1a) {  //is in ME1a
-      if (isEven_) slope = lookupTableME11ILT_->es_diff_slope_L1_ME11a_even(eighthStripDiff);
-      else 	   slope = lookupTableME11ILT_->es_diff_slope_L1_ME11a_odd(eighthStripDiff);
+      if (isEven_) slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11a_even(eighthStripDiff);
+      else 	   slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11a_odd(eighthStripDiff);
     } else {
-      if (isEven_) slope = lookupTableME11ILT_->es_diff_slope_L1_ME11b_even(eighthStripDiff);
-      else         slope = lookupTableME11ILT_->es_diff_slope_L1_ME11b_odd(eighthStripDiff);
+      if (isEven_) slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11b_even(eighthStripDiff);
+      else         slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11b_odd(eighthStripDiff);
     }
   }
 
-  return pow(-1, std::signbit(SignedEighthStripDiff)) * slope; //attach sign of slope by sign of strip difference, then return newly calculated GEM-CSC slope
+  //account for the sign of the difference and take into account whether CLCT slope propagation is on or not
+  slopeShift *= pow(-1, std::signbit(SignedEighthStripDiff));
+  int NewSlope = matchCLCTpropagation_ ? clct.getSlope() * pow(-1, clct.getBend()) + slopeShift : slopeShift;
+
+  std::cout<<"old slope "<<clct.getSlope() * pow(-1, clct.getBend())<<" vs new slope "<<NewSlope<<std::endl;
+
+  return NewSlope;
 }
 
 
@@ -173,7 +179,10 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
 
   int cl_es = isME1a ? cl.getKeyStripME1a(8) : cl.getKeyStrip(8);
 
-  int eighthStripDiff = clct.getKeyStrip(8) - cl_es;
+  int eighthStripDiff = cl_es - clct.getKeyStrip(8);
+
+  //Debugging
+  //std::cout<<"Diff GEM "<<cl_es<<" - CSC "<<clct.getKeyStrip(8)<<" = "<<eighthStripDiff<<std::endl;
 
   if (matchCLCTpropagation_) { //modification of DeltaStrip by CLCT slope
     int SlopeShift = 0;
@@ -183,9 +192,14 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
     int clctSlope = pow(-1, clct.getBend()) * baseSlope;
 
     SlopeShift = CSCGEMSlopeCorrector(isME1a, clctSlope);
-
-    eighthStripDiff += SlopeShift;
+    //Debugging
+    //std::cout<<"SlopeShift = "<<SlopeShift<<" at slope "<<clctSlope<<std::endl;
+    eighthStripDiff -= SlopeShift;
   }
+
+  //Debugging
+  //uint16_t mCOSIslope = mitigatedSlopeByConsistency(clct);
+  //std::cout<<"COSI slope = "<<pow(-1, std::signbit(clct.getBend())) * mCOSIslope<<std::endl;
 
   return eighthStripDiff;
 }
@@ -322,6 +336,9 @@ uint16_t CSCGEMMatcher::mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) con
     }
   }
 
+  //Debugging
+  //std::cout<<"CLCT Hits = "<<CLCTHits[0]<<", "<<CLCTHits[1]<<", "<<CLCTHits[2]<<", "<<CLCTHits[3]<<", "<<CLCTHits[4]<<", "<<CLCTHits[5]<<std::endl;
+
   //calculate slope consistency
   float MinMaxPairDifferences[2] = {999., -999.};
   for (unsigned First = 0; First < 5; ++First) {
@@ -342,6 +359,8 @@ uint16_t CSCGEMMatcher::mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) con
 
   //calculate consistency of slope indicator: cosi
   uint16_t cosi = std::ceil(std::abs(MinMaxPairDifferences[1] - MinMaxPairDifferences[0]));
+  //Debugging
+  //std::cout<<"COSI = "<<cosi<<std::endl;
 
   //disambiguate cosi cases
 
