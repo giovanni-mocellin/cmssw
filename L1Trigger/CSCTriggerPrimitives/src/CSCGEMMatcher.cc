@@ -60,8 +60,11 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
   //account for the sign of the difference and take into account whether CLCT slope propagation is on or not
   slopeShift *= pow(-1, std::signbit(SignedEighthStripDiff));
   int NewSlope = matchCLCTpropagation_ ? clct.getSlope() * pow(-1, clct.getBend()) + slopeShift : slopeShift;
+  int NewSlopeSign = pow(-1, std::signbit(NewSlope));
+  NewSlope = std::min(15, abs(NewSlope)) * NewSlopeSign;
 
-  std::cout<<"old slope "<<clct.getSlope() * pow(-1, clct.getBend())<<" vs new slope "<<NewSlope<<std::endl;
+  //Debugging
+  //std::cout<<"old slope "<<clct.getSlope() * pow(-1, clct.getBend())<<" vs new slope "<<NewSlope<<std::endl;
 
   return NewSlope;
 }
@@ -199,7 +202,7 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
 
   //Debugging
   //uint16_t mCOSIslope = mitigatedSlopeByConsistency(clct);
-  //std::cout<<"COSI slope = "<<pow(-1, std::signbit(clct.getBend())) * mCOSIslope<<std::endl;
+  //std::cout<<"COSI slope = "<<pow(-1, clct.getBend()) * mCOSIslope<<std::endl;
 
   return eighthStripDiff;
 }
