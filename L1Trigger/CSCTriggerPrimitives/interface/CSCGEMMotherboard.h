@@ -33,6 +33,9 @@ public:
   // clear stored pads and copads
   void clear();
 
+  //helper function to convert GEM-CSC amended slopes into Run2 patterns
+  uint16_t Run2PatternConverter(const int slope) const;
+
   /*
   Use ALCTs, CLCTs, GEMs to build LCTs. Matches are attempted in the following order:
     1) ALCT-CLCT-2GEM (coincidence pad)
