@@ -53,6 +53,21 @@ void CSCGEMMotherboard::clear() {
   clusterProc_->clear();
 }
 
+//function to convert GEM-CSC amended signed slope into Run2 legacy pattern number
+uint16_t CSCGEMMotherboard::Run2PatternConverter(const int slope) const{
+  unsigned sign = std::signbit(slope);
+  unsigned slope_ = abs(slope);
+  uint16_t Run2Pattern = 0;  
+
+  if (slope_ < 3)       Run2Pattern = 10;
+  else if (slope_ < 6)  Run2Pattern = 8 + sign;
+  else if (slope_ < 9)  Run2Pattern = 6 + sign;
+  else if (slope_ < 12) Run2Pattern = 4 + sign;
+  else                  Run2Pattern = 2 + sign;
+
+  return Run2Pattern;
+}
+
 void CSCGEMMotherboard::run(const CSCWireDigiCollection* wiredc,
                             const CSCComparatorDigiCollection* compdc,
                             const GEMPadDigiClusterCollection* gemClusters) {
@@ -530,6 +545,7 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
       int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(std::signbit(slope));
+      thisLCT.setPattern(Run2PatternConverter(slope));
     }
     else
       thisLCT.setSlope(clct.getSlope());
@@ -563,9 +579,10 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCCLCTDigi& clct,
   if (runCCLUT_) {
     thisLCT.setRun3(true);
     if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
-    int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
+      int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(pow(-1, std::signbit(slope)));
+      thisLCT.setPattern(Run2PatternConverter(slope));
     }
     else
       thisLCT.setSlope(clct.getSlope());

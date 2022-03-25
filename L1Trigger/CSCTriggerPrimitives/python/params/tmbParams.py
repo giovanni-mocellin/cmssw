@@ -56,11 +56,11 @@ tmbPhase2 = tmbPhase1.clone(
 
 tmbPhase2GEM = tmbPhase2.clone(
     # matching to GEM clusters in time
-    maxDeltaBXALCTGEM = cms.uint32(1),
-    maxDeltaBXCLCTGEM = cms.uint32(2),
+    maxDeltaBXALCTGEM = cms.uint32(7),
+    maxDeltaBXCLCTGEM = cms.uint32(7),
     # Set to True for matching CLCT and GEM clusters by "propagating"
     # CLCT slope to GEM. Otherwise, just matching keystrip positions
-    matchCLCTpropagation = cms.bool(False),
+    matchCLCTpropagation = cms.bool(True),
     # efficiency recovery switches
     dropLowQualityALCTsNoGEMs = cms.bool(False),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
@@ -87,9 +87,9 @@ tmbPhase2GEM = tmbPhase2.clone(
 # to be used by ME11 chambers with GEM-CSC ILT
 tmbPhase2GE11 = tmbPhase2GEM.clone(
     # matching windows for CLCT-GEM clusters in half strip units
-    maxDeltaHsEven = cms.uint32(12),
+    maxDeltaHsEven = cms.uint32(5),
     maxDeltaHsOdd = cms.uint32(20),
-    maxDeltaHsEvenME1a = cms.uint32(12),
+    maxDeltaHsEvenME1a = cms.uint32(5),
     maxDeltaHsOddME1a = cms.uint32(20),
     # efficiency recovery switches
     dropLowQualityCLCTsNoGEMs_ME1a = cms.bool(True),
@@ -101,7 +101,7 @@ tmbPhase2GE11 = tmbPhase2GEM.clone(
 tmbPhase2GE21 = tmbPhase2GEM.clone(
     # matching to GEM clusters with half-strips
     maxDeltaHsEven = cms.uint32(3),
-    maxDeltaHsOdd = cms.uint32(5),
+    maxDeltaHsOdd = cms.uint32(20),
     dropLowQualityALCTsNoGEMs = True,
 )
 
