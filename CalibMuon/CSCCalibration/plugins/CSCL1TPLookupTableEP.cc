@@ -102,46 +102,50 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
       pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME1bFiles");
 
   // read the text files and extract the data
-  auto GEM_pad_CSC_es_ME1a_even_ = load(padToEsME1aFiles_[0]);
-  auto GEM_pad_CSC_es_ME1a_odd_ = load(padToEsME1aFiles_[1]);
-  auto GEM_pad_CSC_es_ME1b_even_ = load(padToEsME1bFiles_[0]);
-  auto GEM_pad_CSC_es_ME1b_odd_ = load(padToEsME1bFiles_[1]);
+  auto GEM_pad_CSC_es_ME11a_even_ = load(padToEsME1aFiles_[0]);
+  auto GEM_pad_CSC_es_ME11a_odd_  = load(padToEsME1aFiles_[1]);
+  auto GEM_pad_CSC_es_ME11b_even_ = load(padToEsME1bFiles_[0]);
+  auto GEM_pad_CSC_es_ME11b_odd_  = load(padToEsME1bFiles_[1]);
+
 
   auto GEM_roll_CSC_min_wg_ME11_even_ = load(rollToMinWgME11Files_[0]);
-  auto GEM_roll_CSC_min_wg_ME11_odd_ = load(rollToMinWgME11Files_[1]);
+  auto GEM_roll_CSC_min_wg_ME11_odd_  = load(rollToMinWgME11Files_[1]);
   auto GEM_roll_CSC_max_wg_ME11_even_ = load(rollToMaxWgME11Files_[0]);
-  auto GEM_roll_CSC_max_wg_ME11_odd_ = load(rollToMaxWgME11Files_[1]);
+  auto GEM_roll_CSC_max_wg_ME11_odd_  = load(rollToMaxWgME11Files_[1]);
 
-  auto CSC_slope_cosi_2to1_L1_ME11_even_ = load(gemCscSlopeCosiFiles_[0]);
-  auto CSC_slope_cosi_2to1_L1_ME11_odd_ = load(gemCscSlopeCosiFiles_[1]);
-  auto CSC_slope_cosi_3to1_L1_ME11_even_ = load(gemCscSlopeCosiFiles_[2]);
-  auto CSC_slope_cosi_3to1_L1_ME11_odd_ = load(gemCscSlopeCosiFiles_[3]);
 
-  auto CSC_slope_cosi_corr_L1_ME11_even_ = load(gemCscSlopeCosiCorrectionFiles_[0]);
-  auto CSC_slope_cosi_corr_L2_ME11_even_ = load(gemCscSlopeCosiCorrectionFiles_[1]);
-  auto CSC_slope_cosi_corr_L1_ME11_odd_ = load(gemCscSlopeCosiCorrectionFiles_[2]);
-  auto CSC_slope_cosi_corr_L2_ME11_odd_ = load(gemCscSlopeCosiCorrectionFiles_[3]);
+  auto CSC_slope_cosi_2to1_L1_ME11a_even_ = load(gemCscSlopeCosiFiles_[0]);
+  auto CSC_slope_cosi_2to1_L1_ME11a_odd_  = load(gemCscSlopeCosiFiles_[1]);
+  auto CSC_slope_cosi_3to1_L1_ME11a_even_ = load(gemCscSlopeCosiFiles_[2]);
+  auto CSC_slope_cosi_3to1_L1_ME11a_odd_  = load(gemCscSlopeCosiFiles_[3]);
 
-  auto CSC_slope_corr_L1_ME11_even_ = load(gemCscSlopeCorrectionFiles_[0]);
-  auto CSC_slope_corr_L2_ME11_even_ = load(gemCscSlopeCorrectionFiles_[1]);
-  auto CSC_slope_corr_L1_ME11_odd_ = load(gemCscSlopeCorrectionFiles_[2]);
-  auto CSC_slope_corr_L2_ME11_odd_ = load(gemCscSlopeCorrectionFiles_[3]);
+  auto CSC_slope_cosi_2to1_L1_ME11b_even_ = load(gemCscSlopeCosiFiles_[4]);
+  auto CSC_slope_cosi_2to1_L1_ME11b_odd_  = load(gemCscSlopeCosiFiles_[5]);
+  auto CSC_slope_cosi_3to1_L1_ME11b_even_ = load(gemCscSlopeCosiFiles_[6]);
+  auto CSC_slope_cosi_3to1_L1_ME11b_odd_  = load(gemCscSlopeCosiFiles_[7]);
 
-  auto es_diff_slope_L1_ME1a_even_ = load(esDiffToSlopeME1aFiles_[0]);
-  auto es_diff_slope_L1_ME1a_odd_ = load(esDiffToSlopeME1aFiles_[1]);
-  auto es_diff_slope_L2_ME1a_even_ = load(esDiffToSlopeME1aFiles_[2]);
-  auto es_diff_slope_L2_ME1a_odd_ = load(esDiffToSlopeME1aFiles_[3]);
 
-  auto es_diff_slope_L1_ME1b_even_ = load(esDiffToSlopeME1bFiles_[0]);
-  auto es_diff_slope_L1_ME1b_odd_ = load(esDiffToSlopeME1bFiles_[1]);
-  auto es_diff_slope_L2_ME1b_even_ = load(esDiffToSlopeME1bFiles_[2]);
-  auto es_diff_slope_L2_ME1b_odd_ = load(esDiffToSlopeME1bFiles_[3]);
+  auto CSC_slope_cosi_corr_L1_ME11a_even_ = load(gemCscSlopeCosiCorrectionFiles_[0]);
+  auto CSC_slope_cosi_corr_L1_ME11b_even_ = load(gemCscSlopeCosiCorrectionFiles_[1]);
+  auto CSC_slope_cosi_corr_L1_ME11_odd_  = load(gemCscSlopeCosiCorrectionFiles_[3]);
+  auto CSC_slope_cosi_corr_L1_ME11b_odd_  = load(gemCscSlopeCosiCorrectionFiles_[4]);
+
+  auto CSC_slope_corr_L1_ME11a_even_ = load(gemCscSlopeCorrectionFiles_[0]);
+  auto CSC_slope_corr_L1_ME11b_even_ = load(gemCscSlopeCorrectionFiles_[1]);
+  auto CSC_slope_corr_L1_ME11a_odd_  = load(gemCscSlopeCorrectionFiles_[3]);
+  auto CSC_slope_corr_L1_ME11b_odd_  = load(gemCscSlopeCorrectionFiles_[4]);
+
+  auto es_diff_slope_L1_ME11a_even_ = load(esDiffToSlopeME1aFiles_[0]);
+  auto es_diff_slope_L1_ME11a_odd_  = load(esDiffToSlopeME1aFiles_[1]);
+
+  auto es_diff_slope_L1_ME11b_even_ = load(esDiffToSlopeME1bFiles_[0]);
+  auto es_diff_slope_L1_ME11b_odd_  = load(esDiffToSlopeME1bFiles_[1]);
 
   // set the data in the LUT object
-  lut->set_GEM_pad_CSC_es_ME1b_even(std::move(GEM_pad_CSC_es_ME1b_even_));
-  lut->set_GEM_pad_CSC_es_ME1a_even(std::move(GEM_pad_CSC_es_ME1a_even_));
-  lut->set_GEM_pad_CSC_es_ME1b_odd(std::move(GEM_pad_CSC_es_ME1b_odd_));
-  lut->set_GEM_pad_CSC_es_ME1a_odd(std::move(GEM_pad_CSC_es_ME1a_odd_));
+  lut->set_GEM_pad_CSC_es_ME11b_even(std::move(GEM_pad_CSC_es_ME11b_even_));
+  lut->set_GEM_pad_CSC_es_ME11a_even(std::move(GEM_pad_CSC_es_ME11a_even_));
+  lut->set_GEM_pad_CSC_es_ME11b_odd(std::move(GEM_pad_CSC_es_ME11b_odd_));
+  lut->set_GEM_pad_CSC_es_ME11a_odd(std::move(GEM_pad_CSC_es_ME11a_odd_));
 
   lut->set_GEM_roll_CSC_min_wg_ME11_even(std::move(GEM_roll_CSC_min_wg_ME11_even_));
   lut->set_GEM_roll_CSC_min_wg_ME11_odd(std::move(GEM_roll_CSC_min_wg_ME11_odd_));
@@ -149,31 +153,28 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
   lut->set_GEM_roll_CSC_max_wg_ME11_odd(std::move(GEM_roll_CSC_max_wg_ME11_odd_));
 
   // GEM-CSC trigger: slope correction
-  lut->set_CSC_slope_cosi_2to1_L1_ME11_even(std::move(CSC_slope_cosi_2to1_L1_ME11_even_));
-  lut->set_CSC_slope_cosi_2to1_L1_ME11_odd(std::move(CSC_slope_cosi_2to1_L1_ME11_odd_));
-  lut->set_CSC_slope_cosi_3to1_L1_ME11_even(std::move(CSC_slope_cosi_3to1_L1_ME11_even_));
-  lut->set_CSC_slope_cosi_3to1_L1_ME11_odd(std::move(CSC_slope_cosi_3to1_L1_ME11_odd_));
+  lut->set_CSC_slope_cosi_2to1_L1_ME11a_even(std::move(CSC_slope_cosi_2to1_L1_ME11a_even_));
+  lut->set_CSC_slope_cosi_2to1_L1_ME11a_odd(std::move(CSC_slope_cosi_2to1_L1_ME11a_odd_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME11a_even(std::move(CSC_slope_cosi_3to1_L1_ME11a_even_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME11a_odd(std::move(CSC_slope_cosi_3to1_L1_ME11a_odd_));
 
-  lut->set_CSC_slope_cosi_corr_L1_ME11_even(std::move(CSC_slope_cosi_corr_L1_ME11_even_));
-  lut->set_CSC_slope_cosi_corr_L1_ME11_odd(std::move(CSC_slope_cosi_corr_L1_ME11_odd_));
-  lut->set_CSC_slope_cosi_corr_L2_ME11_even(std::move(CSC_slope_cosi_corr_L2_ME11_even_));
-  lut->set_CSC_slope_cosi_corr_L2_ME11_odd(std::move(CSC_slope_cosi_corr_L2_ME11_odd_));
+  lut->set_CSC_slope_cosi_2to1_L1_ME11b_even(std::move(CSC_slope_cosi_2to1_L1_ME11b_even_));
+  lut->set_CSC_slope_cosi_2to1_L1_ME11b_odd(std::move(CSC_slope_cosi_2to1_L1_ME11b_odd_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME11b_even(std::move(CSC_slope_cosi_3to1_L1_ME11b_even_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME11b_odd(std::move(CSC_slope_cosi_3to1_L1_ME11b_odd_));
 
-  lut->set_CSC_slope_corr_L1_ME11_even(std::move(CSC_slope_corr_L1_ME11_even_));
-  lut->set_CSC_slope_corr_L1_ME11_odd(std::move(CSC_slope_corr_L1_ME11_odd_));
-  lut->set_CSC_slope_corr_L2_ME11_even(std::move(CSC_slope_corr_L2_ME11_even_));
-  lut->set_CSC_slope_corr_L2_ME11_odd(std::move(CSC_slope_corr_L2_ME11_odd_));
+  lut->set_CSC_slope_corr_L1_ME11a_even(std::move(CSC_slope_corr_L1_ME11a_even_));
+  lut->set_CSC_slope_corr_L1_ME11a_odd(std::move(CSC_slope_corr_L1_ME11a_odd_));
+  lut->set_CSC_slope_corr_L1_ME11b_even(std::move(CSC_slope_corr_L1_ME11b_even_));
+  lut->set_CSC_slope_corr_L1_ME11b_odd(std::move(CSC_slope_corr_L1_ME11b_odd_));
 
   // GEM-CSC trigger: 1/8-strip difference to slope
-  lut->set_es_diff_slope_L1_ME1a_even(std::move(es_diff_slope_L1_ME1a_even_));
-  lut->set_es_diff_slope_L1_ME1a_odd(std::move(es_diff_slope_L1_ME1a_odd_));
-  lut->set_es_diff_slope_L2_ME1a_even(std::move(es_diff_slope_L2_ME1a_even_));
-  lut->set_es_diff_slope_L2_ME1a_odd(std::move(es_diff_slope_L2_ME1a_odd_));
+  lut->set_es_diff_slope_L1_ME11a_even(std::move(es_diff_slope_L1_ME11a_even_));
+  lut->set_es_diff_slope_L1_ME11a_odd(std::move(es_diff_slope_L1_ME11a_odd_));
 
-  lut->set_es_diff_slope_L1_ME1b_even(std::move(es_diff_slope_L1_ME1b_even_));
-  lut->set_es_diff_slope_L1_ME1b_odd(std::move(es_diff_slope_L1_ME1b_odd_));
-  lut->set_es_diff_slope_L2_ME1b_even(std::move(es_diff_slope_L2_ME1b_even_));
-  lut->set_es_diff_slope_L2_ME1b_odd(std::move(es_diff_slope_L2_ME1b_odd_));
+  lut->set_es_diff_slope_L1_ME11b_even(std::move(es_diff_slope_L1_ME11b_even_));
+  lut->set_es_diff_slope_L1_ME11b_odd(std::move(es_diff_slope_L1_ME11b_odd_));
+
 
   return lut;
 }
@@ -188,27 +189,42 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   std::vector<std::string> rollToMaxWgME21Files_ = pset_.getParameter<std::vector<std::string>>("rollToMaxWgME21Files");
   std::vector<std::string> rollToMinWgME21Files_ = pset_.getParameter<std::vector<std::string>>("rollToMinWgME21Files");
 
-  std::vector<std::string> esDiffToSlopeME21Files_ =
-      pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME21Files");
+  std::vector<std::string> gemCscSlopeCosiFiles_ = pset_.getParameter<std::vector<std::string>>("gemCscSlopeCosiFiles");
+  std::vector<std::string> gemCscSlopeCosiCorrectionFiles_ =
+      pset_.getParameter<std::vector<std::string>>("gemCscSlopeCosiCorrectionFiles");
+  std::vector<std::string> gemCscSlopeCorrectionFiles_ =
+      pset_.getParameter<std::vector<std::string>>("gemCscSlopeCorrectionFiles");
+
+  std::vector<std::string> esDiffToSlopeME2Files_ =
+      pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME2Files");
 
   // read the text files and extract the data
   auto GEM_pad_CSC_es_ME21_even_ = load(padToEsME21Files_[0]);
   auto GEM_pad_CSC_es_ME21_odd_ = load(padToEsME21Files_[1]);
 
   auto GEM_roll_L1_CSC_min_wg_ME21_even_ = load(rollToMinWgME21Files_[0]);
-  auto GEM_roll_L1_CSC_min_wg_ME21_odd_ = load(rollToMinWgME21Files_[1]);
+  auto GEM_roll_L1_CSC_min_wg_ME21_odd_  = load(rollToMinWgME21Files_[1]);
   auto GEM_roll_L2_CSC_min_wg_ME21_even_ = load(rollToMinWgME21Files_[2]);
-  auto GEM_roll_L2_CSC_min_wg_ME21_odd_ = load(rollToMinWgME21Files_[3]);
+  auto GEM_roll_L2_CSC_min_wg_ME21_odd_  = load(rollToMinWgME21Files_[3]);
 
   auto GEM_roll_L1_CSC_max_wg_ME21_even_ = load(rollToMaxWgME21Files_[0]);
-  auto GEM_roll_L1_CSC_max_wg_ME21_odd_ = load(rollToMaxWgME21Files_[1]);
+  auto GEM_roll_L1_CSC_max_wg_ME21_odd_  = load(rollToMaxWgME21Files_[1]);
   auto GEM_roll_L2_CSC_max_wg_ME21_even_ = load(rollToMaxWgME21Files_[2]);
-  auto GEM_roll_L2_CSC_max_wg_ME21_odd_ = load(rollToMaxWgME21Files_[3]);
+  auto GEM_roll_L2_CSC_max_wg_ME21_odd_  = load(rollToMaxWgME21Files_[3]);
 
-  auto es_diff_slope_L1_ME21_even_ = load(esDiffToSlopeME21Files_[0]);
-  auto es_diff_slope_L1_ME21_odd_ = load(esDiffToSlopeME21Files_[1]);
-  auto es_diff_slope_L2_ME21_even_ = load(esDiffToSlopeME21Files_[2]);
-  auto es_diff_slope_L2_ME21_odd_ = load(esDiffToSlopeME21Files_[3]);
+  auto es_diff_slope_L1_ME21_even_ = load(esDiffToSlopeME2Files_[0]);
+  auto es_diff_slope_L1_ME21_odd_  = load(esDiffToSlopeME2Files_[1]);
+
+  auto CSC_slope_cosi_2to1_L1_ME21_even_ = load(gemCscSlopeCosiFiles_[8]);
+  auto CSC_slope_cosi_2to1_L1_ME21_odd_  = load(gemCscSlopeCosiFiles_[9]);
+  auto CSC_slope_cosi_3to1_L1_ME21_even_ = load(gemCscSlopeCosiFiles_[10]);
+  auto CSC_slope_cosi_3to1_L1_ME21_odd_  = load(gemCscSlopeCosiFiles_[11]);
+
+  auto CSC_slope_cosi_corr_L1_ME21_even_  = load(gemCscSlopeCosiCorrectionFiles_[2]);
+  auto CSC_slope_cosi_corr_L1_ME21_odd_   = load(gemCscSlopeCosiCorrectionFiles_[5]);
+
+  auto CSC_slope_corr_L1_ME21_even_  = load(gemCscSlopeCorrectionFiles_[2]);
+  auto CSC_slope_corr_L1_ME21_odd_   = load(gemCscSlopeCorrectionFiles_[5]); 
 
   // set the data in the LUT object
   lut->set_GEM_pad_CSC_es_ME21_even(std::move(GEM_pad_CSC_es_ME21_even_));
@@ -225,9 +241,15 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   lut->set_GEM_roll_L2_CSC_max_wg_ME21_odd(std::move(GEM_roll_L2_CSC_max_wg_ME21_odd_));
 
   lut->set_es_diff_slope_L1_ME21_even(std::move(es_diff_slope_L1_ME21_even_));
-  lut->set_es_diff_slope_L2_ME21_even(std::move(es_diff_slope_L2_ME21_even_));
   lut->set_es_diff_slope_L1_ME21_odd(std::move(es_diff_slope_L1_ME21_odd_));
-  lut->set_es_diff_slope_L2_ME21_odd(std::move(es_diff_slope_L2_ME21_odd_));
+
+  lut->set_CSC_slope_cosi_2to1_L1_ME21_even(std::move(CSC_slope_cosi_2to1_L1_ME21_even_));
+  lut->set_CSC_slope_cosi_2to1_L1_ME21_odd(std::move(CSC_slope_cosi_2to1_L1_ME21_odd_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME21_even(std::move(CSC_slope_cosi_3to1_L1_ME21_even_));
+  lut->set_CSC_slope_cosi_3to1_L1_ME21_odd(std::move(CSC_slope_cosi_3to1_L1_ME21_odd_));
+
+  lut->set_CSC_slope_corr_L1_ME21_even(std::move(CSC_slope_corr_L1_ME21_even_));
+  lut->set_CSC_slope_corr_L1_ME21_odd(std::move(CSC_slope_corr_L1_ME21_odd_));
 
   return lut;
 }

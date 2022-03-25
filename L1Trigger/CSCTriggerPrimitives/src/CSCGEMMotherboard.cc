@@ -311,6 +311,7 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
                                          const GEMInternalClusters& clusters,
                                          CSCCorrelatedLCTDigi& lct1,
                                          CSCCorrelatedLCTDigi& lct2) const {
+
   // case where there no valid clusters
   if (clusters.empty())
     return;
@@ -334,6 +335,10 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
     return;
   }
 
+  //remove invalid GEM clusters
+  GEMInternalClusters ValidClusters;
+  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
+
   // at this point, we have at least one valid cluster, and we're either dealing
   // wit GE1/1 or GE2/1 with 16 partitions, both are OK for GEM-CSC trigger
 
@@ -342,10 +347,10 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   // drop low quality CLCTs if no clusters and flags are set
   GEMInternalCluster bestALCTCluster, secondALCTCluster;
   GEMInternalCluster bestCLCTCluster, secondCLCTCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, clusters, bestALCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, clusters, secondALCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, clusters, bestCLCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, clusters, secondCLCTCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestALCT, ValidClusters, bestALCTCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondALCT, ValidClusters, secondALCTCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, ValidClusters, bestCLCTCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, ValidClusters, secondCLCTCluster);
 
   dropLowQualityALCTNoClusters(bestALCT, bestALCTCluster);
   dropLowQualityALCTNoClusters(secondALCT, secondALCTCluster);
@@ -358,10 +363,10 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   // We can now check possible triplets and construct all LCTs with
   // valid ALCT, valid CLCTs and coincidence clusters
   GEMInternalCluster bbCluster, bsCluster, sbCluster, ssCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, bestCLCT, clusters, bbCluster);
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, secondCLCT, clusters, bsCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, bestCLCT, clusters, sbCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, secondCLCT, clusters, ssCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestALCT, bestCLCT, ValidClusters, bbCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestALCT, secondCLCT, ValidClusters, bsCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondALCT, bestCLCT, ValidClusters, sbCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondALCT, secondCLCT, ValidClusters, ssCluster);
 
   // At this point it is still possible that certain pairs with high-quality
   // ALCTs and CLCTs do not have matching clusters. In that case we construct
@@ -427,11 +432,15 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCCLCTDigi& bCLCT,
   if (secondCLCT == bestCLCT)
     secondCLCT.clear();
 
+  //remove invalid GEM clusters
+  GEMInternalClusters ValidClusters;
+  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
+
   // get the best matching cluster
   GEMInternalCluster bestCluster;
   GEMInternalCluster secondCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, clusters, bestCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, clusters, secondCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, ValidClusters, bestCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, ValidClusters, secondCluster);
 
   // drop low quality CLCTs if no clusters and flags are set
   dropLowQualityCLCTNoClusters(bestCLCT, bestCluster);
@@ -463,11 +472,15 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   if (secondALCT == bestALCT)
     secondALCT.clear();
 
+  //remove invalid GEM clusters
+  GEMInternalClusters ValidClusters;
+  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
+
   // get the best matching cluster
   GEMInternalCluster bestCluster;
   GEMInternalCluster secondCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, clusters, bestCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, clusters, secondCluster);
+  cscGEMMatcher_->bestClusterBXLoc(bestALCT, ValidClusters, bestCluster);
+  cscGEMMatcher_->bestClusterBXLoc(secondALCT, ValidClusters, secondCluster);
 
   // drop low quality ALCTs if no clusters and flags are set
   dropLowQualityALCTNoClusters(bestALCT, bestCluster);
@@ -513,8 +526,11 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
   thisLCT.setBX(alct.getBX());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_)
-      thisLCT.setSlope(cscGEMMatcher_->calculateGEMCSCBending(clct, gem));
+    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
+      int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
+      thisLCT.setSlope(abs(slope));
+      thisLCT.setBend(std::signbit(slope));
+    }
     else
       thisLCT.setSlope(clct.getSlope());
     thisLCT.setQuartStripBit(clct.getQuartStripBit());
@@ -546,8 +562,11 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCCLCTDigi& clct,
   thisLCT.setBX(gem.bx());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_)
-      thisLCT.setSlope(cscGEMMatcher_->calculateGEMCSCBending(clct, gem));
+    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
+    int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
+      thisLCT.setSlope(abs(slope));
+      thisLCT.setBend(pow(-1, std::signbit(slope)));
+    }
     else
       thisLCT.setSlope(clct.getSlope());
     thisLCT.setQuartStripBit(clct.getQuartStripBit());
