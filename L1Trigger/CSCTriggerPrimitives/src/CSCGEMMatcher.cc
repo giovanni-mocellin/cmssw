@@ -39,7 +39,7 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
   //ME1a necessitates a different treatment because of a different strip numbering scheme and strip width
-  const int SignedEighthStripDiff = matchedClusterDistES(clct, cluster);
+  const int SignedEighthStripDiff = matchedClusterDistES(clct, cluster, true);
   const unsigned eighthStripDiff = abs(SignedEighthStripDiff); //LUTs consider only absolute change
 
   //use LUTs to determine absolute slope, default 0
@@ -57,16 +57,13 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
     }
   }
 
-  //account for the sign of the difference and take into account whether CLCT slope propagation is on or not
+  //account for the sign of the difference
   slopeShift *= pow(-1, std::signbit(SignedEighthStripDiff));
-  int NewSlope = matchCLCTpropagation_ ? clct.getSlope() * pow(-1, clct.getBend()) + slopeShift : slopeShift;
-  int NewSlopeSign = pow(-1, std::signbit(NewSlope));
-  NewSlope = std::min(15, abs(NewSlope)) * NewSlopeSign;
 
   //Debugging
-  //std::cout<<"old slope "<<clct.getSlope() * pow(-1, clct.getBend())<<" vs new slope "<<NewSlope<<std::endl;
+  //std::cout<<"old slope "<<clct.getSlope() * pow(-1, clct.getBend())<<" vs new slope "<<slopeShift<<std::endl;
 
-  return NewSlope;
+  return slopeShift;
 }
 
 
@@ -161,7 +158,7 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
   // select clusters matched by 1/2-strip or 1/8-strip, picking closest option in eighth-strips
   std::vector<int> distances;
   for (const auto& cl : clusters) {
-    const unsigned distanceES = abs(matchedClusterDistES(clct, cl));
+    const unsigned distanceES = abs(matchedClusterDistES(clct, cl, false));
     if (distanceES <= eighthStripCut){ //only accept clusters in the window around the CLCT
 
       //assure building an ordered in increasing absolute distance list of GEM matches
@@ -176,8 +173,8 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
   }
 }
 
-// calculate distance in eighth-strip units between CLCT and GEM
-int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cl) const {
+// calculate distance in eighth-strip units between CLCT and GEM, switch ForceTotal on to calculate total distance without slope extrapolation
+int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cl, const bool ForceTotal) const {
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
   int cl_es = isME1a ? cl.getKeyStripME1a(8) : cl.getKeyStrip(8);
@@ -187,7 +184,7 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
   //Debugging
   //std::cout<<"Diff GEM "<<cl_es<<" - CSC "<<clct.getKeyStrip(8)<<" = "<<eighthStripDiff<<std::endl;
 
-  if (matchCLCTpropagation_) { //modification of DeltaStrip by CLCT slope
+  if (matchCLCTpropagation_ && !ForceTotal) { //modification of DeltaStrip by CLCT slope
     int SlopeShift = 0;
     uint16_t baseSlope = -1;
     baseSlope =  mitigateSlopeByCosi_ ? mitigatedSlopeByConsistency(clct) : clct.getSlope();

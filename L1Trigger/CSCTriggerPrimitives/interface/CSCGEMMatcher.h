@@ -67,8 +67,8 @@ public:
                            const GEMInternalClusters& clusters,
                            GEMInternalClusters& selected) const;
 
-  // match by 1/8-strip
-  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
+  // matching candidate distance in 1/8 strip, always the total without extrapolation correction, if ForceTotal is true
+  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool ForceTotal) const;
 
   // coincidences or single clusters
   void matchingClustersLoc(const CSCALCTDigi& alct,
