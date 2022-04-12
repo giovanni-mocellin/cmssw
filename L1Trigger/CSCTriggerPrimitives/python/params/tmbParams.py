@@ -56,8 +56,8 @@ tmbPhase2 = tmbPhase1.clone(
 
 tmbPhase2GEM = tmbPhase2.clone(
     # matching to GEM clusters in time
-    maxDeltaBXALCTGEM = cms.uint32(7),
-    maxDeltaBXCLCTGEM = cms.uint32(7),
+    maxDeltaBXALCTGEM = cms.uint32(1),
+    maxDeltaBXCLCTGEM = cms.uint32(3),
     # Set to True for matching CLCT and GEM clusters by "propagating"
     # CLCT slope to GEM. Otherwise, just matching keystrip positions
     matchCLCTpropagation = cms.bool(True),
