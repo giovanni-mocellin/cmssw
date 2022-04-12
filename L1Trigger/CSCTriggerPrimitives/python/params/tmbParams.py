@@ -60,7 +60,7 @@ tmbPhase2GEM = tmbPhase2.clone(
     maxDeltaBXCLCTGEM = cms.uint32(7),
     # Set to True for matching CLCT and GEM clusters by "propagating"
     # CLCT slope to GEM. Otherwise, just matching keystrip positions
-    matchCLCTpropagation = cms.bool(False),
+    matchCLCTpropagation = cms.bool(True),
     # efficiency recovery switches
     dropLowQualityALCTsNoGEMs = cms.bool(False),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
