@@ -28,6 +28,9 @@ CSCGEMMatcher::CSCGEMMatcher(
 
   mitigateSlopeByCosi_ = tmbParams.getParameter<bool>("mitigateSlopeByCosi");
   assign_gem_csc_bending_ = tmbParams.getParameter<bool>("assignGEMCSCBending");
+  
+  //get bunchcrossing preference order bin by bin for GEM-CSC matching in time
+  BunchCrossingCSCminGEMwindow_ = tmbParams.getParameter<std::vector<int> >("BunchCrossingCSCminGEMwindow");
 }
 
 void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME11ILT* conf) { lookupTableME11ILT_ = conf; }
@@ -77,9 +80,11 @@ void CSCGEMMatcher::matchingClustersBX(const CSCALCTDigi& alct,
 
   // select clusters matched in time
   for (const auto& cl : clusters) {
-    const unsigned diff = std::abs(int(alct.getBX()) - cl.bx());
-    if (diff <= maxDeltaBXALCTGEM_)
-      output.push_back(cl);
+    const int diff = int(alct.getBX()) - cl.bx();
+    for(unsigned i = 0; i < BunchCrossingCSCminGEMwindow_.size(); ++i){ //loops through bins of preferential bunchcrossing acceptance order
+      if (diff == BunchCrossingCSCminGEMwindow_[i])
+        output.push_back(cl);
+    }
   }
 }
 

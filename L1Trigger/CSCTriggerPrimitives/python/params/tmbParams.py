@@ -60,7 +60,7 @@ tmbPhase2GEM = tmbPhase2.clone(
     maxDeltaBXCLCTGEM = cms.uint32(7),
     # Set to True for matching CLCT and GEM clusters by "propagating"
     # CLCT slope to GEM. Otherwise, just matching keystrip positions
-    matchCLCTpropagation = cms.bool(True),
+    matchCLCTpropagation = cms.bool(False),
     # efficiency recovery switches
     dropLowQualityALCTsNoGEMs = cms.bool(False),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
@@ -82,6 +82,8 @@ tmbPhase2GEM = tmbPhase2.clone(
     # values of cosi (consistency of slope indicator)
     # to optimize GEM-CSC slope correction
     mitigateSlopeByCosi = cms.bool(False),
+    # Preferred order of bunchcrossing difference between CSC minus GEM BX for matching
+    BunchCrossingCSCminGEMwindow = cms.vint32(0, -1, 1, -2, 2, -3, 3)
 )
 
 # to be used by ME11 chambers with GEM-CSC ILT

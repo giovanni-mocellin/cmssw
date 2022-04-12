@@ -136,6 +136,8 @@ private:
 
   bool assign_gem_csc_bending_;
   bool mitigateSlopeByCosi_;
+
+  std::vector<int> BunchCrossingCSCminGEMwindow_;
 };
 
 #endif
