@@ -16,6 +16,7 @@ CSCGEMMatcher::CSCGEMMatcher(
   maxDeltaBXALCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXALCTGEM");
   maxDeltaBXCLCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXCLCTGEM");
 
+  maxDeltaWG_ = tmbParams.getParameter<unsigned>("maxDeltaWG");
   maxDeltaHsEven_ = tmbParams.getParameter<unsigned>("maxDeltaHsEven");
   maxDeltaHsOdd_ = tmbParams.getParameter<unsigned>("maxDeltaHsOdd");
 
@@ -28,12 +29,9 @@ CSCGEMMatcher::CSCGEMMatcher(
 
   mitigateSlopeByCosi_ = tmbParams.getParameter<bool>("mitigateSlopeByCosi");
   assign_gem_csc_bending_ = tmbParams.getParameter<bool>("assignGEMCSCBending");
-  
+
   //get bunchcrossing preference order bin by bin for GEM-CSC matching in time
   BunchCrossingCSCminGEMwindow_ = tmbParams.getParameter<std::vector<int> >("BunchCrossingCSCminGEMwindow");
-
-  //switch on and off considering second layer-specific tables
-  L2specificTables_ = tmbParams.getParameter<bool>("L2specificTables");
 }
 
 void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME11ILT* conf) { lookupTableME11ILT_ = conf; }
@@ -49,13 +47,13 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
   const unsigned eighthStripDiff = abs(SignedEighthStripDiff); //LUTs consider only absolute change
 
   //enable or disable layer 2-specific tables
-  bool LoadL2 = false;
-  if(!cluster.isCoincidence() && cluster.id().layer() == 2 && L2specificTables_) LoadL2 = true;
+  bool isLayer2 = false;
+  if(!cluster.isCoincidence() && cluster.id().layer() == 2) isLayer2 = true;
 
   //use LUTs to determine absolute slope, default 0
   int slopeShift = 0;
   if (station_ == 2) {
-    if(!LoadL2){
+    if(!isLayer2){
       if (isEven_) slopeShift = lookupTableME21ILT_->es_diff_slope_L1_ME21_even(eighthStripDiff);
       else         slopeShift = lookupTableME21ILT_->es_diff_slope_L1_ME21_odd(eighthStripDiff);
     } else {
@@ -64,7 +62,7 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
     }
   } else if (station_ == 1) {
     if (isME1a) {  //is in ME1a
-      if(!LoadL2){
+      if(!isLayer2){
         if (isEven_) slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11a_even(eighthStripDiff);
         else 	   slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11a_odd(eighthStripDiff);
       } else {
@@ -72,7 +70,7 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInte
         else       slopeShift = lookupTableME11ILT_->es_diff_slope_L2_ME11a_odd(eighthStripDiff);
       }
     } else {
-      if(!LoadL2){
+      if(!isLayer2){
         if (isEven_) slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11b_even(eighthStripDiff);
         else         slopeShift = lookupTableME11ILT_->es_diff_slope_L1_ME11b_odd(eighthStripDiff);
       } else {
@@ -157,10 +155,12 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
 
   // select clusters matched in wiregroup
   for (const auto& cl : clusters) {
-    // for now add 10 wiregroups to make sure the matching can be done
-    // this should be quite generous
-    unsigned deltaWG(station_ == 1 ? 10 : 20);
-    if (cl.min_wg() <= alct.getKeyWG() and alct.getKeyWG() <= cl.max_wg() + deltaWG) {
+    int min_wg = std::max(0, cl.min_wg() - maxDeltaWG_);
+    if (station_==1)
+      int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, cl.max_wg() + maxDeltaWG_);
+    if (station_==2)
+      int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, cl.max_wg() + maxDeltaWG_);
+    if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) {
       output.push_back(cl);
     }
   }
@@ -219,10 +219,10 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
     int clctSlope = pow(-1, clct.getBend()) * baseSlope;
 
     //enable or disable layer 2-specific tables
-    bool LoadL2 = false;
-    if(!cl.isCoincidence() && cl.id().layer() == 2 && L2specificTables_) LoadL2 = true;
+    bool isLayer2 = false;
+    if(!cl.isCoincidence() && cl.id().layer() == 2) isLayer2 = true;
 
-    SlopeShift = CSCGEMSlopeCorrector(isME1a, clctSlope, LoadL2);
+    SlopeShift = CSCGEMSlopeCorrector(isME1a, clctSlope, isLayer2);
     //Debugging
     //std::cout<<"SlopeShift = "<<SlopeShift<<" at slope "<<clctSlope<<std::endl;
     eighthStripDiff -= SlopeShift;
@@ -350,7 +350,7 @@ void CSCGEMMatcher::bestClusterBXLoc(const CSCALCTDigi& alct,
 
 // function to determine CLCT consistency of slope indicator (COSI) and use it to mitigate slope according to LUT
 uint16_t CSCGEMMatcher::mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) const {
-  
+
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
   // extract hit values from CLCT hit matrix
@@ -450,7 +450,7 @@ uint16_t CSCGEMMatcher::mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) con
 }
 
 //function to correct expected GEM position in phi by CSC slope measurement
-int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool LoadL2) const {
+int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool isLayer2) const {
   int SlopeShift = 0;
   int SlopeSign = pow(-1, std::signbit(cscSlope));
 
@@ -469,7 +469,7 @@ int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool LoadL2) 
   }
   else{ //account for slope without mitigation, if opted out
     if (station_ == 1) {
-      if(!LoadL2){
+      if(!isLayer2){
         if (chamber_ % 2 == 0) SlopeShift = isME1a ? lookupTableME11ILT_->CSC_slope_corr_L1_ME11a_even(std::abs(cscSlope))
                                                    : lookupTableME11ILT_->CSC_slope_corr_L1_ME11b_even(std::abs(cscSlope));
         else                   SlopeShift = isME1a ? lookupTableME11ILT_->CSC_slope_corr_L1_ME11a_odd(std::abs(cscSlope))
@@ -482,14 +482,14 @@ int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool LoadL2) 
       }
     }
     else if (station_ == 2) {
-      if(!LoadL2){
+      if(!isLayer2){
         if (chamber_ % 2 == 0) SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L1_ME21_even(std::abs(cscSlope));
         else                   SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L1_ME21_odd(std::abs(cscSlope));
       } else {
         if (chamber_ % 2 == 0) SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L2_ME21_even(std::abs(cscSlope));
         else                   SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L2_ME21_odd(std::abs(cscSlope));
       }
-    }     
+    }
   }
   return std::round(SlopeShift * SlopeSign);
 }

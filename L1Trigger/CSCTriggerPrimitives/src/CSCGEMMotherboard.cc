@@ -57,7 +57,7 @@ void CSCGEMMotherboard::clear() {
 uint16_t CSCGEMMotherboard::Run2PatternConverter(const int slope) const{
   unsigned sign = std::signbit(slope);
   unsigned slope_ = abs(slope);
-  uint16_t Run2Pattern = 0;  
+  uint16_t Run2Pattern = 0;
 
   if (slope_ < 3)       Run2Pattern = 10;
   else if (slope_ < 6)  Run2Pattern = 8 + sign;

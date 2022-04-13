@@ -84,12 +84,12 @@ tmbPhase2GEM = tmbPhase2.clone(
     mitigateSlopeByCosi = cms.bool(False),
     # Preferred order of bunchcrossing difference between CSC minus GEM BX for matching
     BunchCrossingCSCminGEMwindow = cms.vint32(0, -1, 1, -2, 2, -3, 3),
-    #Enable layer 2-specific tables for better precision
-    L2specificTables = cms.bool(True)
 )
 
 # to be used by ME11 chambers with GEM-CSC ILT
 tmbPhase2GE11 = tmbPhase2GEM.clone(
+    # matching windows for ALCT-GEM clusters in wiregroups
+    maxDeltaWG = cms.uint32(7),
     # matching windows for CLCT-GEM clusters in half strip units
     maxDeltaHsEven = cms.uint32(5),
     maxDeltaHsOdd = cms.uint32(10),

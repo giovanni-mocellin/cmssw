@@ -129,6 +129,7 @@ private:
   bool matchCLCTpropagation_;
 
   // Matching interval in Half Strips (less bits to deal with in FW), but then used as Eighth Strips (es=hs*4)
+  unsigned maxDeltaWG_;
   unsigned maxDeltaHsEven_;
   unsigned maxDeltaHsOdd_;
   unsigned maxDeltaHsEvenME1a_;
@@ -138,8 +139,6 @@ private:
   bool mitigateSlopeByCosi_;
 
   std::vector<int> BunchCrossingCSCminGEMwindow_;
-
-  bool L2specificTables_;
 };
 
 #endif
