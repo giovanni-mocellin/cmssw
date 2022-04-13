@@ -155,11 +155,12 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
 
   // select clusters matched in wiregroup
   for (const auto& cl : clusters) {
-    int min_wg = std::max(0, cl.min_wg() - maxDeltaWG_);
-    if (station_==1)
-      int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, cl.max_wg() + maxDeltaWG_);
+    int min_wg = std::max(0, int(cl.min_wg() - maxDeltaWG_));
+    int max_wg;
     if (station_==2)
-      int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, cl.max_wg() + maxDeltaWG_);
+      max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, int(cl.max_wg() + maxDeltaWG_));
+    else
+      max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.max_wg() + maxDeltaWG_));
     if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) {
       output.push_back(cl);
     }
