@@ -79,9 +79,9 @@ void CSCGEMMatcher::matchingClustersBX(const CSCALCTDigi& alct,
     return;
 
   // select clusters matched in time
-  for (const auto& cl : clusters) {
-    const int diff = int(alct.getBX()) - cl.bx();
-    for(unsigned i = 0; i < BunchCrossingCSCminGEMwindow_.size(); ++i){ //loops through bins of preferential bunchcrossing acceptance order
+  for(unsigned i = 0; i < BunchCrossingCSCminGEMwindow_.size(); ++i){ //loops through bins of preferential bunchcrossing acceptance order
+    for (const auto& cl : clusters) {
+      const int diff = int(alct.getBX()) - cl.bx();
       if (diff == BunchCrossingCSCminGEMwindow_[i])
         output.push_back(cl);
     }
