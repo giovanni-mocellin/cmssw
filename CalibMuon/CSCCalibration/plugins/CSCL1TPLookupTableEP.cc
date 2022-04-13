@@ -134,12 +134,20 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
   auto CSC_slope_corr_L1_ME11b_even_ = load(gemCscSlopeCorrectionFiles_[1]);
   auto CSC_slope_corr_L1_ME11a_odd_  = load(gemCscSlopeCorrectionFiles_[3]);
   auto CSC_slope_corr_L1_ME11b_odd_  = load(gemCscSlopeCorrectionFiles_[4]);
+  auto CSC_slope_corr_L2_ME11a_even_ = load(gemCscSlopeCorrectionFiles_[6]);
+  auto CSC_slope_corr_L2_ME11b_even_ = load(gemCscSlopeCorrectionFiles_[7]);
+  auto CSC_slope_corr_L2_ME11a_odd_  = load(gemCscSlopeCorrectionFiles_[9]);
+  auto CSC_slope_corr_L2_ME11b_odd_  = load(gemCscSlopeCorrectionFiles_[10]);
 
   auto es_diff_slope_L1_ME11a_even_ = load(esDiffToSlopeME11aFiles_[0]);
   auto es_diff_slope_L1_ME11a_odd_  = load(esDiffToSlopeME11aFiles_[1]);
+  auto es_diff_slope_L2_ME11a_even_ = load(esDiffToSlopeME11aFiles_[2]);
+  auto es_diff_slope_L2_ME11a_odd_  = load(esDiffToSlopeME11aFiles_[3]);
 
   auto es_diff_slope_L1_ME11b_even_ = load(esDiffToSlopeME11bFiles_[0]);
   auto es_diff_slope_L1_ME11b_odd_  = load(esDiffToSlopeME11bFiles_[1]);
+  auto es_diff_slope_L2_ME11b_even_ = load(esDiffToSlopeME11bFiles_[2]);
+  auto es_diff_slope_L2_ME11b_odd_  = load(esDiffToSlopeME11bFiles_[3]);
 
   // set the data in the LUT object
   lut->set_GEM_pad_CSC_es_ME11b_even(std::move(GEM_pad_CSC_es_ME11b_even_));
@@ -167,13 +175,21 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
   lut->set_CSC_slope_corr_L1_ME11a_odd(std::move(CSC_slope_corr_L1_ME11a_odd_));
   lut->set_CSC_slope_corr_L1_ME11b_even(std::move(CSC_slope_corr_L1_ME11b_even_));
   lut->set_CSC_slope_corr_L1_ME11b_odd(std::move(CSC_slope_corr_L1_ME11b_odd_));
+  lut->set_CSC_slope_corr_L2_ME11a_even(std::move(CSC_slope_corr_L2_ME11a_even_));
+  lut->set_CSC_slope_corr_L2_ME11a_odd(std::move(CSC_slope_corr_L2_ME11a_odd_));
+  lut->set_CSC_slope_corr_L2_ME11b_even(std::move(CSC_slope_corr_L2_ME11b_even_));
+  lut->set_CSC_slope_corr_L2_ME11b_odd(std::move(CSC_slope_corr_L2_ME11b_odd_));
 
   // GEM-CSC trigger: 1/8-strip difference to slope
   lut->set_es_diff_slope_L1_ME11a_even(std::move(es_diff_slope_L1_ME11a_even_));
   lut->set_es_diff_slope_L1_ME11a_odd(std::move(es_diff_slope_L1_ME11a_odd_));
+  lut->set_es_diff_slope_L2_ME11a_even(std::move(es_diff_slope_L2_ME11a_even_));
+  lut->set_es_diff_slope_L2_ME11a_odd(std::move(es_diff_slope_L2_ME11a_odd_));
 
   lut->set_es_diff_slope_L1_ME11b_even(std::move(es_diff_slope_L1_ME11b_even_));
   lut->set_es_diff_slope_L1_ME11b_odd(std::move(es_diff_slope_L1_ME11b_odd_));
+  lut->set_es_diff_slope_L2_ME11b_even(std::move(es_diff_slope_L2_ME11b_even_));
+  lut->set_es_diff_slope_L2_ME11b_odd(std::move(es_diff_slope_L2_ME11b_odd_));
 
 
   return lut;
@@ -214,6 +230,8 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
 
   auto es_diff_slope_L1_ME21_even_ = load(esDiffToSlopeME2Files_[0]);
   auto es_diff_slope_L1_ME21_odd_  = load(esDiffToSlopeME2Files_[1]);
+  auto es_diff_slope_L2_ME21_even_ = load(esDiffToSlopeME2Files_[2]);
+  auto es_diff_slope_L2_ME21_odd_  = load(esDiffToSlopeME2Files_[3]);
 
   auto CSC_slope_cosi_2to1_L1_ME21_even_ = load(gemCscSlopeCosiFiles_[8]);
   auto CSC_slope_cosi_2to1_L1_ME21_odd_  = load(gemCscSlopeCosiFiles_[9]);
@@ -224,7 +242,9 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   auto CSC_slope_cosi_corr_L1_ME21_odd_   = load(gemCscSlopeCosiCorrectionFiles_[5]);
 
   auto CSC_slope_corr_L1_ME21_even_  = load(gemCscSlopeCorrectionFiles_[2]);
-  auto CSC_slope_corr_L1_ME21_odd_   = load(gemCscSlopeCorrectionFiles_[5]); 
+  auto CSC_slope_corr_L1_ME21_odd_   = load(gemCscSlopeCorrectionFiles_[5]);
+  auto CSC_slope_corr_L2_ME21_even_  = load(gemCscSlopeCorrectionFiles_[8]);
+  auto CSC_slope_corr_L2_ME21_odd_   = load(gemCscSlopeCorrectionFiles_[11]); 
 
   // set the data in the LUT object
   lut->set_GEM_pad_CSC_es_ME21_even(std::move(GEM_pad_CSC_es_ME21_even_));
@@ -242,6 +262,8 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
 
   lut->set_es_diff_slope_L1_ME21_even(std::move(es_diff_slope_L1_ME21_even_));
   lut->set_es_diff_slope_L1_ME21_odd(std::move(es_diff_slope_L1_ME21_odd_));
+  lut->set_es_diff_slope_L2_ME21_even(std::move(es_diff_slope_L2_ME21_even_));
+  lut->set_es_diff_slope_L2_ME21_odd(std::move(es_diff_slope_L2_ME21_odd_));
 
   lut->set_CSC_slope_cosi_2to1_L1_ME21_even(std::move(CSC_slope_cosi_2to1_L1_ME21_even_));
   lut->set_CSC_slope_cosi_2to1_L1_ME21_odd(std::move(CSC_slope_cosi_2to1_L1_ME21_odd_));
@@ -250,6 +272,8 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
 
   lut->set_CSC_slope_corr_L1_ME21_even(std::move(CSC_slope_corr_L1_ME21_even_));
   lut->set_CSC_slope_corr_L1_ME21_odd(std::move(CSC_slope_corr_L1_ME21_odd_));
+  lut->set_CSC_slope_corr_L2_ME21_even(std::move(CSC_slope_corr_L2_ME21_even_));
+  lut->set_CSC_slope_corr_L2_ME21_odd(std::move(CSC_slope_corr_L2_ME21_odd_));
 
   return lut;
 }
