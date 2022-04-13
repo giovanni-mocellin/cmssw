@@ -58,12 +58,18 @@ CSCL1TPLookupTableEP = cms.ESSource(
     ),
     # lookup tables for the GEM-CSC slope correction
     gemCscSlopeCorrectionFiles = cms.vstring(
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME11a_even_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME11b_even_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME21_even_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME11a_odd_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME11b_odd_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/GEMCSCSlopeCorr_ME21_odd_layer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11a_even_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11b_even_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME21_even_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11a_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11b_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME21_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11a_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11b_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME21_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11a_odd_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME11b_odd_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/SlopeCorrection/FacingChambers/ExtrapolationBySlope_ME21_odd_GEMlayer2.txt",
     ),
     # lookup tables for the GEM-CSC slope correction
     gemCscSlopeCosiFiles = cms.vstring(
@@ -91,15 +97,21 @@ CSCL1TPLookupTableEP = cms.ESSource(
     ),
     # convert differences in 1/8-strip numbers between GEM and CSC to Run-3 slopes
     esDiffToSlopeME11aFiles = cms.vstring(
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME11a_even_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME11a_odd_layer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11a_even_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11a_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11a_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11a_odd_GEMlayer2.txt",
     ),
     esDiffToSlopeME11bFiles = cms.vstring(
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME11b_even_layer1.txt",
-        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME11b_odd_layer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11b_even_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11b_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11b_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME11b_odd_GEMlayer2.txt",
     ),
     esDiffToSlopeME21Files = cms.vstring(
-	"L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME21_even_layer1.txt",
-	"L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/GEMCSC_SlopeAmendment_NoCOSI_ME21_odd_layer1.txt",
+	"L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME21_even_GEMlayer1.txt",
+	"L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME21_odd_GEMlayer1.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME21_even_GEMlayer2.txt",
+        "L1Trigger/CSCTriggerPrimitives/data/GEMCSC/BendingAngle/SlopeAmendment_ME21_odd_GEMlayer2.txt",
     ),
    )

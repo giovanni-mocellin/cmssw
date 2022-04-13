@@ -115,7 +115,7 @@ private:
   uint16_t mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) const;
 
   // calculate slope correction
-  int CSCGEMSlopeCorrector(const bool isME1a, const int cscSlope) const;
+  int CSCGEMSlopeCorrector(const bool isME1a, const int cscSlope, const bool LoadL2) const;
 
   unsigned endcap_;
   unsigned station_;
@@ -138,6 +138,8 @@ private:
   bool mitigateSlopeByCosi_;
 
   std::vector<int> BunchCrossingCSCminGEMwindow_;
+
+  bool L2specificTables_;
 };
 
 #endif

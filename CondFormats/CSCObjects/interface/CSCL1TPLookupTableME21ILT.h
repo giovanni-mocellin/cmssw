@@ -28,6 +28,8 @@ public:
 
   void set_es_diff_slope_L1_ME21_even(t_lut lut);
   void set_es_diff_slope_L1_ME21_odd(t_lut lut);
+  void set_es_diff_slope_L2_ME21_even(t_lut lut);
+  void set_es_diff_slope_L2_ME21_odd(t_lut lut);
 
   void set_CSC_slope_cosi_2to1_L1_ME21_even(t_lut lut);
   void set_CSC_slope_cosi_2to1_L1_ME21_odd(t_lut lut);
@@ -39,6 +41,8 @@ public:
 
   void set_CSC_slope_corr_L1_ME21_even(t_lut lut);
   void set_CSC_slope_corr_L1_ME21_odd(t_lut lut);
+  void set_CSC_slope_corr_L2_ME21_even(t_lut lut);
+  void set_CSC_slope_corr_L2_ME21_odd(t_lut lut);
 
   // getters
   unsigned GEM_pad_CSC_es_ME21_even(unsigned pad) const;
@@ -64,10 +68,14 @@ public:
 
   unsigned CSC_slope_corr_L1_ME21_even(unsigned slope) const;
   unsigned CSC_slope_corr_L1_ME21_odd(unsigned slope) const;
+  unsigned CSC_slope_corr_L2_ME21_even(unsigned slope) const;
+  unsigned CSC_slope_corr_L2_ME21_odd(unsigned slope) const;
 
   // GEM-CSC trigger: 1/8-strip difference to slope
   unsigned es_diff_slope_L1_ME21_even(unsigned es_diff) const;
   unsigned es_diff_slope_L1_ME21_odd(unsigned es_diff) const;
+  unsigned es_diff_slope_L2_ME21_even(unsigned es_diff) const;
+  unsigned es_diff_slope_L2_ME21_odd(unsigned es_diff) const;
 
 private:
   std::vector<unsigned> GEM_pad_CSC_es_ME21_even_;
@@ -93,9 +101,13 @@ private:
 
   std::vector<unsigned> CSC_slope_corr_L1_ME21_even_;
   std::vector<unsigned> CSC_slope_corr_L1_ME21_odd_;
+  std::vector<unsigned> CSC_slope_corr_L2_ME21_even_;
+  std::vector<unsigned> CSC_slope_corr_L2_ME21_odd_;
 
   std::vector<unsigned> es_diff_slope_L1_ME21_even_;
   std::vector<unsigned> es_diff_slope_L1_ME21_odd_;
+  std::vector<unsigned> es_diff_slope_L2_ME21_even_;
+  std::vector<unsigned> es_diff_slope_L2_ME21_odd_;
 
   COND_SERIALIZABLE;
 };
