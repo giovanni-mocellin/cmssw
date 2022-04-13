@@ -46,8 +46,8 @@ public:
   // See DN-20-016
   enum class LCT_QualityRun3GEM : unsigned int {
     INVALID = 0,
-    ALCT_2GEM = 1,
-    CLCT_2GEM = 2,
+    ALCT_2GEM = 2,
+    CLCT_2GEM = 1,
     ALCT_CLCT = 3,
     ALCT_CLCT_1GEM_CSCBend = 4,
     ALCT_CLCT_1GEM_GEMCSCBend = 5,
