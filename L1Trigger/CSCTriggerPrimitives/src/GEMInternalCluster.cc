@@ -10,23 +10,25 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id,
   isCoincidence_ = false;
   isValid_ = false;
 
+  int delayGEM_ = 0;
+
   if (cluster1.isValid()) {
     isValid_ = true;
     cl1_ = cluster1;
-    bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    bx_ = cluster1.bx() + delayGEM_;
     layer1_pad_ = cluster1.pads()[0];
     layer1_size_ = cluster1.pads().size();
   }
   if (cluster2.isValid()) {
     isValid_ = true;
     cl2_ = cluster2;
-    bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX;
+    bx_ = cluster2.bx() + delayGEM_;
     layer2_pad_ = cluster2.pads()[0];
     layer2_size_ = cluster2.pads().size();
   }
 
   if (cluster1.isValid() and cluster2.isValid()) {
-    bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    bx_ = cluster1.bx() + delayGEM_;
     isCoincidence_ = true;
   }
 
