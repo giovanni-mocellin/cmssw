@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <strings.h>  // for bzero
 #include <cstring>
+#include <iostream>
+
 
 #ifdef LOCAL_UNPACK
 bool CSCGEMData::debug = false;
@@ -153,6 +155,7 @@ std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_rol
           int cluster_size = (theData[dataAddr] >> 11) & 0x7;
           if ((pad < nPads) && (eta == eta_roll)) {
             int padInPart = pad;
+            std::cout << "GEM: Layer" << gem_layer+1 << " tbin: " << i << " fiber#: " << (fiber + 1) << " cluster#: " << (cluster + 1) << " pad: " << pad << " eta: " << 8-eta << " cluster_size: " << cluster_size << std::endl;
             if (debug)
               LogTrace("CSCGEMData|CSCRawToDigi")
                   << "GEMlayer" << gem_layer << " cl_word" << dataAddr << ": 0x" << std::hex << cl_word << std::dec

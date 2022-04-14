@@ -574,8 +574,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis_0;
                 for (int unsigned i = 0; i < correlatedlctDigis.size(); ++i) {
-                  if (correlatedlctDigis[i].isValid())
-                    correlatedlctDigis_0.push_back(correlatedlctDigis[i]);
+                  if (correlatedlctDigis[i].isValid()){
+                    std::cout << "Unpacker: " << correlatedlctDigis[i] << std::endl;
+                    correlatedlctDigis_0.push_back(correlatedlctDigis[i]);}
                 }
                 corrlctProduct->move(std::make_pair(correlatedlctDigis_0.begin(), correlatedlctDigis_0.end()), layer);
               } else
