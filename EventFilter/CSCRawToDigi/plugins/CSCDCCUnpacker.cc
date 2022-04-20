@@ -639,7 +639,7 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                       // GE11 eta needs to be reversed from 0-7 to 8-1
                       GEMDetId gemid(gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, 8 - ieta);
                       std::vector<GEMPadDigiCluster> gemDigis =
-                          cscData[iCSC].tmbData()->gemData()->etaDigis(igem, ieta);
+                          cscData[iCSC].tmbData()->gemData()->etaDigis(igem, ieta, cscData[iCSC].tmbHeader()->ALCTMatchTime());
                       if (!gemDigis.empty())
                         gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
                     }

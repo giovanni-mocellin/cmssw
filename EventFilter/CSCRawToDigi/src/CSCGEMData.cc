@@ -1,11 +1,13 @@
 #include "EventFilter/CSCRawToDigi/interface/CSCGEMData.h"
 #include "DataFormats/GEMDigi/interface/GEMPadDigiCluster.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/CSCDigi/interface/CSCConstants.h"
 
 #include <string>
 #include <cstdio>
 #include <strings.h>  // for bzero
 #include <cstring>
+#include <iostream>
 
 #ifdef LOCAL_UNPACK
 bool CSCGEMData::debug = false;
@@ -133,7 +135,7 @@ std::vector<GEMPadDigiCluster> CSCGEMData::digis(int gem_chamber) const {
   return result;
 }
 
-std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_roll) const {
+std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_roll, int correctionToALCTbx) const {
   /// GEM data format v2
   std::vector<GEMPadDigiCluster> result;
   result.clear();
@@ -162,7 +164,8 @@ std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_rol
             std::vector<short unsigned int> pads;
             for (int iP = 0; iP <= cluster_size; ++iP)
               pads.push_back(padInPart + iP);
-            GEMPadDigiCluster pad_cluster(pads, i);
+            GEMPadDigiCluster pad_cluster(pads, i-correctionToALCTbx+CSCConstants::ALCT_CENTRAL_BX+2);
+            //std::cout << "Timebin: " << i << " GEM: Layer " << gem_layer << " iEta " << 8-eta << pad_cluster << std::endl;
             result.push_back(pad_cluster);
           }
         }

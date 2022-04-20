@@ -10,7 +10,7 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id,
   isCoincidence_ = false;
   isValid_ = false;
 
-  int delayGEM_ = 0;
+  int delayGEM_ = 1;
 
   if (cluster1.isValid()) {
     isValid_ = true;
