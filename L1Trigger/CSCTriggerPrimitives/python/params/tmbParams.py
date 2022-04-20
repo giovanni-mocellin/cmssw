@@ -48,9 +48,9 @@ tmbPhase1 = cms.PSet(
 # to be used by ME11 chambers with upgraded TMB and ALCT
 tmbPhase2 = tmbPhase1.clone(
     # reduce ALCT-CLCT matching window size from 7 to 5
-    matchTrigWindowSize = 5,
+    matchTrigWindowSize = 7,
     # LCTs found in the window [6, 7, 8, 9, 10] are good
-    tmbL1aWindowSize = 5,
+    tmbL1aWindowSize = 7,
     tmbDropUsedClcts = False,
 )
 
@@ -67,13 +67,13 @@ tmbPhase2GEM = tmbPhase2.clone(
     buildLCTfromALCTCLCTand2GEM = cms.bool(True),
     buildLCTfromALCTCLCTand1GEM = cms.bool(True),
     buildLCTfromALCTandGEM = cms.bool(True),
-    buildLCTfromCLCTandGEM = cms.bool(True),
+    buildLCTfromCLCTandGEM = cms.bool(False),
     # assign GEM-CSC bending angle. Works only for
     # Run-3 GEM-CSC TPs.
     assignGEMCSCBending = cms.bool(True),
     # whether to drop GEMs that were matched to ALCTs or CLCTs
     # in this BX, and not use them in the following BX
-    tmbDropUsedGems = cms.bool(False),
+    tmbDropUsedGems = cms.bool(True),
     # For ALCT-centric matching to GEMs, break after finding
     # the first BX with matching GEM coincidence clusters
     matchEarliestGemsOnly = cms.bool(True),
@@ -83,7 +83,7 @@ tmbPhase2GEM = tmbPhase2.clone(
     # to optimize GEM-CSC slope correction
     mitigateSlopeByCosi = cms.bool(False),
     # Preferred order of bunchcrossing difference between CSC minus GEM BX for matching
-    BunchCrossingCSCminGEMwindow = cms.vint32(0, -1, 1, -2, 2, -3, 3),
+    BunchCrossingCSCminGEMwindow = cms.vint32(0, -1, 1, -2, 2, -3, 3)
 )
 
 # to be used by ME11 chambers with GEM-CSC ILT

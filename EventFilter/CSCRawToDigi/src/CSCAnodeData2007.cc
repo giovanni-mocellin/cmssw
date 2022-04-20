@@ -48,7 +48,7 @@ std::vector<CSCWireDigi> CSCAnodeData2007::wireDigis(int layer) const {
         CSCAnodeDataFrame2007 frame = findFrame(tbin, layer, layerPart);
         if (frame.data() != 0) {
           if (frame.isHit(j)) {
-            tbinbits = tbinbits + (1 << tbin+2);
+            tbinbits = tbinbits + (1 << (tbin+2));
           }
         }
       }  //end of tbin loop
