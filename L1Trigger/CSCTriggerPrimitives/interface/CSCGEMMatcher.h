@@ -39,68 +39,51 @@ public:
 
   // match by BX
 
-  // coincidences
+  // ALCT-GEM
   void matchingClustersBX(const CSCALCTDigi& alct,
                           const GEMInternalClusters& clusters,
-                          GEMInternalClusters& selected) const;
+                          GEMInternalClusters& output) const;
 
-  // coincidences
+  // CLCT-GEM
   void matchingClustersBX(const CSCCLCTDigi& clct,
                           const GEMInternalClusters& clusters,
-                          GEMInternalClusters& selected) const;
-
-  // coincidences or single clusters
-  void matchingClustersBX(const CSCALCTDigi& alct,
-                          const CSCCLCTDigi& clct,
-                          const GEMInternalClusters& clusters,
-                          GEMInternalClusters& selected) const;
+                          GEMInternalClusters& output) const;
 
   // match by location
 
-  // coincidences
+  // ALCT-GEM
   void matchingClustersLoc(const CSCALCTDigi& alct,
                            const GEMInternalClusters& clusters,
-                           GEMInternalClusters& selected) const;
+                           GEMInternalClusters& output,
+                           bool isME1a = false) const;
 
-  // coincidences
+  // CLCT-GEM
   void matchingClustersLoc(const CSCCLCTDigi& clct,
                            const GEMInternalClusters& clusters,
-                           GEMInternalClusters& selected) const;
+                           GEMInternalClusters& output) const;
 
   // matching candidate distance in 1/8 strip, always the total without extrapolation correction, if ForceTotal is true
   int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool ForceTotal) const;
 
-  // coincidences or single clusters
+  // ALCT-CLCT-GEM
   void matchingClustersLoc(const CSCALCTDigi& alct,
                            const CSCCLCTDigi& clct,
                            const GEMInternalClusters& clusters,
-                           GEMInternalClusters& selected) const;
+                           GEMInternalClusters& output) const;
 
-  // match by BX and location
+  // best matching clusters by BX and location
 
-  // coincidences
-  void matchingClustersBXLoc(const CSCALCTDigi& alct,
-                             const GEMInternalClusters& clusters,
-                             GEMInternalClusters& selected) const;
+  // ALCT-GEM
+  void bestClusterBXLoc(const CSCALCTDigi& alct,
+                        const GEMInternalClusters& clusters,
+                        GEMInternalCluster& best) const;
 
-  // coincidences
-  void matchingClustersBXLoc(const CSCCLCTDigi& clct,
-                             const GEMInternalClusters& clusters,
-                             GEMInternalClusters& selected) const;
+  // CLCT-GEM
+  void bestClusterBXLoc(const CSCCLCTDigi& clct,
+                        const GEMInternalClusters& clusters,
+                        GEMInternalCluster& best) const;
 
-  // coincidences or single clusters
-  void matchingClustersBXLoc(const CSCALCTDigi& alct,
-                             const CSCCLCTDigi& clct,
-                             const GEMInternalClusters& clusters,
-                             GEMInternalClusters& selected) const;
-
-  // best matching clusters
-  void bestClusterBXLoc(const CSCALCTDigi& alct, const GEMInternalClusters& clusters, GEMInternalCluster& best) const;
-
-  // coincidences
-  void bestClusterBXLoc(const CSCCLCTDigi& clct, const GEMInternalClusters& clusters, GEMInternalCluster& best) const;
-
-  // coincidences or single clusters
+  // ALCT-CLCT-GEM
   void bestClusterBXLoc(const CSCALCTDigi& alct,
                         const CSCCLCTDigi& clct,
                         const GEMInternalClusters& clusters,
