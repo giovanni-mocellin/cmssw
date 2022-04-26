@@ -18,14 +18,21 @@
 class GEMInternalCluster {
 public:
   // constructor
-  GEMInternalCluster(const GEMDetId& id, const GEMPadDigiCluster& cluster1, const GEMPadDigiCluster& cluster2);
+  GEMInternalCluster(const GEMDetId& id1, const GEMDetId& id2, const GEMPadDigiCluster& cluster1, const GEMPadDigiCluster& cluster2);
 
   // empty object
   GEMInternalCluster();
 
-  GEMDetId id() const { return id_; }
+  GEMDetId id1() const { return id1_; }
+  GEMDetId id2() const { return id2_; }
   GEMPadDigiCluster cl1() const { return cl1_; }
   GEMPadDigiCluster cl2() const { return cl2_; }
+  bool isMatchingLayer1() const { return isMatchingLayer1_; }
+  bool isMatchingLayer2() const { return isMatchingLayer2_; }
+
+  // setter for detIDs
+  void set_matchingLayer1(const bool isMatching) { isMatchingLayer1_ = isMatching; }
+  void set_matchingLayer2(const bool isMatching) { isMatchingLayer2_ = isMatching; }
 
   // an internal cluster is valid if at least one is valid
   bool isValid() const { return isValid_; }
@@ -38,7 +45,8 @@ public:
   GEMCoPadDigi copad() const;
 
   int bx() const { return bx_; }
-  int roll() const { return id_.roll(); }
+  int roll1() const { return id1_.roll(); }
+  int roll2() const { return id2_.roll(); }
   int layer1_pad() const { return layer1_pad_; }
   int layer1_size() const { return layer1_size_; }
   int layer2_pad() const { return layer2_pad_; }
@@ -47,15 +55,13 @@ public:
   int layer1_max_wg() const { return layer1_max_wg_; }
   int layer2_min_wg() const { return layer2_min_wg_; }
   int layer2_max_wg() const { return layer2_max_wg_; }
-  int min_wg() const;
-  int max_wg() const;
   bool isCoincidence() const { return isCoincidence_; }
 
   // return "key wiregroup" and "key half-strip" for a cluster
   // these are approximate numbers obviously for LCTs with lower quality
-  unsigned getKeyWG() const { return (min_wg() + max_wg()) / 2.; }
-  uint16_t getKeyStrip(int n = 2) const;
-  uint16_t getKeyStripME1a(int n = 2) const;
+  unsigned getKeyWG() const { return (layer2_min_wg() + layer2_max_wg()) / 2.; }
+  uint16_t getKeyStrip(int n = 2, bool isLayer2 = false) const;
+  uint16_t getKeyStripME1a(int n = 2, bool isLayer2 = false) const;
 
   // first and last 1/8-strips
   int layer1_first_es() const { return layer1_first_es_; }
@@ -105,14 +111,18 @@ public:
 
 private:
   /*
-    Detector id. There are three cases. For single clusters in layer 1
-    the GEMDetId in layer 1 is stored. Similarly, for single clusters in
-    layer 2 the GEMDetId in layer 2 is stored. For coincidences the  GEMDetId
-    in layer 1 is stored
+    Detector id. For single clusters in layer 1 the GEMDetId in layer 1 is stored.
+    Similarly, for single clusters in layer 2 the GEMDetId in layer 2 is stored.
+    For coincidences the  GEMDetId both are stored.
   */
-  GEMDetId id_;
+  GEMDetId id1_;
+  GEMDetId id2_;
   GEMPadDigiCluster cl1_;
   GEMPadDigiCluster cl2_;
+
+  // set matches to false first
+  bool isMatchingLayer1_;
+  bool isMatchingLayer2_;
 
   bool isValid_;
 

@@ -12,6 +12,7 @@
  */
 
 #include "L1Trigger/CSCTriggerPrimitives/interface/CSCMotherboard.h"
+#include "L1Trigger/CSCTriggerPrimitives/interface/GEMInternalCluster.h"
 #include "L1Trigger/CSCTriggerPrimitives/interface/GEMClusterProcessor.h"
 #include "L1Trigger/CSCTriggerPrimitives/interface/CSCGEMMatcher.h"
 #include "Geometry/GEMGeometry/interface/GEMGeometry.h"
@@ -137,6 +138,7 @@ private:
   // map of BX to vectors of GEM clusters. Makes it easier to match objects
   std::map<int, GEMInternalClusters> clusters_;
 
+  /* CSCGEM matcher */
   std::unique_ptr<CSCGEMMatcher> cscGEMMatcher_;
 
   /* GEM cluster processor */
@@ -159,8 +161,8 @@ private:
   bool build_lct_from_clct_gem_me1a_;
 
   // bunch crossing window cuts
-  unsigned max_delta_bx_alct_gem_;
-  unsigned max_delta_bx_clct_gem_;
+  unsigned alct_gem_bx_window_size_;
+  unsigned clct_gem_bx_window_size_;
 
   // assign GEM-CSC bending angle
   bool assign_gem_csc_bending_;

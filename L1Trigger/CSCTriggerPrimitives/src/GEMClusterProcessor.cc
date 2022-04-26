@@ -51,12 +51,12 @@ void GEMClusterProcessor::run(const GEMPadDigiClusterCollection* in_clusters) {
   doCoordinateConversion();
 }
 
-std::vector<GEMInternalCluster> GEMClusterProcessor::getClusters(int bx, int deltaBX, ClusterTypes option) const {
+std::vector<GEMInternalCluster> GEMClusterProcessor::getClusters(int bx, ClusterTypes option) const {
   std::vector<GEMInternalCluster> output;
 
   for (const auto& cl : clusters_) {
     // valid single clusters with the right BX
-    if (std::abs(cl.bx() - bx) <= deltaBX and cl.isValid()) {
+    if (cl.bx() == bx and cl.isValid()) {
       // ignore the coincidence clusters
       if (option == SingleClusters and cl.isCoincidence())
         continue;
@@ -66,20 +66,6 @@ std::vector<GEMInternalCluster> GEMClusterProcessor::getClusters(int bx, int del
       output.push_back(cl);
     }
   }
-
-  return output;
-}
-
-std::vector<GEMInternalCluster> GEMClusterProcessor::getCoincidenceClusters(int bx) const {
-  std::vector<GEMInternalCluster> output;
-
-  for (const auto& cl : clusters_) {
-    // valid coincidences with the right BX
-    if (cl.bx() == bx and cl.isCoincidence()) {
-      output.push_back(cl);
-    }
-  }
-
   return output;
 }
 
@@ -149,7 +135,7 @@ void GEMClusterProcessor::addCoincidenceClusters(const GEMPadDigiClusterCollecti
             continue;
 
           // make a new coincidence
-          clusters_.emplace_back(id, *p, *co_p);
+          clusters_.emplace_back(id, co_id, *p, *co_p);
         }
       }
     }
@@ -192,9 +178,9 @@ void GEMClusterProcessor::addSingleClusters(const GEMPadDigiClusterCollection* i
 
       // put the single clusters into the collection
       if (id.layer() == 1)
-        clusters_.emplace_back(id, *p, GEMPadDigiCluster());
+        clusters_.emplace_back(id, id, *p, GEMPadDigiCluster());
       else
-        clusters_.emplace_back(id, GEMPadDigiCluster(), *p);
+        clusters_.emplace_back(id, id, GEMPadDigiCluster(), *p);
     }
   }
 }
@@ -258,7 +244,7 @@ void GEMClusterProcessor::doCoordinateConversion() {
 
       // calculate the wiregroups
       // need to subtract 1 to use the LUTs
-      const int roll = cluster.roll() - 1;
+      const int roll = cluster.roll1() - 1;
 
       int roll_l1_to_min_wg = -1;
       int roll_l1_to_max_wg = -1;
@@ -347,7 +333,7 @@ void GEMClusterProcessor::doCoordinateConversion() {
 
     // calculate the wiregroups
     // need to subtract 1 to use the LUTs
-    const int roll = cluster.roll() - 1;
+    const int roll = cluster.roll2() - 1;
 
     int roll_l2_to_min_wg = -1;
     int roll_l2_to_max_wg = -1;
@@ -390,7 +376,7 @@ std::vector<GEMCoPadDigi> GEMClusterProcessor::readoutCoPads() const {
       continue;
 
     // construct coincidence pads out of the centers of the coincidence clusters
-    output.emplace_back(cluster.roll(), cluster.mid1(), cluster.mid2());
+    output.emplace_back(cluster.roll2(), cluster.mid1(), cluster.mid2());
   }
 
   return output;

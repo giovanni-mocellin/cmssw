@@ -37,18 +37,6 @@ public:
   // calculate the bending angle
   int calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
 
-  // match by BX
-
-  // ALCT-GEM
-  void matchingClustersBX(const CSCALCTDigi& alct,
-                          const GEMInternalClusters& clusters,
-                          GEMInternalClusters& output) const;
-
-  // CLCT-GEM
-  void matchingClustersBX(const CSCCLCTDigi& clct,
-                          const GEMInternalClusters& clusters,
-                          GEMInternalClusters& output) const;
-
   // match by location
 
   // ALCT-GEM
@@ -63,7 +51,7 @@ public:
                            GEMInternalClusters& output) const;
 
   // matching candidate distance in 1/8 strip, always the total without extrapolation correction, if ForceTotal is true
-  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool ForceTotal) const;
+  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool isLayer2, const bool ForceTotal) const;
 
   // ALCT-CLCT-GEM
   void matchingClustersLoc(const CSCALCTDigi& alct,
@@ -71,23 +59,23 @@ public:
                            const GEMInternalClusters& clusters,
                            GEMInternalClusters& output) const;
 
-  // best matching clusters by BX and location
+  // best matching clusters by location
 
   // ALCT-GEM
-  void bestClusterBXLoc(const CSCALCTDigi& alct,
-                        const GEMInternalClusters& clusters,
-                        GEMInternalCluster& best) const;
+  void bestClusterLoc(const CSCALCTDigi& alct,
+                      const GEMInternalClusters& clusters,
+                      GEMInternalCluster& best) const;
 
   // CLCT-GEM
-  void bestClusterBXLoc(const CSCCLCTDigi& clct,
-                        const GEMInternalClusters& clusters,
-                        GEMInternalCluster& best) const;
+  void bestClusterLoc(const CSCCLCTDigi& clct,
+                      const GEMInternalClusters& clusters,
+                      GEMInternalCluster& best) const;
 
   // ALCT-CLCT-GEM
-  void bestClusterBXLoc(const CSCALCTDigi& alct,
-                        const CSCCLCTDigi& clct,
-                        const GEMInternalClusters& clusters,
-                        GEMInternalCluster& best) const;
+  void bestClusterLoc(const CSCALCTDigi& alct,
+                      const CSCCLCTDigi& clct,
+                      const GEMInternalClusters& clusters,
+                      GEMInternalCluster& best) const;
 
 private:
   // access to lookup tables via eventsetup
@@ -98,7 +86,7 @@ private:
   uint16_t mitigatedSlopeByConsistency(const CSCCLCTDigi& clct) const;
 
   // calculate slope correction
-  int CSCGEMSlopeCorrector(const bool isME1a, const int cscSlope, const bool LoadL2) const;
+  int CSCGEMSlopeCorrector(const bool isME1a, const int cscSlope, bool isLayer2) const;
 
   unsigned endcap_;
   unsigned station_;
@@ -106,22 +94,15 @@ private:
   unsigned chamber_;
   bool isEven_;
 
-  unsigned maxDeltaBXALCTGEM_;
-  unsigned maxDeltaBXCLCTGEM_;
-
   bool matchCLCTpropagation_;
 
   // Matching interval in Half Strips (less bits to deal with in FW), but then used as Eighth Strips (es=hs*4)
   unsigned maxDeltaWG_;
   unsigned maxDeltaHsEven_;
   unsigned maxDeltaHsOdd_;
-  unsigned maxDeltaHsEvenME1a_;
-  unsigned maxDeltaHsOddME1a_;
 
   bool assign_gem_csc_bending_;
   bool mitigateSlopeByCosi_;
-
-  std::vector<int> BunchCrossingCSCminGEMwindow_;
 };
 
 #endif

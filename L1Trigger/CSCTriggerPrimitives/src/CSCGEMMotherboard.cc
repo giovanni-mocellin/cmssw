@@ -20,8 +20,8 @@ CSCGEMMotherboard::CSCGEMMotherboard(unsigned endcap,
     build_lct_from_clct_gem_me1a_ = tmbParams_.getParameter<bool>("buildLCTfromCLCTandGEM_ME1a");
   }
 
-  max_delta_bx_alct_gem_ = tmbParams_.getParameter<unsigned>("maxDeltaBXALCTGEM");
-  max_delta_bx_clct_gem_ = tmbParams_.getParameter<unsigned>("maxDeltaBXCLCTGEM");
+  alct_gem_bx_window_size_ = tmbParams_.getParameter<unsigned>("windowBXALCTGEM");
+  clct_gem_bx_window_size_ = tmbParams_.getParameter<unsigned>("windowBXCLCTGEM");
 
   assign_gem_csc_bending_ = tmbParams_.getParameter<bool>("assignGEMCSCBending");
   qualityAssignment_->setGEMCSCBending(assign_gem_csc_bending_);
@@ -168,7 +168,10 @@ void CSCGEMMotherboard::matchALCTCLCTGEM(bool bunch_crossing_mask[CSCConstants::
   for (int bx_alct = 0; bx_alct < CSCConstants::MAX_ALCT_TBINS; bx_alct++) {
     // do not consider invalid ALCTs
     if (alctProc->getBestALCT(bx_alct).isValid()) {
-      for (unsigned mbx = 0; mbx < match_trig_window_size; mbx++) {
+
+      bool matched_first_clct = false;
+
+      for (unsigned mbx = 0; mbx < match_trig_window_size and !matched_first_clct; mbx++) {
         // evaluate the preffered CLCT BX, taking into account that there is an offset in the simulation
         unsigned bx_clct = bx_alct + preferred_bx_match_[mbx] - CSCConstants::ALCT_CLCT_OFFSET;
 
@@ -180,27 +183,36 @@ void CSCGEMMotherboard::matchALCTCLCTGEM(bool bunch_crossing_mask[CSCConstants::
           continue;
         // do not consider invalid CLCTs
         if (clctProc->getBestCLCT(bx_clct).isValid()) {
-          LogTrace("CSCMotherboard") << "Successful ALCT-CLCT match: bx_alct = " << bx_alct << "; bx_clct = " << bx_clct
-                                     << "; mbx = " << mbx;
+          LogTrace("CSCMotherboard") << "Successful ALCT-CLCT match: bx_alct = " << bx_alct << "; bx_clct = " << bx_clct << "; mbx = " << mbx;
 
-          // now correlate the ALCT and CLCT into LCT.
-          // smaller mbx means more preferred!
-          correlateLCTsGEM(alctProc->getBestALCT(bx_alct),
-                           alctProc->getSecondALCT(bx_alct),
-                           clctProc->getBestCLCT(bx_clct),
-                           clctProc->getSecondCLCT(bx_clct),
-                           clusterProc_->getClusters(bx_alct, max_delta_bx_alct_gem_, option),
-                           allLCTs_(bx_alct, mbx, 0),
-                           allLCTs_(bx_alct, mbx, 1));
+          bool matched_first_gem = false;
 
-          if (allLCTs_(bx_alct, mbx, 0).isValid()) {
-            // mask this CLCT as used. If a flag is set, the CLCT may or may not be reused
-            used_clct_mask[bx_clct] = true;
-            // mask this bunch crossing for future considation
-            bunch_crossing_mask[bx_alct] = true;
-            // if we only consider the first valid CLCT, we move on to the next ALCT immediately
-            if (match_earliest_clct_only_)
-              break;
+          for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_ and !matched_first_gem; gmbx++) {
+            // evaluate the preffered CLCT BX, taking into account that there is an offset in the simulation
+            unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
+
+            // now correlate the ALCT and CLCT into LCT.
+            // smaller mbx means more preferred!
+            correlateLCTsGEM(alctProc->getBestALCT(bx_alct),
+                             alctProc->getSecondALCT(bx_alct),
+                             clctProc->getBestCLCT(bx_clct),
+                             clctProc->getSecondCLCT(bx_clct),
+                             clusterProc_->getClusters(bx_gem, option),
+                             allLCTs_(bx_alct, mbx, 0),
+                             allLCTs_(bx_alct, mbx, 1));
+
+            if (allLCTs_(bx_alct, mbx, 0).isValid()) {
+              // mask this CLCT as used. If a flag is set, the CLCT may or may not be reused
+              used_clct_mask[bx_clct] = true;
+              // mask this bunch crossing for future considation
+              bunch_crossing_mask[bx_alct] = true;
+              // if we only consider the first valid CLCT, we move on to the next ALCT immediately
+              if (match_earliest_clct_only_)
+                matched_first_clct = true;
+              // if we only consider the first valid GEM cluster, we move on to the next ALCT
+              if (match_earliest_gem_only_)
+                matched_first_gem = true;
+            }
           }
         }
       }
@@ -214,6 +226,9 @@ void CSCGEMMotherboard::matchCLCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
   if (isME21_ and !hasGE21Geometry16Partitions_)
     return;
 
+  // by default we will try to match coincidence clusters
+  GEMClusterProcessor::ClusterTypes option = GEMClusterProcessor::CoincidenceClusters;
+
   // array to mask CLCTs
   bool used_clct_mask[CSCConstants::MAX_CLCT_TBINS] = {false};
 
@@ -223,10 +238,13 @@ void CSCGEMMotherboard::matchCLCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
       continue;
 
     // Check that there is at least one valid GEM coincidence cluster in this BX
-    if (!clusterProc_->getCoincidenceClusters(bx_gem).empty()) {
+    if (!clusterProc_->getClusters(bx_gem, option).empty()) {
+
+      bool matched_first_clct = false;
+
       // GEM clusters will have central BX 8. So do ALCTs. But! CLCTs still have central BX 7
       // therefore we need to make a correction. The correction is thus the same as for ALCT-CLCT
-      for (unsigned mbx = 0; mbx < 2 * max_delta_bx_clct_gem_ + 1; mbx++) {
+      for (unsigned mbx = 0; mbx < clct_gem_bx_window_size_ and !matched_first_clct; mbx++) {
         // evaluate the preffered CLCT BX, taking into account that there is an offset in the simulation
         int bx_clct = bx_gem + preferred_bx_match_[mbx] - CSCConstants::ALCT_CLCT_OFFSET;
 
@@ -247,7 +265,7 @@ void CSCGEMMotherboard::matchCLCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
           // to be sent to the MPC
           correlateLCTsGEM(clctProc->getBestCLCT(bx_clct),
                            clctProc->getSecondCLCT(bx_clct),
-                           clusterProc_->getCoincidenceClusters(bx_gem),
+                           clusterProc_->getClusters(bx_gem, option), // option = CoincidenceClusters
                            allLCTs_(bx_gem, mbx, 0),
                            allLCTs_(bx_gem, mbx, 1));
 
@@ -259,7 +277,7 @@ void CSCGEMMotherboard::matchCLCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
             // if we only consider the first valid GEM coincidence clusters,
             // we move on to the next ALCT immediately
             if (match_earliest_clct_only_)
-              break;
+              matched_first_clct = true;
           }
         }
       }
@@ -273,6 +291,9 @@ void CSCGEMMotherboard::matchALCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
   if (isME21_ and !hasGE21Geometry16Partitions_)
     return;
 
+  // by default we will try to match coincidence clusters
+  GEMClusterProcessor::ClusterTypes option = GEMClusterProcessor::CoincidenceClusters;
+
   // clear the array to mask GEMs  this window is quite wide.
   // We don't expect GEM coincidence clusters to show up too far
   // from the central BX (8)
@@ -283,9 +304,11 @@ void CSCGEMMotherboard::matchALCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
     if (bunch_crossing_mask[bx_alct])
       continue;
 
+    bool matched_first_gem = false;
+
     if (alctProc->getBestALCT(bx_alct).isValid()) {
-      for (unsigned mbx = 0; mbx < 2 * max_delta_bx_alct_gem_ + 1; mbx++) {
-        // evaluate the preffered GEM BX
+      for (unsigned mbx = 0; mbx < alct_gem_bx_window_size_ and !matched_first_gem; mbx++) {
+        // evaluate the preferred GEM BX
         int bx_gem = bx_alct + preferred_bx_match_[mbx];
 
         if (bx_gem < 0 or bx_gem >= CSCConstants::MAX_ALCT_TBINS)
@@ -294,12 +317,12 @@ void CSCGEMMotherboard::matchALCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
         if (drop_used_gems_ and used_gem_mask[bx_gem])
           continue;
         // check for at least one valid GEM cluster
-        if (!clusterProc_->getCoincidenceClusters(bx_gem).empty()) {
+        if (!clusterProc_->getClusters(bx_gem, option).empty()) {
           // now correlate the ALCT and GEM into LCT.
           // smaller mbx means more preferred!
           correlateLCTsGEM(alctProc->getBestALCT(bx_alct),
                            alctProc->getSecondALCT(bx_alct),
-                           clusterProc_->getCoincidenceClusters(bx_gem),
+                           clusterProc_->getClusters(bx_gem, option), // option = CoincidenceClusters
                            allLCTs_(bx_alct, mbx, 0),
                            allLCTs_(bx_alct, mbx, 1));
 
@@ -311,7 +334,7 @@ void CSCGEMMotherboard::matchALCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX
             // if we only consider the first valid GEM coincidence clusters,
             // we move on to the next ALCT immediately
             if (match_earliest_gem_only_)
-              break;
+              matched_first_gem = true;
           }
         }
       }
@@ -362,10 +385,10 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   // drop low quality CLCTs if no clusters and flags are set
   GEMInternalCluster bestALCTCluster, secondALCTCluster;
   GEMInternalCluster bestCLCTCluster, secondCLCTCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, ValidClusters, bestALCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, ValidClusters, secondALCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, ValidClusters, bestCLCTCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, ValidClusters, secondCLCTCluster);
+  cscGEMMatcher_->bestClusterLoc(bestALCT, ValidClusters, bestALCTCluster);
+  cscGEMMatcher_->bestClusterLoc(secondALCT, ValidClusters, secondALCTCluster);
+  cscGEMMatcher_->bestClusterLoc(bestCLCT, ValidClusters, bestCLCTCluster);
+  cscGEMMatcher_->bestClusterLoc(secondCLCT, ValidClusters, secondCLCTCluster);
 
   dropLowQualityALCTNoClusters(bestALCT, bestALCTCluster);
   dropLowQualityALCTNoClusters(secondALCT, secondALCTCluster);
@@ -378,10 +401,10 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   // We can now check possible triplets and construct all LCTs with
   // valid ALCT, valid CLCTs and coincidence clusters
   GEMInternalCluster bbCluster, bsCluster, sbCluster, ssCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, bestCLCT, ValidClusters, bbCluster);
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, secondCLCT, ValidClusters, bsCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, bestCLCT, ValidClusters, sbCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, secondCLCT, ValidClusters, ssCluster);
+  cscGEMMatcher_->bestClusterLoc(bestALCT, bestCLCT, ValidClusters, bbCluster);
+  cscGEMMatcher_->bestClusterLoc(bestALCT, secondCLCT, ValidClusters, bsCluster);
+  cscGEMMatcher_->bestClusterLoc(secondALCT, bestCLCT, ValidClusters, sbCluster);
+  cscGEMMatcher_->bestClusterLoc(secondALCT, secondCLCT, ValidClusters, ssCluster);
 
   // At this point it is still possible that certain pairs with high-quality
   // ALCTs and CLCTs do not have matching clusters. In that case we construct
@@ -454,8 +477,8 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCCLCTDigi& bCLCT,
   // get the best matching cluster
   GEMInternalCluster bestCluster;
   GEMInternalCluster secondCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestCLCT, ValidClusters, bestCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondCLCT, ValidClusters, secondCluster);
+  cscGEMMatcher_->bestClusterLoc(bestCLCT, ValidClusters, bestCluster);
+  cscGEMMatcher_->bestClusterLoc(secondCLCT, ValidClusters, secondCluster);
 
   // drop low quality CLCTs if no clusters and flags are set
   dropLowQualityCLCTNoClusters(bestCLCT, bestCluster);
@@ -494,8 +517,8 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& bALCT,
   // get the best matching cluster
   GEMInternalCluster bestCluster;
   GEMInternalCluster secondCluster;
-  cscGEMMatcher_->bestClusterBXLoc(bestALCT, ValidClusters, bestCluster);
-  cscGEMMatcher_->bestClusterBXLoc(secondALCT, ValidClusters, secondCluster);
+  cscGEMMatcher_->bestClusterLoc(bestALCT, ValidClusters, bestCluster);
+  cscGEMMatcher_->bestClusterLoc(secondALCT, ValidClusters, secondCluster);
 
   // drop low quality ALCTs if no clusters and flags are set
   dropLowQualityALCTNoClusters(bestALCT, bestCluster);

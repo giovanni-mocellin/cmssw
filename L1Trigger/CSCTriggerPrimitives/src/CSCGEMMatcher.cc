@@ -13,141 +13,70 @@ CSCGEMMatcher::CSCGEMMatcher(
     : endcap_(endcap), station_(station), chamber_(chamber) {
   isEven_ = (chamber_ % 2 == 0);
 
-  maxDeltaBXALCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXALCTGEM");
-  maxDeltaBXCLCTGEM_ = tmbParams.getParameter<unsigned>("maxDeltaBXCLCTGEM");
-
   maxDeltaWG_ = tmbParams.getParameter<unsigned>("maxDeltaWG");
   maxDeltaHsEven_ = tmbParams.getParameter<unsigned>("maxDeltaHsEven");
   maxDeltaHsOdd_ = tmbParams.getParameter<unsigned>("maxDeltaHsOdd");
 
   matchCLCTpropagation_ = tmbParams.getParameter<bool>("matchCLCTpropagation");
 
-  if (station_ == 1) {
-    maxDeltaHsEvenME1a_ = tmbParams.getParameter<unsigned>("maxDeltaHsEvenME1a");
-    maxDeltaHsOddME1a_ = tmbParams.getParameter<unsigned>("maxDeltaHsOddME1a");
-  }
-
   mitigateSlopeByCosi_ = tmbParams.getParameter<bool>("mitigateSlopeByCosi");
   assign_gem_csc_bending_ = tmbParams.getParameter<bool>("assignGEMCSCBending");
-
-  //get bunchcrossing preference order bin by bin for GEM-CSC matching in time
-  BunchCrossingCSCminGEMwindow_ = tmbParams.getParameter<std::vector<int> >("BunchCrossingCSCminGEMwindow");
 }
 
 void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME11ILT* conf) { lookupTableME11ILT_ = conf; }
 
 void CSCGEMMatcher::setESLookupTables(const CSCL1TPLookupTableME21ILT* conf) { lookupTableME21ILT_ = conf; }
 
-
-
 //##############################################################
-//            Best clusters for BX and Location
+//                Best clusters by location
 //##############################################################
 
-
-
-void CSCGEMMatcher::bestClusterBXLoc(const CSCALCTDigi& alct,
-                                     const GEMInternalClusters& clusters,
-                                     GEMInternalCluster& best) const {
+void CSCGEMMatcher::bestClusterLoc(const CSCALCTDigi& alct,
+                                   const GEMInternalClusters& clusters,
+                                   GEMInternalCluster& best) const {
 
   if (!alct.isValid() or clusters.empty())
     return;
 
-  // match by BX
-  GEMInternalClusters clustersBX;
-  matchingClustersBX(alct, clusters, clustersBX);
-
   // match spatially
-  GEMInternalClusters clustersBXLoc;
-  matchingClustersLoc(alct, clustersBX, clustersBXLoc);
+  GEMInternalClusters clustersLoc;
+  matchingClustersLoc(alct, clusters, clustersLoc);
 
   // simply pick the first matching one
-  if (!clustersBXLoc.empty()) best = clustersBXLoc[0];
+  if (!clustersLoc.empty()) best = clustersLoc[0];
 }
 
-void CSCGEMMatcher::bestClusterBXLoc(const CSCCLCTDigi& clct,
-                                     const GEMInternalClusters& clusters,
-                                     GEMInternalCluster& best) const {
+void CSCGEMMatcher::bestClusterLoc(const CSCCLCTDigi& clct,
+                                   const GEMInternalClusters& clusters,
+                                   GEMInternalCluster& best) const {
 
   if (!clct.isValid() or clusters.empty())
     return;
 
-  // match by BX
-  GEMInternalClusters clustersBX;
-  matchingClustersBX(clct, clusters, clustersBX);
-
   // match spatially
-  GEMInternalClusters clustersBXLoc;
-  matchingClustersLoc(clct, clustersBX, clustersBXLoc);
+  GEMInternalClusters clustersLoc;
+  matchingClustersLoc(clct, clusters, clustersLoc);
 
   // the first matching one is also the closest in phi distance (to expected position, if extrapolating), by ordered list in CLCT matching
-  if (!clustersBXLoc.empty()) best = clustersBXLoc[0];
+  if (!clustersLoc.empty()) best = clustersLoc[0];
 }
 
-void CSCGEMMatcher::bestClusterBXLoc(const CSCALCTDigi& alct,
-                                     const CSCCLCTDigi& clct,
-                                     const GEMInternalClusters& clusters,
-                                     GEMInternalCluster& best) const {
+void CSCGEMMatcher::bestClusterLoc(const CSCALCTDigi& alct,
+                                   const CSCCLCTDigi& clct,
+                                   const GEMInternalClusters& clusters,
+                                   GEMInternalCluster& best) const {
 
   if (!alct.isValid() or !clct.isValid() or clusters.empty())
     return;
 
-  // match by BX GEM to ALCT. No need of checking CLCT (already associated to ALCT in CSCGEMMotherboard)
-  GEMInternalClusters clustersBX;
-  matchingClustersBX(alct, clusters, clustersBX);
-
   // match spatially
-  GEMInternalClusters clustersBXLoc;
-  matchingClustersLoc(alct, clct, clustersBX, clustersBXLoc);
+  GEMInternalClusters clustersLoc;
+  matchingClustersLoc(alct, clct, clusters, clustersLoc);
 
   // the first matching one is also the closest in phi distance (to expected position, if extrapolating), by ordered list in CLCT matching
-  if (!clustersBXLoc.empty()){
-    best = clustersBXLoc[0];
+  if (!clustersLoc.empty()){
+    best = clustersLoc[0];
     //std::cout << "GEM selected: " << best << std::endl;
-  }
-}
-
-//##############################################################
-//                      Matching by BX
-//##############################################################
-
-// match an ALCT to GEMInternalCluster by bunch-crossing
-void CSCGEMMatcher::matchingClustersBX(const CSCALCTDigi& alct,
-                                       const GEMInternalClusters& clusters,
-                                       GEMInternalClusters& output) const {
-  if (!alct.isValid() or clusters.empty())
-    return;
-
-  //std::cout << "ALCT BX: " << alct.getBX() << std::endl;
-
-  bool stopHere = false;
-  // select clusters matched in time
-  for(unsigned i = 0; i < BunchCrossingCSCminGEMwindow_.size() and !stopHere; ++i){ //loops through bins of preferential bunchcrossing acceptance order
-    for (const auto& cl : clusters) {
-      if (stopHere) continue;
-      const int diff = int(alct.getBX()) - cl.bx();
-      if (diff == BunchCrossingCSCminGEMwindow_[i]) {
-        output.push_back(cl);
-        stopHere = true; // select only one gem cluster
-      }
-    }
-  }
-}
-
-// match a CLCT to GEMInternalCluster by bunch-crossing
-void CSCGEMMatcher::matchingClustersBX(const CSCCLCTDigi& clct,
-                                       const GEMInternalClusters& clusters,
-                                       GEMInternalClusters& output) const {
-  if (!clct.isValid() or clusters.empty())
-    return;
-
-  //std::cout << "CLCT BX: " << clct.getBX() << std::endl;
-
-  // select clusters matched in time
-  for (const auto& cl : clusters) {
-    const unsigned diff = std::abs(int(clct.getBX()) - cl.bx());
-    if (diff <= maxDeltaBXCLCTGEM_)
-      output.push_back(cl);
   }
 }
 
@@ -168,17 +97,35 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
   for (const auto& cl : clusters) {
     if (station_ == 2) { // ME2/1-GE2/1
       for (const auto& cl : clusters) {
-        int min_wg = std::max(0, int(cl.min_wg() - maxDeltaWG_));
-        int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, int(cl.max_wg() + maxDeltaWG_));
+        int min_wg = std::max(0, int(cl.layer2_min_wg() - maxDeltaWG_));
+        int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, int(cl.layer2_max_wg() + maxDeltaWG_));
         if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg)
           output.push_back(cl);
       }
     }
-    else if ((isME1a and cl.roll() == 8) or (!isME1a and cl.roll() < 8)) { // ME1/1-GE1/1
-      int min_wg = std::max(0, int(cl.min_wg() - maxDeltaWG_));
-      int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.max_wg() + maxDeltaWG_));
-      if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg)
-        output.push_back(cl);
+    else if (station_ == 1) { // ME1/1-GE1/1
+      bool isMatchedLayer1 = false;
+      bool isMatchedLayer2 = false;
+
+      if (cl.id1().layer() == 1) { // cluster has valid layer 1
+        if ((isME1a and cl.roll1() == 8) or (!isME1a and cl.roll1() < 8)) {
+          int min_wg = std::max(0, int(cl.layer1_min_wg() - maxDeltaWG_));
+          int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.layer1_max_wg() + maxDeltaWG_));
+          if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer1 = true;
+        }
+      }
+      if (cl.id2().layer() == 2) { // cluster has valid layer 2
+        if ((isME1a and cl.roll2() == 8) or (!isME1a and cl.roll2() < 8)) {
+          int min_wg = std::max(0, int(cl.layer2_min_wg() - maxDeltaWG_));
+          int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.layer2_max_wg() + maxDeltaWG_));
+          if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer2 = true;
+        }
+      }
+      if (isMatchedLayer1 or isMatchedLayer2) {
+          output.push_back(cl);
+          if (isMatchedLayer1) output.back().set_matchingLayer1(true);
+          if (isMatchedLayer2) output.back().set_matchingLayer1(true);
+      }
     }
   }
 }
@@ -190,34 +137,53 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
   if (!clct.isValid() or clusters.empty())
     return;
 
-  const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
+  bool isLayer2 = false;
 
   //determine window size
-  unsigned eighthStripCut;
-  if (isEven_) {
-    eighthStripCut = 4 * (isME1a ? maxDeltaHsEvenME1a_ : maxDeltaHsEven_); // Cut in 1/8 = 4 * cut in 1/2
-  } else {
-    eighthStripCut = 4 * (isME1a ? maxDeltaHsOddME1a_ : maxDeltaHsOdd_); // Cut in 1/8 = 4 * cut in 1/2
+  unsigned eighthStripCut = isEven_ ? 4 * maxDeltaHsEven_ : 4 * maxDeltaHsOdd_; // Cut in 1/8 = 4 * cut in 1/2
+
+  // select clusters matched by 1/8-strip
+  GEMInternalClusters matchedClustersCLCT;
+
+  for (const auto& cl : clusters) {
+    if (cl.isMatchingLayer1()) {
+      isLayer2 = false;
+      unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
+      if (distanceES <= eighthStripCut) {
+        if (!cl.isMatchingLayer2()) matchedClustersCLCT.push_back(cl);
+
+        else if (cl.isMatchingLayer2()) {
+          isLayer2 = true;
+          unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
+          if (distanceES <= eighthStripCut) matchedClustersCLCT.push_back(cl);
+          else { // if layer2 is not matching now and it was before, set matchingLayer2 to false
+            matchedClustersCLCT.push_back(cl);
+            matchedClustersCLCT.back().set_matchingLayer2(false);
+          }
+        }
+      }
+    }
+    else if (!cl.isMatchingLayer1() and cl.isMatchingLayer2()) {
+      isLayer2 = true;
+      unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
+      if (distanceES <= eighthStripCut) matchedClustersCLCT.push_back(cl);
+    }
   }
 
-  // select clusters matched by 1/8-strip, picking the one with smallest absolute distance (= smallest slope)
+  // ordering the clusters by smallest absolute distance (= smallest slope)
   std::vector<int> distances;
-  for (const auto& cl : clusters) {
-    unsigned distanceES = abs(matchedClusterDistES(clct, cl, false));
-    if (distanceES <= eighthStripCut){ //only accept clusters in the window around the CLCT
-      //std::cout << cl << " distanceES: " << distanceES << std::endl;
-
-      distanceES = abs(matchedClusterDistES(clct, cl, true)); // calculate absolute CLCT-GEM distance
-
-      //assure building an ordered in increasing absolute distance list of GEM matches
-      unsigned ListPosition = output.size();
-      for (unsigned i = 0; i < output.size(); ++i){
-	      if (distanceES < abs(distances[i])) ListPosition = i;
-	      break;
-      }
-      distances.insert(distances.begin() + ListPosition, distanceES);
-      output.insert(output.begin() + ListPosition, cl);
+  for (const auto& cl : matchedClustersCLCT) {
+    isLayer2 = false;
+    if (!cl.isMatchingLayer1() and cl.isMatchingLayer2()) isLayer2 = true;
+    unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, true)); // calculate absolute CLCT-GEM distance
+    //assure building an ordered in increasing absolute distance list of GEM matches
+    unsigned ListPosition = output.size();
+    for (unsigned i = 0; i < output.size(); ++i){
+      if (distanceES < abs(distances[i])) ListPosition = i;
+      break;
     }
+    distances.insert(distances.begin() + ListPosition, distanceES);
+    output.insert(output.begin() + ListPosition, cl);
   }
 }
 
@@ -244,10 +210,10 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
 
 
 // calculate distance in eighth-strip units between CLCT and GEM, switch ForceTotal on to calculate total distance without slope extrapolation
-int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cl, const bool ForceTotal) const {
+int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cl, const bool isLayer2, const bool ForceTotal) const {
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
-  int cl_es = isME1a ? cl.getKeyStripME1a(8) : cl.getKeyStrip(8);
+  int cl_es = isME1a ? cl.getKeyStripME1a(8,isLayer2) : cl.getKeyStrip(8,isLayer2);
 
   int eighthStripDiff = cl_es - clct.getKeyStrip(8);
 
@@ -257,9 +223,6 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct, const GEMIntern
     baseSlope =  mitigateSlopeByCosi_ ? mitigatedSlopeByConsistency(clct) : clct.getSlope();
 
     int clctSlope = pow(-1, clct.getBend()) * baseSlope;
-
-    bool isLayer2 = false;
-    if(!cl.isCoincidence() && cl.id().layer() == 2) isLayer2 = true;
 
     SlopeShift = CSCGEMSlopeCorrector(isME1a, clctSlope, isLayer2);
     eighthStripDiff -= SlopeShift;
@@ -397,7 +360,7 @@ int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool isLayer2
   }
   else{ //account for slope without mitigation, if opted out
     if (station_ == 1) {
-      if(!isLayer2){
+      if (!isLayer2) {
         if (chamber_ % 2 == 0) SlopeShift = isME1a ? lookupTableME11ILT_->CSC_slope_corr_L1_ME11a_even(std::abs(cscSlope))
                                                    : lookupTableME11ILT_->CSC_slope_corr_L1_ME11b_even(std::abs(cscSlope));
         else                   SlopeShift = isME1a ? lookupTableME11ILT_->CSC_slope_corr_L1_ME11a_odd(std::abs(cscSlope))
@@ -410,7 +373,7 @@ int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool isLayer2
       }
     }
     else if (station_ == 2) {
-      if(!isLayer2){
+      if (!isLayer2) {
         if (chamber_ % 2 == 0) SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L1_ME21_even(std::abs(cscSlope));
         else                   SlopeShift = lookupTableME21ILT_->CSC_slope_corr_L1_ME21_odd(std::abs(cscSlope));
       } else {
@@ -430,13 +393,12 @@ int CSCGEMMatcher::CSCGEMSlopeCorrector(bool isME1a, int cscSlope, bool isLayer2
 int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const {
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
 
-  //ME1a necessitates a different treatment because of a different strip numbering scheme and strip width
-  const int SignedEighthStripDiff = matchedClusterDistES(clct, cluster, true);
-  const unsigned eighthStripDiff = abs(SignedEighthStripDiff); //LUTs consider only absolute change
-
-  //enable or disable layer 2-specific tables
   bool isLayer2 = false;
-  if(!cluster.isCoincidence() && cluster.id().layer() == 2) isLayer2 = true;
+  if(!cluster.isMatchingLayer1() and cluster.isMatchingLayer2()) isLayer2 = true;
+
+  //ME1a necessitates a different treatment because of a different strip numbering scheme and strip width
+  const int SignedEighthStripDiff = matchedClusterDistES(clct, cluster, isLayer2, true);
+  const unsigned eighthStripDiff = abs(SignedEighthStripDiff); //LUTs consider only absolute change
 
   //use LUTs to determine absolute slope, default 0
   int slopeShift = 0;
