@@ -124,7 +124,7 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
       if (isMatchedLayer1 or isMatchedLayer2) {
           output.push_back(cl);
           if (isMatchedLayer1) output.back().set_matchingLayer1(true);
-          if (isMatchedLayer2) output.back().set_matchingLayer1(true);
+          if (isMatchedLayer2) output.back().set_matchingLayer2(true);
       }
     }
   }
