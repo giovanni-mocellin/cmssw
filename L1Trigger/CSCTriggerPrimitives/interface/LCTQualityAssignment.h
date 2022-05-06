@@ -76,10 +76,10 @@ public:
   unsigned findQuality(const CSCCLCTDigi& cLCT, const GEMInternalCluster& cl) const;
 
 private:
-  // quality for all LCTs in Run-1 and Run-2 (CCLUT off)
+  // quality for all LCTs in Run-1 and Run-2 (run-3 mode off)
   unsigned findQualityRun2(const CSCALCTDigi& aLCT, const CSCCLCTDigi& cLCT) const;
 
-  // quality for non-ME1/1 LCTs in Run-3 without GEMs (CCLUT on)
+  // quality for non-ME1/1 LCTs in Run-3 without GEMs (run-3 mode on)
   unsigned findQualityRun3(const CSCALCTDigi& aLCT, const CSCCLCTDigi& cLCT) const;
 
   // quality for LCTs in Run-3 with GEMs (CCLUT off)
@@ -87,7 +87,7 @@ private:
   unsigned findQualityGEMv1(const CSCCLCTDigi&, const GEMInternalCluster& cl) const;
   unsigned findQualityGEMv1(const CSCALCTDigi&, const CSCCLCTDigi&, const GEMInternalCluster& cl) const;
 
-  // quality for LCTs in Run-3 with GEMs (CCLUT on(
+  // quality for LCTs in Run-3 with GEMs (CCLUT on)
   unsigned findQualityGEMv2(const CSCALCTDigi&, const CSCCLCTDigi&, const GEMInternalCluster& cl) const;
 
   bool assignGEMCSCBending_;

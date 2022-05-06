@@ -488,8 +488,8 @@ std::pair<unsigned, unsigned> LCTQualityControl::get_csc_lct_min_max_quality(uns
 
   const bool GEMCSC = (isME11_ and runME11ILT_) or (isME21_ and runME21ILT_);
 
-  // Run-3 with CCLUT on
-  if (runCCLUT_ and !GEMCSC) {
+  // Run-3
+  if (run3_ and !GEMCSC) {
     min_quality = static_cast<unsigned>(LCTQualityAssignment::LCT_QualityRun3::LowQ);
     max_quality = static_cast<unsigned>(LCTQualityAssignment::LCT_QualityRun3::HighQ);
   }
