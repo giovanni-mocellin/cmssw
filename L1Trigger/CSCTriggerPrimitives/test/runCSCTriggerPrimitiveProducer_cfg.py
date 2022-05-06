@@ -32,7 +32,7 @@ options.register("useB904ME21", False, VarParsing.multiplicity.singleton, VarPar
                  "Set to True when using B904 ME2/1 data (also works for ME3/1 and ME4/1).")
 options.register("useB904ME234s2", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using B904 ME1/1 data (also works for MEX/2 and ME1/3).")
-options.register("run3", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
+options.register("run3", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using Run-3 data.")
 options.register("runCCLUTOTMB", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using the CCLUT OTMB algorithm.")
@@ -124,6 +124,7 @@ if useB904Data:
 ## l1 emulator
 l1csc = process.cscTriggerPrimitiveDigis
 if options.l1:
+      l1csc.commonParam.run3 = cms.bool(options.run3)
       l1csc.commonParam.runCCLUT_OTMB = cms.bool(options.runCCLUTOTMB)
       l1csc.commonParam.runCCLUT_TMB = cms.bool(options.runCCLUTTMB)
       l1csc.commonParam.runME11ILT = options.runME11ILT
