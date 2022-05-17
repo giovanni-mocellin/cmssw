@@ -40,7 +40,7 @@ options.register('useB904GE11Short',False,VarParsing.multiplicity.singleton,VarP
                  "Set to True when using data from GE1/1 Short super chamber in B904.")
 options.register('useB904GE11Long',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
                  "Set to True when using data from GE1/1 Long super chamber in B904.")
-options.register("run3", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
+options.register("run3", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using Run-3 data.")
 options.register("runCCLUTOTMB", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool,
                  "Set to True when using the CCLUT OTMB algorithm.")
@@ -158,6 +158,7 @@ if useB904Data:
 ## l1 emulator
 l1csc = process.cscTriggerPrimitiveDigis
 if options.l1:
+      l1csc.commonParam.run3 = cms.bool(options.run3)
       l1csc.commonParam.runCCLUT_OTMB = cms.bool(options.runCCLUTOTMB)
       l1csc.commonParam.runCCLUT_TMB = cms.bool(options.runCCLUTTMB)
       l1csc.commonParam.runME11ILT = options.runME11ILT
