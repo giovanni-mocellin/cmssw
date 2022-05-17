@@ -535,8 +535,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCALCTDigi> alctDigis_0;
                 for (int unsigned i = 0; i < alctDigis.size(); ++i) {
-                  if (alctDigis[i].isValid())
-                    alctDigis_0.push_back(alctDigis[i]);
+                  if (alctDigis[i].isValid()){
+                    //std::cout << "Unpacker: " << alctDigis[i] << std::endl;
+                    alctDigis_0.push_back(alctDigis[i]);}
                 }
                 alctProduct->move(std::make_pair(alctDigis_0.begin(), alctDigis_0.end()), layer);
               } else
@@ -574,8 +575,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis_0;
                 for (int unsigned i = 0; i < correlatedlctDigis.size(); ++i) {
-                  if (correlatedlctDigis[i].isValid())
-                    correlatedlctDigis_0.push_back(correlatedlctDigis[i]);
+                  if (correlatedlctDigis[i].isValid()){
+                    //std::cout << "Unpacker: " << correlatedlctDigis[i] << std::endl;
+                    correlatedlctDigis_0.push_back(correlatedlctDigis[i]);}
                 }
                 corrlctProduct->move(std::make_pair(correlatedlctDigis_0.begin(), correlatedlctDigis_0.end()), layer);
               } else
@@ -585,8 +587,9 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCCLCTDigi> clctDigis_0;
                 for (int unsigned i = 0; i < clctDigis.size(); ++i) {
-                  if (clctDigis[i].isValid())
-                    clctDigis_0.push_back(clctDigis[i]);
+                  if (clctDigis[i].isValid()){
+                    //std::cout << "Unpacker: " << clctDigis[i] << std::endl;
+                    clctDigis_0.push_back(clctDigis[i]);}
                 }
                 clctProduct->move(std::make_pair(clctDigis_0.begin(), clctDigis_0.end()), layer);
               } else
