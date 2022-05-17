@@ -6,6 +6,7 @@
  * Helper class to check if an ALCT or CLCT matches with a GEMInternalCluster
  *
  * \author Sven Dildick (Rice University)
+ * \updates by Giovanni Mocellin (UC Davis)
  *
  */
 
@@ -48,7 +49,8 @@ public:
   // CLCT-GEM
   void matchingClustersLoc(const CSCCLCTDigi& clct,
                            const GEMInternalClusters& clusters,
-                           GEMInternalClusters& output) const;
+                           GEMInternalClusters& output,
+                           bool ignoreALCTGEMmatch) const;
 
   // matching candidate distance in 1/8 strip, always the total without extrapolation correction, if ForceTotal is true
   int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool isLayer2, const bool ForceTotal) const;
