@@ -8,6 +8,7 @@
  * ALCT/CLCT to GEM single clusters or coincidences of clusters
  *
  * \author Sven Dildick (Rice University)
+ * \updates by Giovanni Mocellin (UC Davis)
  *
  */
 
@@ -37,15 +38,6 @@ public:
   //helper function to convert GEM-CSC amended slopes into Run2 patterns
   uint16_t Run2PatternConverter(const int slope) const;
 
-  /*
-  Use ALCTs, CLCTs, GEMs to build LCTs. Matches are attempted in the following order:
-    1) ALCT-CLCT-2GEM (coincidence pad)
-    2) ALCT-CLCT-GEM
-    3) ALCT-CLCT
-    4) CLCT-2GEM (requires CLCT with at least 4 layers)
-    5) ALCT-2GEM (requires ALCT with at least 4 layers)
-    Sort LCTs according to the cross-bunch-crossing algorithm, and send out best 2 LCTs
-  */
   void run(const CSCWireDigiCollection* wiredc,
            const CSCComparatorDigiCollection* compdc,
            const GEMPadDigiClusterCollection* gemPads);
@@ -57,79 +49,65 @@ public:
   void setGEMGeometry(const GEMGeometry* g) { gem_g = g; }
 
 private:
-  // match ALCT-CLCT-(2)GEM pairs
-  void matchALCTCLCTGEM(bool bunch_crossing_mask[CSCConstants::MAX_ALCT_TBINS]);
+  /*
+  Use ALCTs, CLCTs, GEMs to build LCTs. Matches in FW are attempted in the following order:
+    1) ALCT-CLCT-2GEM (coincidence pad)
+    2) ALCT-CLCT-GEM
+    3) ALCT-CLCT
+    4) CLCT-2GEM
+    5) ALCT-2GEM
+    => If there are second ALCTs/CLCTs which could not be matched to GEM:
+    6) Copy over valid to invalid (best to second)
+    7) Try again with previous matchings and copied second ALCTs/CLCTs
+    => Copying in SW makes little sense, thus combination first-second are matched
+  */
+  void matchALCTCLCTGEM();
 
-  // match ALCT-CLCT pairs
-  void matchALCTCLCT(bool bunch_crossing_mask[CSCConstants::MAX_ALCT_TBINS]);
-
-  // match CLCT-2GEM pairs. The GEM coincidence cluster BX is considered the
-  // reference
-  void matchCLCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX_ALCT_TBINS]);
-
-  // match ALCT-2GEM pairs. The GEM coincidence cluster BX is considered the
-  // reference
-  void matchALCT2GEM(bool bunch_crossing_mask[CSCConstants::MAX_ALCT_TBINS]);
-
-  /* correlate a pair of ALCTs and a pair of CLCTs with matched clusters or coclusters
-     the output is up to two LCTs */
-  void correlateLCTsGEM(const CSCALCTDigi& bestALCT,
-                        const CSCALCTDigi& secondALCT,
-                        const CSCCLCTDigi& bestCLCT,
-                        const CSCCLCTDigi& secondCLCT,
+  // correlate ALCT, CLCT with matched pads or copads
+  void correlateLCTsGEM(const CSCALCTDigi& ALCT,
+                        const CSCCLCTDigi& CLCT,
                         const GEMInternalClusters& clusters,
-                        CSCCorrelatedLCTDigi& lct1,
-                        CSCCorrelatedLCTDigi& lct2) const;
+                        CSCCorrelatedLCTDigi& lct) const;
 
-  /* correlate a pair of CLCTs with matched clusters or coclusters
-     the output is up to two LCTs */
-  void correlateLCTsGEM(const CSCCLCTDigi& bestCLCT,
-                        const CSCCLCTDigi& secondCLCT,
+  // correlate ALCT and CLCT, no GEM
+  void correlateLCTsGEM(const CSCALCTDigi& ALCT,
+                        const CSCCLCTDigi& CLCT,
+                        CSCCorrelatedLCTDigi& lct) const;
+
+  // correlate CLCT with matched pads or copads
+  void correlateLCTsGEM(const CSCCLCTDigi& CLCT,
                         const GEMInternalClusters& clusters,
-                        CSCCorrelatedLCTDigi& lct1,
-                        CSCCorrelatedLCTDigi& lct2) const;
+                        CSCCorrelatedLCTDigi& lct) const;
 
-  /* correlate a pair of ALCTs with matched clusters or coclusters
-     the output is up to two LCTs */
-  void correlateLCTsGEM(const CSCALCTDigi& bestALCT,
-                        const CSCALCTDigi& secondALCT,
+  // correlate ALCT with matched pads or copads
+  void correlateLCTsGEM(const CSCALCTDigi& ALCT,
                         const GEMInternalClusters& clusters,
-                        CSCCorrelatedLCTDigi& lct1,
-                        CSCCorrelatedLCTDigi& lct2) const;
+                        CSCCorrelatedLCTDigi& lct) const;
 
-  /* Construct LCT from CSC and GEM information. Options are ALCT-CLCT-GEM, ALCT-CLCT-2GEM */
+  // Construct LCT from CSC and GEM information. ALCT+CLCT+GEM
   void constructLCTsGEM(const CSCALCTDigi& alct,
                         const CSCCLCTDigi& clct,
                         const GEMInternalCluster& gem,
                         CSCCorrelatedLCTDigi& lct) const;
 
-  /* Construct LCT from CSC and GEM information. Options are CLCT-2GEM */
+  // Construct LCT from CSC and no GEM information. ALCT+CLCT
+  void constructLCTsGEM(const CSCALCTDigi& alct,
+                        const CSCCLCTDigi& clct,
+                        CSCCorrelatedLCTDigi& lct) const;
+
+  // Construct LCT from CSC and GEM information. CLCT+2GEM
   void constructLCTsGEM(const CSCCLCTDigi& clct,
                         const GEMInternalCluster& gem,
-                        int trackNumber,
                         CSCCorrelatedLCTDigi& lct) const;
 
-  /* Construct LCT from CSC and GEM information. Options are ALCT-2GEM */
+  // Construct LCT from CSC and GEM information. ALCT+2GEM
   void constructLCTsGEM(const CSCALCTDigi& alct,
                         const GEMInternalCluster& gem,
-                        int trackNumber,
                         CSCCorrelatedLCTDigi& lct) const;
 
-  // helper functions to drop low quality ALCTs or CLCTs
-  // without matching LCTs
-  void dropLowQualityALCTNoClusters(CSCALCTDigi& alct, const GEMInternalCluster& cluster) const;
-  void dropLowQualityCLCTNoClusters(CSCCLCTDigi& clct, const GEMInternalCluster& cluster) const;
-
-  /*
-    - For Run-2 GEM-CSC trigger primitives, which we temporarily have
-    to integrate with the Run-2 EMTF during LS2, we sort by quality.
-    Larger quality means smaller bending
-
-    - For Run-3 GEM-CSC trigger primitives, which we have
-    to integrate with the Run-3 EMTF, we sort by slope.
-    Smaller slope means smaller bending
-  */
-  void sortLCTsByBending(std::vector<CSCCorrelatedLCTDigi>& lcts) const;
+  // LCTs are sorted by quality. If there are two with the same quality,
+  // then the sorting is done by the slope
+  void sortLCTs(std::vector<CSCCorrelatedLCTDigi>& lcts) const;
 
   /** Chamber id (trigger-type labels). */
   unsigned gemId;
@@ -145,20 +123,16 @@ private:
   std::shared_ptr<GEMClusterProcessor> clusterProc_;
 
   // Drop low quality stubs in ME1/b or ME2/1
-  bool drop_low_quality_alct_no_gems_;
-  bool drop_low_quality_clct_no_gems_;
+  bool drop_low_quality_alct_;
+  bool drop_low_quality_clct_;
+  // Drop low quality stubs in ME1/a
+  bool drop_low_quality_clct_me1a_;
 
   // build LCT from ALCT/CLCT and GEM in ME1/b or ME2/1
   bool build_lct_from_alct_clct_2gem_;
   bool build_lct_from_alct_clct_1gem_;
   bool build_lct_from_alct_gem_;
   bool build_lct_from_clct_gem_;
-
-  // Drop low quality stubs in ME1/a
-  bool drop_low_quality_clct_no_gems_me1a_;
-
-  // build LCT from CLCT and GEM in ME1/a
-  bool build_lct_from_clct_gem_me1a_;
 
   // bunch crossing window cuts
   unsigned alct_gem_bx_window_size_;

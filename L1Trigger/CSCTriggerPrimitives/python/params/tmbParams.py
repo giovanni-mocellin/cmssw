@@ -34,7 +34,7 @@ tmbPhase1 = cms.PSet(
     matchEarliestClctOnly = cms.bool(True),
     # For ALCT-centric matching, whether to drop CLCTs that were matched
     # to ALCTs in this BX, and not use them in the following BX
-    tmbDropUsedClcts = cms.bool(True),
+    tmbDropUsedClcts = cms.bool(False),
     # True: allow construction of unphysical LCTs
     # in ME11 for which WG and HS do not intersect.
     # False: do not build such unphysical LCTs
@@ -62,10 +62,8 @@ tmbPhase2GEM = tmbPhase2.clone(
     # CLCT slope to GEM. Otherwise, just matching keystrip positions
     matchCLCTpropagation = cms.bool(True),
     # efficiency recovery switches
-    dropLowQualityALCTsNoGEMs = cms.bool(False),
-    dropLowQualityCLCTsNoGEMs = cms.bool(True),
-    buildLCTfromALCTCLCTand2GEM = cms.bool(True),
-    buildLCTfromALCTCLCTand1GEM = cms.bool(True),
+    dropLowQualityALCTs = cms.bool(True),
+    dropLowQualityCLCTs = cms.bool(True),
     buildLCTfromALCTandGEM = cms.bool(True),
     buildLCTfromCLCTandGEM = cms.bool(False),
     # assign GEM-CSC bending angle. Works only for
@@ -73,7 +71,7 @@ tmbPhase2GEM = tmbPhase2.clone(
     assignGEMCSCBending = cms.bool(True),
     # whether to drop GEMs that were matched to ALCTs or CLCTs
     # in this BX, and not use them in the following BX
-    tmbDropUsedGems = cms.bool(True),
+    tmbDropUsedGems = cms.bool(False),
     # For ALCT-centric matching to GEMs, break after finding
     # the first BX with matching GEM coincidence clusters
     matchEarliestGemsOnly = cms.bool(True),
@@ -94,17 +92,14 @@ tmbPhase2GE11 = tmbPhase2GEM.clone(
     maxDeltaHsEven = cms.uint32(5),
     maxDeltaHsOdd = cms.uint32(10),
     # efficiency recovery switches
-    dropLowQualityCLCTsNoGEMs_ME1a = cms.bool(True),
-    buildLCTfromALCTandGEM_ME1a = cms.bool(True),
-    buildLCTfromCLCTandGEM_ME1a = cms.bool(True),
+    dropLowQualityCLCTs_ME1a = cms.bool(True),
 )
 
 # to be used by ME21 chambers with GEM-CSC ILT
 tmbPhase2GE21 = tmbPhase2GEM.clone(
     # matching to GEM clusters with half-strips
     maxDeltaHsEven = cms.uint32(5),
-    maxDeltaHsOdd = cms.uint32(10),
-    dropLowQualityALCTsNoGEMs = True,
+    maxDeltaHsOdd = cms.uint32(10)
 )
 
 tmbPSets = cms.PSet(
