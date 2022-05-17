@@ -4,6 +4,7 @@
 /** \class GEMClusterProcessor
  *
  * \author Sven Dildick (Rice University)
+ * \updates by Giovanni Mocellin (UC Davis)
  *
  */
 

@@ -7,6 +7,7 @@
  * 1/2-strips, 1/8-strips and wiregroups for easy matching with CSC TPs
  *
  * Author: Sven Dildick (Rice University)
+ * Updates: Giovanni Mocellin (UC Davis)
  *
  */
 
