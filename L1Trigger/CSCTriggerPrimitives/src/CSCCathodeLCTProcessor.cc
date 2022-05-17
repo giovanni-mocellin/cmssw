@@ -656,7 +656,7 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::findLCTs(
         if (tempBestCLCT.isValid() and tempSecondCLCT.isValid()) {
           qualityBest = tempBestCLCT.getQuality();
           qualitySecond = tempSecondCLCT.getQuality();
-          if (!run3_) {
+          if (!runCCLUT_) {
             patternBest = tempBestCLCT.getPattern();
             patternSecond = tempSecondCLCT.getPattern();
           }
