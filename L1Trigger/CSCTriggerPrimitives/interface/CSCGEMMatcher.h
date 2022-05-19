@@ -43,8 +43,7 @@ public:
   // ALCT-GEM
   void matchingClustersLoc(const CSCALCTDigi& alct,
                            const GEMInternalClusters& clusters,
-                           GEMInternalClusters& output,
-                           bool isME1a = false) const;
+                           GEMInternalClusters& output) const;
 
   // CLCT-GEM
   void matchingClustersLoc(const CSCCLCTDigi& clct,
@@ -96,6 +95,11 @@ private:
   unsigned chamber_;
   bool isEven_;
 
+  // enable GEM-CSC matching in ME1a and ME1b
+  bool enable_match_gem_me1a_;
+  bool enable_match_gem_me1b_;
+
+  // match GEM-CSC by propagating CLCT to GEM via LUT
   bool matchCLCTpropagation_;
 
   // Matching interval in Half Strips (less bits to deal with in FW), but then used as Eighth Strips (es=hs*4)

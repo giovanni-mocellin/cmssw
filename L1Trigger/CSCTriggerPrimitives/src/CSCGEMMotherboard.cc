@@ -153,64 +153,39 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
 
     bool matchingBX = 0;
 
-    // BestCLCT
+    // BestCLCT and secondCLCT
     for (unsigned mbx = 0; mbx < match_trig_window_size; mbx++) {
       unsigned bx_clct = bx_alct + preferred_bx_match_[mbx] - CSCConstants::ALCT_CLCT_OFFSET;
       if (bx_clct >= CSCConstants::MAX_CLCT_TBINS) continue;
       bestCLCT = clctProc->getBestCLCT(bx_clct);
+      secondCLCT = clctProc->getSecondCLCT(bx_clct);
       matchingBX = mbx;
       if (bestCLCT.isValid()) break;
-    }
-
-    // SecondCLCT
-    for (unsigned mbx = 0; mbx < match_trig_window_size; mbx++) {
-      unsigned bx_clct = bx_alct + preferred_bx_match_[mbx] - CSCConstants::ALCT_CLCT_OFFSET;
-      if (bx_clct >= CSCConstants::MAX_CLCT_TBINS) continue;
-      secondCLCT = clctProc->getSecondCLCT(bx_clct);
-      if (secondCLCT.isValid()) break;
     }
 
     if (!bestALCT.isValid() and !secondALCT.isValid() and !bestCLCT.isValid() and !secondCLCT.isValid()) continue;
     if (!build_lct_from_clct_gem_ and !bestALCT.isValid()) continue;
     if (!build_lct_from_alct_gem_ and !bestCLCT.isValid()) continue;
 
-    /*
-    std::cout << "" << std::endl;
+    /*std::cout << "" << std::endl;
     std::cout << "BestALCT = " << bestALCT << std::endl;
     std::cout << "SecondALCT = " << secondALCT << std::endl;
     std::cout << "BestCLCT = " << bestCLCT << std::endl;
     std::cout << "SecondCLCT = " << secondCLCT << std::endl;
-    std::cout << "" << std::endl;
-    */
+    std::cout << "" << std::endl;*/
 
     // ALCT + CLCT + GEM
 
     for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
       unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
       clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::AllClusters);
-      correlateLCTsGEM(bestALCT, bestCLCT, clustersGEM, LCTbestAbestCgem);
-      if (LCTbestAbestCgem.isValid()) break;
-    }
-
-    for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
-      unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
-      clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::AllClusters);
-      correlateLCTsGEM(bestALCT, secondCLCT, clustersGEM, LCTbestAsecondCgem);
-      if (LCTbestAsecondCgem.isValid()) break;
-    }
-
-    for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
-      unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
-      clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::AllClusters);
-      correlateLCTsGEM(secondALCT, bestCLCT, clustersGEM, LCTsecondAbestCgem);
-      if (LCTsecondAbestCgem.isValid()) break;
-    }
-
-    for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
-      unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
-      clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::AllClusters);
-      correlateLCTsGEM(secondALCT, secondCLCT, clustersGEM, LCTsecondAsecondCgem);
-      if (LCTsecondAsecondCgem.isValid()) break;
+      if (!clustersGEM.empty()) {
+        correlateLCTsGEM(bestALCT, bestCLCT, clustersGEM, LCTbestAbestCgem);
+        correlateLCTsGEM(bestALCT, secondCLCT, clustersGEM, LCTbestAsecondCgem);
+        correlateLCTsGEM(secondALCT, bestCLCT, clustersGEM, LCTsecondAbestCgem);
+        correlateLCTsGEM(secondALCT, secondCLCT, clustersGEM, LCTsecondAsecondCgem);
+        break;
+      }
     }
 
     // ALCT + CLCT
@@ -238,15 +213,11 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
       for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
         unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
         clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::CoincidenceClusters);
-        correlateLCTsGEM(bestALCT, clustersGEM, LCTbestALCTgem);
-        if (LCTbestALCTgem.isValid()) break;
-      }
-
-      for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
-        unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
-        clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::CoincidenceClusters);
-        correlateLCTsGEM(secondALCT, clustersGEM, LCTsecondALCTgem);
-        if (LCTsecondALCTgem.isValid()) break;
+        if (!clustersGEM.empty()) {
+          correlateLCTsGEM(bestALCT, clustersGEM, LCTbestALCTgem);
+          correlateLCTsGEM(secondALCT, clustersGEM, LCTsecondALCTgem);
+          break;
+        }
       }
     }
 
@@ -258,7 +229,7 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     if (bestALCT.isValid() and !secondALCT.isValid() and !bestCLCT.isValid() and !secondCLCT.isValid()) {
       if (LCTbestALCTgem.isValid()) {
         LCTbestALCTgem.setTrknmb(1);
-        allLCTs_(bx_alct, 0, 0) = LCTbestALCTgem;
+        allLCTs_(bx_alct, matchingBX, 0) = LCTbestALCTgem;
       }
     }
 
@@ -266,7 +237,7 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     if (!bestALCT.isValid() and !secondALCT.isValid() and bestCLCT.isValid() and !secondCLCT.isValid()) {
       if (LCTbestCLCTgem.isValid()) {
         LCTbestCLCTgem.setTrknmb(1);
-        allLCTs_(bx_alct, 0, 0) = LCTbestCLCTgem;
+        allLCTs_(bx_alct, matchingBX, 0) = LCTbestCLCTgem;
       }
     }
 
@@ -274,50 +245,68 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     if (bestALCT.isValid() and !secondALCT.isValid() and bestCLCT.isValid() and !secondCLCT.isValid()) {
       if (LCTbestAbestCgem.isValid()) {
         LCTbestAbestCgem.setTrknmb(1);
-        allLCTs_(bx_alct, 0, 0) = LCTbestAbestCgem;
+        allLCTs_(bx_alct, matchingBX, 0) = LCTbestAbestCgem;
       }
       else if (LCTbestAbestC.isValid()) {
         LCTbestAbestC.setTrknmb(1);
-        allLCTs_(bx_alct, 0, 0) = LCTbestAbestC;
+        allLCTs_(bx_alct, matchingBX, 0) = LCTbestAbestC;
       }
     }
 
     // CASE => bestALCT, secondALCT, bestCLCT are valid
     if (bestALCT.isValid() and secondALCT.isValid() and bestCLCT.isValid() and !secondCLCT.isValid()) {
-      if (LCTbestAbestCgem.isValid()) selectedLCTs.push_back(LCTbestAbestCgem);
-      else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
-      if (!LCTsecondALCTgem.isValid() or !build_lct_from_alct_gem_) {
-        if (LCTsecondAbestCgem.isValid()) selectedLCTs.push_back(LCTsecondAbestCgem);
+      CSCCorrelatedLCTDigi lctbb, lctsb;
+      if (LCTbestAbestCgem.isValid()) lctbb = LCTbestAbestCgem;
+      else if (LCTbestAbestC.isValid()) lctbb = LCTbestAbestC;
+      if (LCTsecondAbestCgem.isValid()) lctsb = LCTsecondAbestCgem;
+      else if (LCTsecondAbestC.isValid()) lctsb = LCTsecondAbestC;
+
+      if (lctbb.getQuality() >= lctsb.getQuality() and lctbb.isValid()) {
+        selectedLCTs.push_back(lctbb);
+        if (LCTsecondALCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTsecondALCTgem);
         else if (LCTsecondAbestC.isValid()) selectedLCTs.push_back(LCTsecondAbestC);
       }
-      else if (LCTsecondALCTgem.isValid()) selectedLCTs.push_back(LCTsecondALCTgem);
+      else if (lctbb.getQuality() < lctsb.getQuality() and lctsb.isValid()) {
+        selectedLCTs.push_back(lctsb);
+        if (LCTbestALCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTbestALCTgem);
+        else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
+      }
 
       sortLCTs(selectedLCTs);
 
       for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()),unsigned(CSCConstants::MAX_LCTS_PER_CSC)); iLCT++) {
         if (selectedLCTs[iLCT].isValid()) {
           selectedLCTs[iLCT].setTrknmb(iLCT+1);
-          allLCTs_(bx_alct, 0, iLCT) = selectedLCTs[iLCT];
+          allLCTs_(bx_alct, matchingBX, iLCT) = selectedLCTs[iLCT];
         }
       }
     }
 
     // CASE => bestALCT, bestCLCT, secondCLCT are valid
     if (bestALCT.isValid() and !secondALCT.isValid() and bestCLCT.isValid() and secondCLCT.isValid()) {
-      if (LCTbestAbestCgem.isValid()) selectedLCTs.push_back(LCTbestAbestCgem);
-      else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
-      if (!LCTsecondCLCTgem.isValid() or !build_lct_from_clct_gem_) {
-        if (LCTbestAsecondCgem.isValid()) selectedLCTs.push_back(LCTbestAsecondCgem);
+      CSCCorrelatedLCTDigi lctbb, lctbs;
+      if (LCTbestAbestCgem.isValid()) lctbb = LCTbestAbestCgem;
+      else if (LCTbestAbestC.isValid()) lctbb = LCTbestAbestC;
+      if (LCTbestAsecondCgem.isValid()) lctbs = LCTbestAsecondCgem;
+      else if (LCTbestAsecondC.isValid()) lctbs = LCTbestAsecondC;
+
+      if (lctbb.getQuality() >= lctbs.getQuality() and lctbb.isValid()) {
+        selectedLCTs.push_back(lctbb);
+        if (LCTsecondCLCTgem.isValid() and build_lct_from_clct_gem_) selectedLCTs.push_back(LCTsecondCLCTgem);
         else if (LCTbestAsecondC.isValid()) selectedLCTs.push_back(LCTbestAsecondC);
       }
-      else if (LCTsecondCLCTgem.isValid()) selectedLCTs.push_back(LCTsecondCLCTgem);
+      else if (lctbb.getQuality() < lctbs.getQuality() and lctbs.isValid()) {
+        selectedLCTs.push_back(lctbs);
+        if (LCTbestCLCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTbestCLCTgem);
+        else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
+      }
 
       sortLCTs(selectedLCTs);
 
       for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()),unsigned(CSCConstants::MAX_LCTS_PER_CSC)); iLCT++) {
         if (selectedLCTs[iLCT].isValid()) {
           selectedLCTs[iLCT].setTrknmb(iLCT+1);
-          allLCTs_(bx_alct, 0, iLCT) = selectedLCTs[iLCT];
+          allLCTs_(bx_alct, matchingBX, iLCT) = selectedLCTs[iLCT];
         }
       }
     }

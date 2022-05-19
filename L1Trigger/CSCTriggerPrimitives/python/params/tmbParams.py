@@ -86,13 +86,17 @@ tmbPhase2GEM = tmbPhase2.clone(
 
 # to be used by ME11 chambers with GEM-CSC ILT
 tmbPhase2GE11 = tmbPhase2GEM.clone(
+    # match ME1a with GEM (it affects CLCT-GEM match)
+    enableMatchGEMandME1a = cms.bool(True),
+    # match ME1b with GEM (it affects CLCT-GEM match)
+    enableMatchGEMandME1b = cms.bool(True),
     # matching windows for ALCT-GEM clusters in wiregroups
     maxDeltaWG = cms.uint32(7),
     # matching windows for CLCT-GEM clusters in half strip units
     maxDeltaHsEven = cms.uint32(5),
     maxDeltaHsOdd = cms.uint32(10),
     # efficiency recovery switches
-    dropLowQualityCLCTs_ME1a = cms.bool(True),
+    dropLowQualityCLCTs_ME1a = cms.bool(True)
 )
 
 # to be used by ME21 chambers with GEM-CSC ILT

@@ -53,13 +53,12 @@ private:
   Use ALCTs, CLCTs, GEMs to build LCTs. Matches in FW are attempted in the following order:
     1) ALCT-CLCT-2GEM (coincidence pad)
     2) ALCT-CLCT-GEM
-    3) ALCT-CLCT
-    4) CLCT-2GEM
-    5) ALCT-2GEM
+    3) ALCT-CLCT (requires CLCT with at least 4 layers)
+    4) CLCT-2GEM (requires CLCT with at least 4 layers)
+    5) ALCT-2GEM (requires ALCT with at least 4 layers)
     => If there are second ALCTs/CLCTs which could not be matched to GEM:
-    6) Copy over valid to invalid (best to second)
-    7) Try again with previous matchings and copied second ALCTs/CLCTs
-    => Copying in SW makes little sense, thus combination first-second are matched
+    6) Copy over valid to invalid
+    7) ALCT-CLCT with unused combination
   */
   void matchALCTCLCTGEM();
 
@@ -129,8 +128,6 @@ private:
   bool drop_low_quality_clct_me1a_;
 
   // build LCT from ALCT/CLCT and GEM in ME1/b or ME2/1
-  bool build_lct_from_alct_clct_2gem_;
-  bool build_lct_from_alct_clct_1gem_;
   bool build_lct_from_alct_gem_;
   bool build_lct_from_clct_gem_;
 
