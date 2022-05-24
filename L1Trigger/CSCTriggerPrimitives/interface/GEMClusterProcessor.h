@@ -4,7 +4,7 @@
 /** \class GEMClusterProcessor
  *
  * \author Sven Dildick (Rice University)
- *
+ * \updates by Giovanni Mocellin (UC Davis)
  */
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -32,10 +32,7 @@ public:
     1: single and coincidence, 2: only coincidence, 3: only single
   */
   enum ClusterTypes { AllClusters = 1, SingleClusters = 2, CoincidenceClusters = 3 };
-  std::vector<GEMInternalCluster> getClusters(int bx, int deltaBX = 0, ClusterTypes option = AllClusters) const;
-
-  /* Returns coincidence clusters for a given BX */
-  std::vector<GEMInternalCluster> getCoincidenceClusters(int bx) const;
+  std::vector<GEMInternalCluster> getClusters(int bx, ClusterTypes option = AllClusters) const;
 
   /** Returns vector of CoPads in the read-out time window, if any. */
   std::vector<GEMCoPadDigi> readoutCoPads() const;
