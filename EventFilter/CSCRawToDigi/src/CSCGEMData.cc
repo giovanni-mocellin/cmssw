@@ -143,7 +143,7 @@ std::vector<GEMPadDigiCluster> CSCGEMData::digis(int gem_chamber) const {
 /// Unpack GEMPadDigiCluster digi trigger objects per eta/roll
 /// gem_chamber - GEM GE11 layer gemA/B [0,1]
 /// eta_roll - GEM eta/roll 8 rolls per GEM layer [0-7]
-std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_roll) const {
+std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_roll, int correctionToALCTbx) const {
   /// GEM data format v2
   std::vector<GEMPadDigiCluster> result;
   result.clear();
@@ -172,7 +172,8 @@ std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_rol
             std::vector<short unsigned int> pads;
             for (int iP = 0; iP <= cluster_size; ++iP)
               pads.push_back(padInPart + iP);
-            GEMPadDigiCluster pad_cluster(pads, i);
+            GEMPadDigiCluster pad_cluster(pads, i-correctionToALCTbx+CSCConstants::ALCT_CENTRAL_BX+2+1);
+            //std::cout << "Timebin: " << i << " correctionToALCTbx: " << correctionToALCTbx << " GEM: Layer " << gem_layer << " iEta " << 8-eta << " pads: " << pad_cluster << std::endl;
             result.push_back(pad_cluster);
           }
         }
