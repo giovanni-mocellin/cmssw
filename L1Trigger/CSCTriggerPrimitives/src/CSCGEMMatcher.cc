@@ -217,8 +217,8 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
       distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
     }
 
-    std::cout << " CLCT-GEM distance = " << distanceES << std::endl;*/
-  }
+    std::cout << " CLCT-GEM distance = " << distanceES << std::endl;
+  }*/
 }
 
 void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
