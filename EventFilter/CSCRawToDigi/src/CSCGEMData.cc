@@ -1,11 +1,13 @@
 #include "EventFilter/CSCRawToDigi/interface/CSCGEMData.h"
 #include "DataFormats/GEMDigi/interface/GEMPadDigiCluster.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/CSCDigi/interface/CSCConstants.h"
 
 #include <string>
 #include <cstdio>
 #include <strings.h>  // for bzero
 #include <cstring>
+#include <iostream>
 
 #ifdef LOCAL_UNPACK
 bool CSCGEMData::debug = false;
