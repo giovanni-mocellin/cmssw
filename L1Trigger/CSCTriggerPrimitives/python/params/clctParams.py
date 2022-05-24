@@ -34,7 +34,7 @@ clctPhase1 = cms.PSet(
 # Parameters for upgrade CLCT processors
 clctPhase2 = clctPhase1.clone(
     # decrease possible minimal #HS distance between two CLCTs in a BX from 10 to 5:
-    clctMinSeparation     = 5,
+    clctMinSeparation = 5,
 
     # Turns on algorithms of localized dead-time zones:
     useDeadTimeZoning = True,
