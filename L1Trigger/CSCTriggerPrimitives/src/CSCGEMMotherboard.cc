@@ -164,12 +164,12 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     if (!build_lct_from_clct_gem_ and !bestALCT.isValid()) continue;
     if (!build_lct_from_alct_gem_ and !bestCLCT.isValid()) continue;
 
-    std::cout << "" << std::endl;
+    /*std::cout << "" << std::endl;
     std::cout << "BestALCT = " << bestALCT << std::endl;
     std::cout << "SecondALCT = " << secondALCT << std::endl;
     std::cout << "BestCLCT = " << bestCLCT << std::endl;
     std::cout << "SecondCLCT = " << secondCLCT << std::endl;
-    std::cout << "" << std::endl;
+    std::cout << "" << std::endl;*/
 
     // ALCT + CLCT + GEM
 
