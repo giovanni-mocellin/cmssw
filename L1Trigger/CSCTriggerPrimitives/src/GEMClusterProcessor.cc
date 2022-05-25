@@ -136,7 +136,7 @@ void GEMClusterProcessor::addCoincidenceClusters(const GEMPadDigiClusterCollecti
 
           // make a new coincidence
           clusters_.emplace_back(id, co_id, *p, *co_p);
-          std::cout << clusters_.back() << std::endl;
+          // std::cout << clusters_.back() << std::endl;
         }
       }
     }
@@ -180,10 +180,10 @@ void GEMClusterProcessor::addSingleClusters(const GEMPadDigiClusterCollection* i
       // put the single clusters into the collection
       if (id.layer() == 1){
         clusters_.emplace_back(id, id, *p, GEMPadDigiCluster());
-        std::cout << clusters_.back() << std::endl;}
+        // std::cout << clusters_.back() << std::endl;}
       else{
         clusters_.emplace_back(id, id, GEMPadDigiCluster(), *p);
-        std::cout << clusters_.back() << std::endl;}
+        // std::cout << clusters_.back() << std::endl;}
     }
   }
 }
