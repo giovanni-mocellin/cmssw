@@ -228,10 +228,10 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   auto GEM_roll_L2_CSC_max_wg_ME21_even_ = load(rollToMaxWgME21Files_[2]);
   auto GEM_roll_L2_CSC_max_wg_ME21_odd_  = load(rollToMaxWgME21Files_[3]);
 
-  auto es_diff_slope_L1_ME21_even_ = load(esDiffToSlopeME2Files_[0]);
-  auto es_diff_slope_L1_ME21_odd_  = load(esDiffToSlopeME2Files_[1]);
-  auto es_diff_slope_L2_ME21_even_ = load(esDiffToSlopeME2Files_[2]);
-  auto es_diff_slope_L2_ME21_odd_  = load(esDiffToSlopeME2Files_[3]);
+  auto es_diff_slope_L1_ME21_even_ = load(esDiffToSlopeME21Files_[0]);
+  auto es_diff_slope_L1_ME21_odd_  = load(esDiffToSlopeME21Files_[1]);
+  auto es_diff_slope_L2_ME21_even_ = load(esDiffToSlopeME21Files_[2]);
+  auto es_diff_slope_L2_ME21_odd_  = load(esDiffToSlopeME21Files_[3]);
 
   auto CSC_slope_cosi_2to1_L1_ME21_even_ = load(gemCscSlopeCosiFiles_[8]);
   auto CSC_slope_cosi_2to1_L1_ME21_odd_  = load(gemCscSlopeCosiFiles_[9]);
