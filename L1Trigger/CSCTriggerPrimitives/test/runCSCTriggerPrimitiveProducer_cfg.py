@@ -137,21 +137,16 @@ if useB904Data:
 
       ## GEM mapping for b904 GEM-CSC integration stand
       if options.useB904GE11Long:
-          process.GlobalTag.toGet = cms.VPSet(
-                  cms.PSet(record = cms.string("GEMeMapRcd"),
-                           tag = cms.string("GEMeMapB904Data"),
-                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Even.db")
-                          )
-          )
           process.muonCSCDigis.B904GE11Long = True
       if options.useB904GE11Short:
-          process.GlobalTag.toGet = cms.VPSet(
-                  cms.PSet(record = cms.string("GEMeMapRcd"),
-                           tag = cms.string("GEMeMapB904Data"),
-                           connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Odd.db")
-                          )
-          )
           process.muonCSCDigis.B904GE11Short = True
+
+      process.GlobalTag.toGet = cms.VPSet(
+              cms.PSet(record = cms.string("GEMeMapRcd"),
+                       tag = cms.string("GEMeMapB904Data"),
+                       connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
+                      )
+      )
       process.muonGEMDigis.useDBEMap = True
       process.muonGEMDigis.InputLabel = "rawDataCollectorGEM"
       process.muonGEMDigis.fedIdStart = 1478

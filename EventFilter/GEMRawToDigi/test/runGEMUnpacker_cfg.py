@@ -150,23 +150,13 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '112X_dataRun3_Prompt_v5', '')
 
 # Mapping for b904 GEM-CSC integration stand
-if options.useB904GE11Long:
-    process.GlobalTag.toGet = cms.VPSet(
-            cms.PSet(record = cms.string("GEMeMapRcd"),
-                     tag = cms.string("GEMeMapB904Data"),
-                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Even.db")
-                    )
-    )
-    process.muonGEMDigis.useDBEMap = True
-
-if options.useB904GE11Short:
-    process.GlobalTag.toGet = cms.VPSet(
-            cms.PSet(record = cms.string("GEMeMapRcd"),
-                     tag = cms.string("GEMeMapB904Data"),
-                     connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904_Odd.db")
-                    )
-    )
-    process.muonGEMDigis.useDBEMap = True
+process.GlobalTag.toGet = cms.VPSet(
+        cms.PSet(record = cms.string("GEMeMapRcd"),
+                 tag = cms.string("GEMeMapB904Data"),
+                 connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
+                )
+)
+process.muonGEMDigis.useDBEMap = True
 
 # dump raw data
 process.dumpRaw = cms.EDAnalyzer(
