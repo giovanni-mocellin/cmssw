@@ -4,7 +4,9 @@
 GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
                                        const GEMDetId& id2,
                                        const GEMPadDigiCluster& cluster1,
-                                       const GEMPadDigiCluster& cluster2) {
+                                       const GEMPadDigiCluster& cluster2,
+                                       const unsigned delayGEMinOTMB,
+                                       const bool isMC) {
 
   // set coincidence to false first
   isCoincidence_ = false;
@@ -20,20 +22,23 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
   if (cluster1.isValid()) {
     isValid_ = true;
     cl1_ = cluster1;
-    bx_ = cluster1.bx();
+    if (isMC)  bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC) bx_ = cluster1.bx() + delayGEMinOTMB;
     layer1_pad_ = cluster1.pads()[0];
     layer1_size_ = cluster1.pads().size();
   }
   if (cluster2.isValid()) {
     isValid_ = true;
     cl2_ = cluster2;
-    bx_ = cluster2.bx();
+    if (isMC)  bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC) bx_ = cluster2.bx() + delayGEMinOTMB;
     layer2_pad_ = cluster2.pads()[0];
     layer2_size_ = cluster2.pads().size();
   }
 
   if (cluster1.isValid() and cluster2.isValid()) {
-    bx_ = cluster1.bx();
+    if (isMC)  bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC) bx_ = cluster1.bx() + delayGEMinOTMB;
     isCoincidence_ = true;
   }
 

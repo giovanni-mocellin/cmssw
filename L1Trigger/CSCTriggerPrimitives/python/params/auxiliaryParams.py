@@ -2,6 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 # Parameters common for all boards
 commonParam = cms.PSet(
+    # Master flag for MonteCarlo studies
+    MC = cms.bool(False),
+
     # Master flag for Phase-2 studies
     runPhase2 = cms.bool(False),
 

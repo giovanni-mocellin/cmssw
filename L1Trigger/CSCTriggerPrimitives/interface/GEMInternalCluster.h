@@ -10,6 +10,7 @@
  * Updates by Giovanni Mocellin (UC Davis)
  */
 
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/MuonDetId/interface/GEMDetId.h"
 #include "DataFormats/GEMDigi/interface/GEMPadDigiCluster.h"
 #include "DataFormats/GEMDigi/interface/GEMPadDigi.h"
@@ -18,7 +19,7 @@
 class GEMInternalCluster {
 public:
   // constructor
-  GEMInternalCluster(const GEMDetId& id1, const GEMDetId& id2, const GEMPadDigiCluster& cluster1, const GEMPadDigiCluster& cluster2);
+  GEMInternalCluster(const GEMDetId& id1, const GEMDetId& id2, const GEMPadDigiCluster& cluster1, const GEMPadDigiCluster& cluster2, const unsigned delayGEMinOTMB, const bool isMC);
 
   // empty object
   GEMInternalCluster();
