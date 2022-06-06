@@ -12,7 +12,7 @@ l1tdeGEMTPGCommon = cms.PSet(
     clusterMaxBin = cms.vdouble(20,192,10),
     ## GEM reads out only one BX (BX=0) in DAQ path
     ## For debugging purposes, show all the trigger clusters
-    useDataClustersOnlyInBX0 = cms.bool(False),
+    useDataClustersOnlyInBX0 = cms.bool(True),
     B904Setup = cms.bool(False),
 )
 
