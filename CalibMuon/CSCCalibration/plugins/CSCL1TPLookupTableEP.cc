@@ -127,7 +127,7 @@ std::unique_ptr<CSCL1TPLookupTableME11ILT> CSCL1TPLookupTableEP::produceME11ILT(
 
   auto CSC_slope_cosi_corr_L1_ME11a_even_ = load(gemCscSlopeCosiCorrectionFiles_[0]);
   auto CSC_slope_cosi_corr_L1_ME11b_even_ = load(gemCscSlopeCosiCorrectionFiles_[1]);
-  auto CSC_slope_cosi_corr_L1_ME11_odd_  = load(gemCscSlopeCosiCorrectionFiles_[3]);
+  auto CSC_slope_cosi_corr_L1_ME11a_odd_  = load(gemCscSlopeCosiCorrectionFiles_[3]);
   auto CSC_slope_cosi_corr_L1_ME11b_odd_  = load(gemCscSlopeCosiCorrectionFiles_[4]);
 
   auto CSC_slope_corr_L1_ME11a_even_ = load(gemCscSlopeCorrectionFiles_[0]);
