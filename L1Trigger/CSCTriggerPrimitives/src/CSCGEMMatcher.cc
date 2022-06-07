@@ -154,11 +154,7 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
     bool isMatchedLayer2 = false;
 
     if (cl.id1().layer() == 1) { // cluster has valid layer 1
-<<<<<<< HEAD
       if ((station_ == 1 and enable_match_gem_me1a_ and ((isME1a and cl.roll1() == 8) or (!isME1a and cl.roll1() < 8))) or
-=======
-      if ((station_ == 1 and enable_match_gem_me1a_ and (isME1a and (cl.roll1() == 8 or !isME1a and cl.roll1() < 8))) or
->>>>>>> 7f1c8bc89b9d5724c93c9049f1ba66c5b544005e
           (station_ == 1 and !enable_match_gem_me1a_ and !isME1a) or
           (station_ == 2)) {
         isLayer2 = false;
@@ -167,11 +163,7 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
       }
     }
     if (cl.id2().layer() == 2) { // cluster has valid layer 2
-<<<<<<< HEAD
       if ((station_ == 1 and enable_match_gem_me1a_ and ((isME1a and cl.roll2() == 8) or (!isME1a and cl.roll2() < 8))) or
-=======
-      if ((station_ == 1 and enable_match_gem_me1a_ and (isME1a and (cl.roll2() == 8 or !isME1a and cl.roll2() < 8))) or
->>>>>>> 7f1c8bc89b9d5724c93c9049f1ba66c5b544005e
           (station_ == 1 and !enable_match_gem_me1a_ and !isME1a) or
           (station_ == 2)) {
         isLayer2 = true;
