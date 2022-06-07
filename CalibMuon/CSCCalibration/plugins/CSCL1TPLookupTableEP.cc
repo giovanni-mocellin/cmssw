@@ -211,8 +211,8 @@ std::unique_ptr<CSCL1TPLookupTableME21ILT> CSCL1TPLookupTableEP::produceME21ILT(
   std::vector<std::string> gemCscSlopeCorrectionFiles_ =
       pset_.getParameter<std::vector<std::string>>("gemCscSlopeCorrectionFiles");
 
-  std::vector<std::string> esDiffToSlopeME2Files_ =
-      pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME2Files");
+  std::vector<std::string> esDiffToSlopeME21Files_ =
+      pset_.getParameter<std::vector<std::string>>("esDiffToSlopeME21Files");
 
   // read the text files and extract the data
   auto GEM_pad_CSC_es_ME21_even_ = load(padToEsME21Files_[0]);
