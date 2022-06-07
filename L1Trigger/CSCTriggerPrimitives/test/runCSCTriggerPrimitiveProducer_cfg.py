@@ -142,9 +142,9 @@ if useB904Data:
           process.muonCSCDigis.B904GE11Short = True
 
       process.GlobalTag.toGet = cms.VPSet(
-              cms.PSet(record = cms.string("GEMeMapRcd"),
-                       tag = cms.string("GEMeMapB904Data"),
-                       connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
+              cms.PSet(record = cms.string("GEMChMapRcd"),
+                       tag = cms.string("GEMChMap"),
+                       connect = cms.string("sqlite_fip:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
                       )
       )
       process.muonGEMDigis.useDBEMap = True

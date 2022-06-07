@@ -151,9 +151,9 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '112X_dataRun3_Prompt_v5', '')
 
 # Mapping for b904 GEM-CSC integration stand
 process.GlobalTag.toGet = cms.VPSet(
-        cms.PSet(record = cms.string("GEMeMapRcd"),
-                 tag = cms.string("GEMeMapB904Data"),
-                 connect = cms.string("sqlite_file:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
+        cms.PSet(record = cms.string("GEMChMapRcd"),
+                 tag = cms.string("GEMChMap"),
+                 connect = cms.string("sqlite_fip:./EventFilter/GEMRawToDigi/test/GEMeMap_GE11_b904.db")
                 )
 )
 process.muonGEMDigis.useDBEMap = True
