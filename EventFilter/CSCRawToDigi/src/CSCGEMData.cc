@@ -175,7 +175,7 @@ std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_rol
             for (int iP = 0; iP <= cluster_size; ++iP)
               pads.push_back(padInPart + iP);
             GEMPadDigiCluster pad_cluster(pads, i-correctionToALCTbx+CSCConstants::ALCT_CENTRAL_BX+2);
-            //std::cout << "Timebin: " << i << " correctionToALCTbx: " << correctionToALCTbx << " GEM: Layer " << gem_layer << " iEta " << 8-eta << " pads: " << pad_cluster << std::endl;
+            if (CSCGEMData::debug) std::cout << "Timebin: " << i << " correctionToALCTbx: " << correctionToALCTbx << " GEM: Layer " << gem_layer << " iEta " << 8-eta << " pads: " << pad_cluster << std::endl;
             result.push_back(pad_cluster);
           }
         }
