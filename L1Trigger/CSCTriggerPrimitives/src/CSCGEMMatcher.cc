@@ -96,40 +96,34 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCALCTDigi& alct,
   if (!alct.isValid() or clusters.empty())
     return;
 
+  int number_of_wg = 0;
+  if (station_ == 1) number_of_wg = CSCConstants::NUM_WIREGROUPS_ME11;
+  if (station_ == 2) number_of_wg = CSCConstants::NUM_WIREGROUPS_ME21;
+
   // select clusters matched in wiregroup
 
   for (const auto& cl : clusters) {
     // std::cout << "GEM cluster: " << cl << std::endl;
-    if (station_ == 2) { // ME2/1-GE2/1
-      for (const auto& cl : clusters) {
-        int min_wg = std::max(0, int(cl.layer2_min_wg() - maxDeltaWG_));
-        int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME21-1, int(cl.layer2_max_wg() + maxDeltaWG_));
-        if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg)
-          output.push_back(cl);
-      }
+    bool isMatchedLayer1 = false;
+    bool isMatchedLayer2 = false;
+
+    if (cl.id1().layer() == 1) { // cluster has valid layer 1
+      int min_wg = std::max(0, int(cl.layer1_min_wg() - maxDeltaWG_));
+      int max_wg = std::min(number_of_wg-1, int(cl.layer1_max_wg() + maxDeltaWG_));
+      if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer1 = true;
     }
-    else if (station_ == 1) { // ME1/1-GE1/1
-      bool isMatchedLayer1 = false;
-      bool isMatchedLayer2 = false;
+    if (cl.id2().layer() == 2) { // cluster has valid layer 2
+      int min_wg = std::max(0, int(cl.layer2_min_wg() - maxDeltaWG_));
+      int max_wg = std::min(number_of_wg-1, int(cl.layer2_max_wg() + maxDeltaWG_));
+      if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer2 = true;
+    }
 
-      if (cl.id1().layer() == 1) { // cluster has valid layer 1
-        int min_wg = std::max(0, int(cl.layer1_min_wg() - maxDeltaWG_));
-        int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.layer1_max_wg() + maxDeltaWG_));
-        if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer1 = true;
-      }
-      if (cl.id2().layer() == 2) { // cluster has valid layer 2
-        int min_wg = std::max(0, int(cl.layer2_min_wg() - maxDeltaWG_));
-        int max_wg = std::min(CSCConstants::NUM_WIREGROUPS_ME11-1, int(cl.layer2_max_wg() + maxDeltaWG_));
-        if (min_wg <= alct.getKeyWG() and alct.getKeyWG() <= max_wg) isMatchedLayer2 = true;
-      }
+    // std::cout << "ALCT-GEM matching L1-L2: " << isMatchedLayer1 << " " << isMatchedLayer2 << std::endl;
 
-      // std::cout << "ALCT-GEM matching L1-L2: " << isMatchedLayer1 << " " << isMatchedLayer2 << std::endl;
-
-      if (isMatchedLayer1 or isMatchedLayer2) {
-          output.push_back(cl);
-          if (isMatchedLayer1) output.back().set_matchingLayer1(true);
-          if (isMatchedLayer2) output.back().set_matchingLayer2(true);
-      }
+    if (isMatchedLayer1 or isMatchedLayer2) {
+        output.push_back(cl);
+        if (isMatchedLayer1) output.back().set_matchingLayer1(true);
+        if (isMatchedLayer2) output.back().set_matchingLayer2(true);
     }
   }
 }
@@ -142,7 +136,7 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
   if (!clct.isValid() or clusters.empty())
     return;
 
-  if (!enable_match_gem_me1a_ and !enable_match_gem_me1b_)
+  if (station_ == 1 and !enable_match_gem_me1a_ and !enable_match_gem_me1b_)
     return;
 
   const bool isME1a(station_ == 1 and clct.getKeyStrip() > CSCConstants::MAX_HALF_STRIP_ME1B);
@@ -160,16 +154,18 @@ void CSCGEMMatcher::matchingClustersLoc(const CSCCLCTDigi& clct,
     bool isMatchedLayer2 = false;
 
     if (cl.id1().layer() == 1) { // cluster has valid layer 1
-      if ((enable_match_gem_me1a_ and ((isME1a and cl.roll1() == 8) or (!isME1a and cl.roll1() < 8))) or
-          (!enable_match_gem_me1a_ and !isME1a)) {
+      if ((station_ == 1 and enable_match_gem_me1a_ and (isME1a and cl.roll1() == 8 or !isME1a and cl.roll1() < 8)) or
+          (station_ == 1 and !enable_match_gem_me1a_ and !isME1a) or
+          (station_ == 2)) {
         isLayer2 = false;
         unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
         if (distanceES <= eighthStripCut) isMatchedLayer1 = true;
       }
     }
     if (cl.id2().layer() == 2) { // cluster has valid layer 2
-      if ((enable_match_gem_me1a_ and ((isME1a and cl.roll2() == 8) or (!isME1a and cl.roll2() < 8))) or
-          (!enable_match_gem_me1a_ and !isME1a)) {
+      if ((station_ == 1 and enable_match_gem_me1a_ and (isME1a and cl.roll2() == 8 or !isME1a and cl.roll2() < 8)) or
+          (station_ == 1 and !enable_match_gem_me1a_ and !isME1a) or
+          (station_ == 2)) {
         isLayer2 = true;
         unsigned distanceES = abs(matchedClusterDistES(clct, cl, isLayer2, false));
         if (distanceES <= eighthStripCut) isMatchedLayer2 = true;
