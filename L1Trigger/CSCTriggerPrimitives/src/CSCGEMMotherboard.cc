@@ -48,16 +48,21 @@ void CSCGEMMotherboard::clear() {
 }
 
 //function to convert GEM-CSC amended signed slope into Run2 legacy pattern number
-uint16_t CSCGEMMotherboard::Run2PatternConverter(const int slope) const{
+uint16_t CSCGEMMotherboard::Run2PatternConverter(const int slope) const {
   unsigned sign = std::signbit(slope);
   unsigned slope_ = abs(slope);
   uint16_t Run2Pattern = 0;
 
-  if (slope_ < 3)       Run2Pattern = 10;
-  else if (slope_ < 6)  Run2Pattern = 8 + sign;
-  else if (slope_ < 9)  Run2Pattern = 6 + sign;
-  else if (slope_ < 12) Run2Pattern = 4 + sign;
-  else                  Run2Pattern = 2 + sign;
+  if (slope_ < 3)
+    Run2Pattern = 10;
+  else if (slope_ < 6)
+    Run2Pattern = 8 + sign;
+  else if (slope_ < 9)
+    Run2Pattern = 6 + sign;
+  else if (slope_ < 12)
+    Run2Pattern = 4 + sign;
+  else
+    Run2Pattern = 2 + sign;
 
   return Run2Pattern;
 }
@@ -121,14 +126,12 @@ void CSCGEMMotherboard::run(const CSCWireDigiCollection* wiredc,
 }
 
 void CSCGEMMotherboard::matchALCTCLCTGEM() {
-
   // no matching is done for GE2/1 geometries with 8 eta partitions
   // this has been superseded by 16-eta partition geometries
   if (isME21_ and !hasGE21Geometry16Partitions_)
     return;
 
   for (int bx_alct = 0; bx_alct < CSCConstants::MAX_ALCT_TBINS; bx_alct++) {
-
     // Declaration of all LCTs for this BX:
 
     // ALCT + CLCT + GEM
@@ -148,21 +151,26 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
 
     // Find best and second CLCTs by preferred CLCT BX, taking into account that there is an offset in the simulation
 
-    bool matchingBX = 0;
+    bool matchingBX = false;
 
     // BestCLCT and secondCLCT
     for (unsigned mbx = 0; mbx < match_trig_window_size; mbx++) {
       unsigned bx_clct = bx_alct + preferred_bx_match_[mbx] - CSCConstants::ALCT_CLCT_OFFSET;
-      if (bx_clct >= CSCConstants::MAX_CLCT_TBINS) continue;
+      if (bx_clct >= CSCConstants::MAX_CLCT_TBINS)
+        continue;
       bestCLCT = clctProc->getBestCLCT(bx_clct);
       secondCLCT = clctProc->getSecondCLCT(bx_clct);
       matchingBX = mbx;
-      if (bestCLCT.isValid()) break;
+      if (bestCLCT.isValid())
+        break;
     }
 
-    if (!bestALCT.isValid() and !secondALCT.isValid() and !bestCLCT.isValid() and !secondCLCT.isValid()) continue;
-    if (!build_lct_from_clct_gem_ and !bestALCT.isValid()) continue;
-    if (!build_lct_from_alct_gem_ and !bestCLCT.isValid()) continue;
+    if (!bestALCT.isValid() and !secondALCT.isValid() and !bestCLCT.isValid() and !secondCLCT.isValid())
+      continue;
+    if (!build_lct_from_clct_gem_ and !bestALCT.isValid())
+      continue;
+    if (!build_lct_from_alct_gem_ and !bestCLCT.isValid())
+      continue;
 
     /*std::cout << "" << std::endl;
     std::cout << "BestALCT = " << bestALCT << std::endl;
@@ -206,7 +214,6 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     // ALCT + 2 GEM
 
     if (build_lct_from_alct_gem_) {
-
       for (unsigned gmbx = 0; gmbx < alct_gem_bx_window_size_; gmbx++) {
         unsigned bx_gem = bx_alct + preferred_bx_match_[gmbx];
         clustersGEM = clusterProc_->getClusters(bx_gem, GEMClusterProcessor::CoincidenceClusters);
@@ -243,8 +250,7 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
       if (LCTbestAbestCgem.isValid()) {
         LCTbestAbestCgem.setTrknmb(1);
         allLCTs_(bx_alct, matchingBX, 0) = LCTbestAbestCgem;
-      }
-      else if (LCTbestAbestC.isValid()) {
+      } else if (LCTbestAbestC.isValid()) {
         LCTbestAbestC.setTrknmb(1);
         allLCTs_(bx_alct, matchingBX, 0) = LCTbestAbestC;
       }
@@ -253,27 +259,35 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     // CASE => bestALCT, secondALCT, bestCLCT are valid
     if (bestALCT.isValid() and secondALCT.isValid() and bestCLCT.isValid() and !secondCLCT.isValid()) {
       CSCCorrelatedLCTDigi lctbb, lctsb;
-      if (LCTbestAbestCgem.isValid()) lctbb = LCTbestAbestCgem;
-      else if (LCTbestAbestC.isValid()) lctbb = LCTbestAbestC;
-      if (LCTsecondAbestCgem.isValid()) lctsb = LCTsecondAbestCgem;
-      else if (LCTsecondAbestC.isValid()) lctsb = LCTsecondAbestC;
+      if (LCTbestAbestCgem.isValid())
+        lctbb = LCTbestAbestCgem;
+      else if (LCTbestAbestC.isValid())
+        lctbb = LCTbestAbestC;
+      if (LCTsecondAbestCgem.isValid())
+        lctsb = LCTsecondAbestCgem;
+      else if (LCTsecondAbestC.isValid())
+        lctsb = LCTsecondAbestC;
 
       if (lctbb.getQuality() >= lctsb.getQuality() and lctbb.isValid()) {
         selectedLCTs.push_back(lctbb);
-        if (LCTsecondALCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTsecondALCTgem);
-        else if (LCTsecondAbestC.isValid()) selectedLCTs.push_back(LCTsecondAbestC);
-      }
-      else if (lctbb.getQuality() < lctsb.getQuality() and lctsb.isValid()) {
+        if (LCTsecondALCTgem.isValid() and build_lct_from_alct_gem_)
+          selectedLCTs.push_back(LCTsecondALCTgem);
+        else if (LCTsecondAbestC.isValid())
+          selectedLCTs.push_back(LCTsecondAbestC);
+      } else if (lctbb.getQuality() < lctsb.getQuality() and lctsb.isValid()) {
         selectedLCTs.push_back(lctsb);
-        if (LCTbestALCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTbestALCTgem);
-        else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
+        if (LCTbestALCTgem.isValid() and build_lct_from_alct_gem_)
+          selectedLCTs.push_back(LCTbestALCTgem);
+        else if (LCTbestAbestC.isValid())
+          selectedLCTs.push_back(LCTbestAbestC);
       }
 
       sortLCTs(selectedLCTs);
 
-      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()),unsigned(CSCConstants::MAX_LCTS_PER_CSC)); iLCT++) {
+      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()), unsigned(CSCConstants::MAX_LCTS_PER_CSC));
+           iLCT++) {
         if (selectedLCTs[iLCT].isValid()) {
-          selectedLCTs[iLCT].setTrknmb(iLCT+1);
+          selectedLCTs[iLCT].setTrknmb(iLCT + 1);
           allLCTs_(bx_alct, matchingBX, iLCT) = selectedLCTs[iLCT];
         }
       }
@@ -282,27 +296,35 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     // CASE => bestALCT, bestCLCT, secondCLCT are valid
     if (bestALCT.isValid() and !secondALCT.isValid() and bestCLCT.isValid() and secondCLCT.isValid()) {
       CSCCorrelatedLCTDigi lctbb, lctbs;
-      if (LCTbestAbestCgem.isValid()) lctbb = LCTbestAbestCgem;
-      else if (LCTbestAbestC.isValid()) lctbb = LCTbestAbestC;
-      if (LCTbestAsecondCgem.isValid()) lctbs = LCTbestAsecondCgem;
-      else if (LCTbestAsecondC.isValid()) lctbs = LCTbestAsecondC;
+      if (LCTbestAbestCgem.isValid())
+        lctbb = LCTbestAbestCgem;
+      else if (LCTbestAbestC.isValid())
+        lctbb = LCTbestAbestC;
+      if (LCTbestAsecondCgem.isValid())
+        lctbs = LCTbestAsecondCgem;
+      else if (LCTbestAsecondC.isValid())
+        lctbs = LCTbestAsecondC;
 
       if (lctbb.getQuality() >= lctbs.getQuality() and lctbb.isValid()) {
         selectedLCTs.push_back(lctbb);
-        if (LCTsecondCLCTgem.isValid() and build_lct_from_clct_gem_) selectedLCTs.push_back(LCTsecondCLCTgem);
-        else if (LCTbestAsecondC.isValid()) selectedLCTs.push_back(LCTbestAsecondC);
-      }
-      else if (lctbb.getQuality() < lctbs.getQuality() and lctbs.isValid()) {
+        if (LCTsecondCLCTgem.isValid() and build_lct_from_clct_gem_)
+          selectedLCTs.push_back(LCTsecondCLCTgem);
+        else if (LCTbestAsecondC.isValid())
+          selectedLCTs.push_back(LCTbestAsecondC);
+      } else if (lctbb.getQuality() < lctbs.getQuality() and lctbs.isValid()) {
         selectedLCTs.push_back(lctbs);
-        if (LCTbestCLCTgem.isValid() and build_lct_from_alct_gem_) selectedLCTs.push_back(LCTbestCLCTgem);
-        else if (LCTbestAbestC.isValid()) selectedLCTs.push_back(LCTbestAbestC);
+        if (LCTbestCLCTgem.isValid() and build_lct_from_alct_gem_)
+          selectedLCTs.push_back(LCTbestCLCTgem);
+        else if (LCTbestAbestC.isValid())
+          selectedLCTs.push_back(LCTbestAbestC);
       }
 
       sortLCTs(selectedLCTs);
 
-      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()),unsigned(CSCConstants::MAX_LCTS_PER_CSC)); iLCT++) {
+      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()), unsigned(CSCConstants::MAX_LCTS_PER_CSC));
+           iLCT++) {
         if (selectedLCTs[iLCT].isValid()) {
-          selectedLCTs[iLCT].setTrknmb(iLCT+1);
+          selectedLCTs[iLCT].setTrknmb(iLCT + 1);
           allLCTs_(bx_alct, matchingBX, iLCT) = selectedLCTs[iLCT];
         }
       }
@@ -311,29 +333,37 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
     // CASE => bestALCT, secondALCT, bestCLCT, secondCLCT are valid
     if (bestALCT.isValid() and secondALCT.isValid() and bestCLCT.isValid() and secondCLCT.isValid()) {
       CSCCorrelatedLCTDigi lctbb, lctbs, lctsb, lctss;
-      if (LCTbestAbestCgem.isValid()) lctbb = LCTbestAbestCgem;
-      else if (LCTbestAbestC.isValid()) lctbb = LCTbestAbestC;
-      if (LCTbestAsecondCgem.isValid()) lctbs = LCTbestAsecondCgem;
-      else if (LCTbestAsecondC.isValid()) lctbs = LCTbestAsecondC;
-      if (LCTsecondAbestCgem.isValid()) lctsb = LCTsecondAbestCgem;
-      else if (LCTsecondAbestC.isValid()) lctsb = LCTsecondAbestC;
-      if (LCTsecondAsecondCgem.isValid()) lctss = LCTsecondAsecondCgem;
-      else if (LCTsecondAsecondC.isValid()) lctss = LCTsecondAsecondC;
+      if (LCTbestAbestCgem.isValid())
+        lctbb = LCTbestAbestCgem;
+      else if (LCTbestAbestC.isValid())
+        lctbb = LCTbestAbestC;
+      if (LCTbestAsecondCgem.isValid())
+        lctbs = LCTbestAsecondCgem;
+      else if (LCTbestAsecondC.isValid())
+        lctbs = LCTbestAsecondC;
+      if (LCTsecondAbestCgem.isValid())
+        lctsb = LCTsecondAbestCgem;
+      else if (LCTsecondAbestC.isValid())
+        lctsb = LCTsecondAbestC;
+      if (LCTsecondAsecondCgem.isValid())
+        lctss = LCTsecondAsecondCgem;
+      else if (LCTsecondAsecondC.isValid())
+        lctss = LCTsecondAsecondC;
 
       if (lctbb.getQuality() >= lctbs.getQuality()) {
         selectedLCTs.push_back(lctbb);
         selectedLCTs.push_back(lctss);
-      }
-      else if (lctbb.getQuality() < lctbs.getQuality()) {
+      } else if (lctbb.getQuality() < lctbs.getQuality()) {
         selectedLCTs.push_back(lctbs);
         selectedLCTs.push_back(lctsb);
       }
 
       sortLCTs(selectedLCTs);
 
-      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()),unsigned(CSCConstants::MAX_LCTS_PER_CSC)); iLCT++) {
+      for (unsigned iLCT = 0; iLCT < std::min(unsigned(selectedLCTs.size()), unsigned(CSCConstants::MAX_LCTS_PER_CSC));
+           iLCT++) {
         if (selectedLCTs[iLCT].isValid()) {
-          selectedLCTs[iLCT].setTrknmb(iLCT+1);
+          selectedLCTs[iLCT].setTrknmb(iLCT + 1);
           allLCTs_(bx_alct, matchingBX, iLCT) = selectedLCTs[iLCT];
         }
       }
@@ -346,7 +376,6 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& ALCT,
                                          const CSCCLCTDigi& CLCT,
                                          const GEMInternalClusters& clusters,
                                          CSCCorrelatedLCTDigi& lct) const {
-
   // Sanity checks on ALCT, CLCT, GEM clusters
   if (!ALCT.isValid()) {
     // edm::LogError("CSCGEMMotherboard") << "Best ALCT invalid in correlateLCTsGEM!";
@@ -359,14 +388,18 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& ALCT,
   }
 
   GEMInternalClusters ValidClusters;
-  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
-  if (ValidClusters.empty()) return;
+  for (const auto& cl : clusters)
+    if (cl.isValid())
+      ValidClusters.push_back(cl);
+  if (ValidClusters.empty())
+    return;
 
   // We can now check possible triplets and construct all LCTs with
   // valid ALCT, valid CLCTs and GEM clusters
   GEMInternalCluster bestCluster;
   cscGEMMatcher_->bestClusterLoc(ALCT, CLCT, ValidClusters, bestCluster);
-  if (bestCluster.isValid()) constructLCTsGEM(ALCT, CLCT, bestCluster, lct);
+  if (bestCluster.isValid())
+    constructLCTsGEM(ALCT, CLCT, bestCluster, lct);
 }
 
 // Correlate CSC information. Option ALCT-CLCT
@@ -374,7 +407,7 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& ALCT,
                                          const CSCCLCTDigi& CLCT,
                                          CSCCorrelatedLCTDigi& lct) const {
   // Sanity checks on ALCT, CLCT
-  if (!ALCT.isValid() or (ALCT.getQuality()==0 and drop_low_quality_alct_)) {
+  if (!ALCT.isValid() or (ALCT.getQuality() == 0 and drop_low_quality_alct_)) {
     // edm::LogError("CSCGEMMotherboard") << "Best ALCT invalid in correlateLCTsGEM!";
     return;
   }
@@ -409,8 +442,11 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCCLCTDigi& CLCT,
   }
 
   GEMInternalClusters ValidClusters;
-  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
-  if (ValidClusters.empty()) return;
+  for (const auto& cl : clusters)
+    if (cl.isValid())
+      ValidClusters.push_back(cl);
+  if (ValidClusters.empty())
+    return;
 
   // get the best matching cluster
   GEMInternalCluster bestCluster;
@@ -427,14 +463,17 @@ void CSCGEMMotherboard::correlateLCTsGEM(const CSCALCTDigi& ALCT,
                                          const GEMInternalClusters& clusters,
                                          CSCCorrelatedLCTDigi& lct) const {
   // Sanity checks on ALCT, GEM clusters
-  if (!ALCT.isValid() or (ALCT.getQuality()==0 and drop_low_quality_alct_)) {
+  if (!ALCT.isValid() or (ALCT.getQuality() == 0 and drop_low_quality_alct_)) {
     // edm::LogError("CSCGEMMotherboard") << "Best ALCT invalid in correlateLCTsGEM!";
     return;
   }
 
   GEMInternalClusters ValidClusters;
-  for (const auto& cl : clusters) if (cl.isValid()) ValidClusters.push_back(cl);
-  if (ValidClusters.empty()) return;
+  for (const auto& cl : clusters)
+    if (cl.isValid())
+      ValidClusters.push_back(cl);
+  if (ValidClusters.empty())
+    return;
 
   // get the best matching cluster
   GEMInternalCluster bestCluster;
@@ -452,8 +491,10 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
                                          const GEMInternalCluster& gem,
                                          CSCCorrelatedLCTDigi& thisLCT) const {
   thisLCT.setValid(true);
-  if (gem.isCoincidence()) thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCT2GEM);
-  else if (gem.isValid()) thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCTGEM);
+  if (gem.isCoincidence())
+    thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCT2GEM);
+  else if (gem.isValid())
+    thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCTGEM);
   thisLCT.setQuality(qualityAssignment_->findQuality(alct, clct, gem));
   thisLCT.setALCT(getBXShiftedALCT(alct));
   thisLCT.setCLCT(getBXShiftedCLCT(clct));
@@ -465,20 +506,20 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
   thisLCT.setBX0(0);
   thisLCT.setSyncErr(0);
   thisLCT.setCSCID(theTrigChamber);
-  thisLCT.setTrknmb(0); // will be set later after sorting
+  thisLCT.setTrknmb(0);  // will be set later after sorting
   thisLCT.setWireGroup(alct.getKeyWG());
   thisLCT.setStrip(clct.getKeyStrip());
   thisLCT.setBend(clct.getBend());
   thisLCT.setBX(alct.getBX());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
+    if (assign_gem_csc_bending_ &&
+        gem.isValid()) {  //calculate new slope from strip difference between CLCT and associated GEM
       int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(std::signbit(slope));
       thisLCT.setPattern(Run2PatternConverter(slope));
-    }
-    else
+    } else
       thisLCT.setSlope(clct.getSlope());
     thisLCT.setQuartStripBit(clct.getQuartStripBit());
     thisLCT.setEighthStripBit(clct.getEighthStripBit());
@@ -488,8 +529,8 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
 
 // Construct LCT from CSC and GEM information. Option ALCT-CLCT
 void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& aLCT,
-                                   const CSCCLCTDigi& cLCT,
-                                   CSCCorrelatedLCTDigi& thisLCT) const {
+                                         const CSCCLCTDigi& cLCT,
+                                         CSCCorrelatedLCTDigi& thisLCT) const {
   thisLCT.setValid(true);
   thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCT);
   thisLCT.setALCT(getBXShiftedALCT(aLCT));
@@ -499,7 +540,7 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& aLCT,
   thisLCT.setBX0(0);
   thisLCT.setSyncErr(0);
   thisLCT.setCSCID(theTrigChamber);
-  thisLCT.setTrknmb(0); // will be set later after sorting
+  thisLCT.setTrknmb(0);  // will be set later after sorting
   thisLCT.setWireGroup(aLCT.getKeyWG());
   thisLCT.setStrip(cLCT.getKeyStrip());
   thisLCT.setBend(cLCT.getBend());
@@ -530,20 +571,20 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCCLCTDigi& clct,
   thisLCT.setBX0(0);
   thisLCT.setSyncErr(0);
   thisLCT.setCSCID(theTrigChamber);
-  thisLCT.setTrknmb(0); // will be set later after sorting
+  thisLCT.setTrknmb(0);  // will be set later after sorting
   thisLCT.setWireGroup(gem.getKeyWG());
   thisLCT.setStrip(clct.getKeyStrip());
   thisLCT.setBend(clct.getBend());
   thisLCT.setBX(gem.bx());
   if (runCCLUT_) {
     thisLCT.setRun3(true);
-    if (assign_gem_csc_bending_ && gem.isValid()){ //calculate new slope from strip difference between CLCT and associated GEM
+    if (assign_gem_csc_bending_ &&
+        gem.isValid()) {  //calculate new slope from strip difference between CLCT and associated GEM
       int slope = cscGEMMatcher_->calculateGEMCSCBending(clct, gem);
       thisLCT.setSlope(abs(slope));
       thisLCT.setBend(pow(-1, std::signbit(slope)));
       thisLCT.setPattern(Run2PatternConverter(slope));
-    }
-    else
+    } else
       thisLCT.setSlope(clct.getSlope());
     thisLCT.setQuartStripBit(clct.getQuartStripBit());
     thisLCT.setEighthStripBit(clct.getEighthStripBit());
@@ -566,7 +607,7 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
   thisLCT.setBX0(0);
   thisLCT.setSyncErr(0);
   thisLCT.setCSCID(theTrigChamber);
-  thisLCT.setTrknmb(0); // will be set later after sorting
+  thisLCT.setTrknmb(0);  // will be set later after sorting
   thisLCT.setWireGroup(alct.getKeyWG());
   thisLCT.setStrip(gem.getKeyStrip());
   thisLCT.setBend(0);
@@ -584,8 +625,11 @@ void CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct,
 void CSCGEMMotherboard::sortLCTs(std::vector<CSCCorrelatedLCTDigi>& lcts) const {
   // LCTs are sorted by quality. If there are two with the same quality, then the sorting is done by the slope
   std::sort(lcts.begin(), lcts.end(), [](const CSCCorrelatedLCTDigi& lct1, const CSCCorrelatedLCTDigi& lct2) -> bool {
-    if (lct1.getQuality() > lct2.getQuality()) return lct1.getQuality() > lct2.getQuality();
-    else if (lct1.getQuality() == lct2.getQuality()) return lct1.getSlope() < lct2.getSlope();
-    else return false;
+    if (lct1.getQuality() > lct2.getQuality())
+      return lct1.getQuality() > lct2.getQuality();
+    else if (lct1.getQuality() == lct2.getQuality())
+      return lct1.getSlope() < lct2.getSlope();
+    else
+      return false;
   });
 }

@@ -659,17 +659,20 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::findLCTs(
           if (!runCCLUT_) {
             patternBest = tempBestCLCT.getPattern();
             patternSecond = tempSecondCLCT.getPattern();
-          }
-          else {
+          } else {
             patternBest = tempBestCLCT.getRun3Pattern();
             patternSecond = tempSecondCLCT.getRun3Pattern();
           }
           halfStripBest = tempBestCLCT.getKeyStrip();
           halfStripSecond = tempSecondCLCT.getKeyStrip();
 
-          if (qualitySecond > qualityBest) changeOrder = true;
-          else if ((qualitySecond == qualityBest) and (int(patternSecond/2) > int(patternBest/2))) changeOrder = true;
-          else if ((qualitySecond == qualityBest) and (int(patternSecond/2) == int(patternBest/2)) and (halfStripSecond < halfStripBest)) changeOrder = true;
+          if (qualitySecond > qualityBest)
+            changeOrder = true;
+          else if ((qualitySecond == qualityBest) and (int(patternSecond / 2) > int(patternBest / 2)))
+            changeOrder = true;
+          else if ((qualitySecond == qualityBest) and (int(patternSecond / 2) == int(patternBest / 2)) and
+                   (halfStripSecond < halfStripBest))
+            changeOrder = true;
         }
 
         CSCCLCTDigi tempCLCT;

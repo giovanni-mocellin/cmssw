@@ -93,7 +93,7 @@ public:
   unsigned CSC_slope_corr_L2_ME11a_odd(unsigned channel) const;
   unsigned CSC_slope_corr_L2_ME11b_odd(unsigned channel) const;
 
- // GEM-CSC trigger: 1/8-strip difference to slope
+  // GEM-CSC trigger: 1/8-strip difference to slope
   unsigned es_diff_slope_L1_ME11a_even(unsigned es_diff) const;
   unsigned es_diff_slope_L1_ME11a_odd(unsigned es_diff) const;
   unsigned es_diff_slope_L1_ME11b_even(unsigned es_diff) const;

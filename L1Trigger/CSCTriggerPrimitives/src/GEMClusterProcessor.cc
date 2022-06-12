@@ -185,14 +185,13 @@ void GEMClusterProcessor::addSingleClusters(const GEMPadDigiClusterCollection* i
         continue;
 
       // put the single clusters into the collection
-      if (id.layer() == 1){
+      if (id.layer() == 1) {
         clusters_.emplace_back(id, id, *p, GEMPadDigiCluster(), delayGEMinOTMB_, isMC_);
         // std::cout << clusters_.back() << std::endl;
-        }
-      else{
+      } else {
         clusters_.emplace_back(id, id, GEMPadDigiCluster(), *p, delayGEMinOTMB_, isMC_);
         // std::cout << clusters_.back() << std::endl;
-        }
+      }
     }
   }
 }

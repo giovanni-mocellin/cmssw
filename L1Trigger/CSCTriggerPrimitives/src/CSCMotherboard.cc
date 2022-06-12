@@ -437,15 +437,13 @@ void CSCMotherboard::correlateLCTs(const CSCALCTDigi& bALCT,
 }
 
 // copy the valid ALCT/CLCT information to the valid ALCT
-void CSCMotherboard::copyValidToInValidALCT(CSCALCTDigi& bestALCT,
-                                            CSCALCTDigi& secondALCT) const {
+void CSCMotherboard::copyValidToInValidALCT(CSCALCTDigi& bestALCT, CSCALCTDigi& secondALCT) const {
   if (bestALCT.isValid() and !secondALCT.isValid())
     secondALCT = bestALCT;
 }
 
 // copy the valid CLCT information to the valid CLCT
-void CSCMotherboard::copyValidToInValidCLCT(CSCCLCTDigi& bestCLCT,
-                                            CSCCLCTDigi& secondCLCT) const {
+void CSCMotherboard::copyValidToInValidCLCT(CSCCLCTDigi& bestCLCT, CSCCLCTDigi& secondCLCT) const {
   if (bestCLCT.isValid() and !secondCLCT.isValid())
     secondCLCT = bestCLCT;
 }

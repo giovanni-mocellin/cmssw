@@ -69,19 +69,13 @@ private:
                         CSCCorrelatedLCTDigi& lct) const;
 
   // correlate ALCT and CLCT, no GEM
-  void correlateLCTsGEM(const CSCALCTDigi& ALCT,
-                        const CSCCLCTDigi& CLCT,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void correlateLCTsGEM(const CSCALCTDigi& ALCT, const CSCCLCTDigi& CLCT, CSCCorrelatedLCTDigi& lct) const;
 
   // correlate CLCT with matched pads or copads
-  void correlateLCTsGEM(const CSCCLCTDigi& CLCT,
-                        const GEMInternalClusters& clusters,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void correlateLCTsGEM(const CSCCLCTDigi& CLCT, const GEMInternalClusters& clusters, CSCCorrelatedLCTDigi& lct) const;
 
   // correlate ALCT with matched pads or copads
-  void correlateLCTsGEM(const CSCALCTDigi& ALCT,
-                        const GEMInternalClusters& clusters,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void correlateLCTsGEM(const CSCALCTDigi& ALCT, const GEMInternalClusters& clusters, CSCCorrelatedLCTDigi& lct) const;
 
   // Construct LCT from CSC and GEM information. ALCT+CLCT+GEM
   void constructLCTsGEM(const CSCALCTDigi& alct,
@@ -90,19 +84,13 @@ private:
                         CSCCorrelatedLCTDigi& lct) const;
 
   // Construct LCT from CSC and no GEM information. ALCT+CLCT
-  void constructLCTsGEM(const CSCALCTDigi& alct,
-                        const CSCCLCTDigi& clct,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void constructLCTsGEM(const CSCALCTDigi& alct, const CSCCLCTDigi& clct, CSCCorrelatedLCTDigi& lct) const;
 
   // Construct LCT from CSC and GEM information. CLCT+2GEM
-  void constructLCTsGEM(const CSCCLCTDigi& clct,
-                        const GEMInternalCluster& gem,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void constructLCTsGEM(const CSCCLCTDigi& clct, const GEMInternalCluster& gem, CSCCorrelatedLCTDigi& lct) const;
 
   // Construct LCT from CSC and GEM information. ALCT+2GEM
-  void constructLCTsGEM(const CSCALCTDigi& alct,
-                        const GEMInternalCluster& gem,
-                        CSCCorrelatedLCTDigi& lct) const;
+  void constructLCTsGEM(const CSCALCTDigi& alct, const GEMInternalCluster& gem, CSCCorrelatedLCTDigi& lct) const;
 
   // LCTs are sorted by quality. If there are two with the same quality,
   // then the sorting is done by the slope
