@@ -2,6 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 # Parameters common for all boards
 commonParam = cms.PSet(
+    # Master flag for MonteCarlo studies
+    MC = cms.bool(False),
+
     # Master flag for Phase-2 studies
     runPhase2 = cms.bool(False),
 
@@ -25,15 +28,18 @@ commonParam = cms.PSet(
     runME41Up = cms.bool(False),
 
     # GEM-CSC integrated triggers
-    runME11ILT = cms.bool(False),
+    runME11ILT = cms.bool(True),
     runME21ILT = cms.bool(False),
+
+    # Run-3 mode
+    run3 = cms.bool(True),
 
     # comparator-code algorithm to improve
     # CLCT position and bending resolution
     # CCLUT for TMB is NOT planned for startup Run-3
     runCCLUT_TMB = cms.bool(False),
     # CCLUT for OTMB is planned for startup Run-3
-    runCCLUT_OTMB = cms.bool(False),
+    runCCLUT_OTMB = cms.bool(True),
 
     ## Phase-2 version is not needed for Run-3
     enableAlctPhase2 = cms.bool(False)
