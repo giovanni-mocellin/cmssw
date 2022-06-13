@@ -151,7 +151,7 @@ void CSCGEMMotherboard::matchALCTCLCTGEM() {
 
     // Find best and second CLCTs by preferred CLCT BX, taking into account that there is an offset in the simulation
 
-    bool matchingBX = false;
+    unsigned matchingBX = false;
 
     // BestCLCT and secondCLCT
     for (unsigned mbx = 0; mbx < match_trig_window_size; mbx++) {
