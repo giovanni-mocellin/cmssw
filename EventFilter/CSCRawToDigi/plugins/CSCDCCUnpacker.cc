@@ -102,7 +102,8 @@ private:
   unsigned int errorMask, examinerMask;
   bool instantiateDQM;
 
-  bool disableMappingCheck, b904Setup;
+  bool disableMappingCheck, b904Setup, b904ME11PositiveEndcap, b904ME11NegativeEndcap, b904GE11Long, b904GE11Short,
+      b904ME234s2;
 
   CSCMonitorInterface* monitor;
 
@@ -140,6 +141,11 @@ CSCDCCUnpacker::CSCDCCUnpacker(const edm::ParameterSet& pset) : numOfEvents(0) {
   disableMappingCheck = pset.getUntrackedParameter<bool>("DisableMappingCheck", false);
   // Make aware the unpacker that B904 test setup is used (disable mapping inconsistency check)
   b904Setup = pset.getUntrackedParameter<bool>("B904Setup", false);
+  b904ME11PositiveEndcap = pset.getUntrackedParameter<bool>("B904ME11PositiveEndcap", false);
+  b904ME11NegativeEndcap = pset.getUntrackedParameter<bool>("B904ME11NegativeEndcap", false);
+  b904GE11Short = pset.getUntrackedParameter<bool>("B904GE11Short", false);
+  b904GE11Long = pset.getUntrackedParameter<bool>("B904GE11Long", false);
+  b904ME234s2 = pset.getUntrackedParameter<bool>("B904ME234s2", false);
 
   /// Visualization of raw data
   visualFEDInspect = pset.getUntrackedParameter<bool>("VisualFEDInspect", false);
@@ -229,6 +235,15 @@ void CSCDCCUnpacker::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.addUntracked<bool>("DisableMappingCheck", false)
       ->setComment("# Disable FED/DDU to chamber mapping inconsistency check");
   desc.addUntracked<bool>("B904Setup", false)->setComment("# Make the unpacker aware of B904 test setup configuration");
+  desc.addUntracked<bool>("B904ME11PositiveEndcap", false)
+      ->setComment("# Set positive endcap for ME1/1 chamber used in B904 test setup");
+  desc.addUntracked<bool>("B904ME11NegativeEndcap", false)
+      ->setComment("# Set negative endcap for ME1/1 chamber used in B904 test setup");
+  desc.addUntracked<bool>("B904GE11Long", false)
+      ->setComment("# Set even slot number for ME1/1 chamber when GE1/1 long type used in B904 test setup");
+  desc.addUntracked<bool>("B904GE11Short", false)
+      ->setComment("# Set odd slot number for ME1/1 chamber when GE1/1 short type used in B904 test setup");
+  desc.addUntracked<bool>("B904ME234s2", false)->setComment("# Using ME4/2 chamber in B904 test setup");
   descriptions.add("muonCSCDCCUnpacker", desc);
   descriptions.setComment(" This is the generic cfi file for CSC unpacking");
 }
@@ -469,6 +484,24 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
             int vmecrate = cscData[iCSC].dmbHeader()->crateID();
             int dmb = cscData[iCSC].dmbHeader()->dmbID();
 
+            // Set vmecrate and dmb numbers manually for b904 chambers
+            if (b904ME11PositiveEndcap) {
+              vmecrate = 1;
+              dmb = 3;
+            }  // Set manually the VME crate number for ME+1/1/02 (and default DMB slot for even chamber)
+            if (b904ME11NegativeEndcap) {
+              vmecrate = 31;
+              dmb = 3;
+            }  // Set manually the VME crate number for ME-1/1/02 (and default DMB slot for even chamber)
+            if (b904GE11Short)
+              dmb = 2;  // Set manually the DMB slot number for ME+-1/1/01
+            if (b904GE11Long)
+              dmb = 3;  // Set manually the DMB slot number for ME+-1/1/02
+            if (b904ME234s2) {
+              vmecrate = 30;
+              dmb = 9;
+            }  // Set manually the VME crate number and default DMB for ME+4/2/01
+
             int icfeb = 0;   /// default value for all digis not related to cfebs
             int ilayer = 0;  /// layer=0 flags entire chamber
 
@@ -523,8 +556,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCALCTDigi> alctDigis_0;
                 for (int unsigned i = 0; i < alctDigis.size(); ++i) {
-                  if (alctDigis[i].isValid())
+                  if (alctDigis[i].isValid()) {
+                    //std::cout << "Unpacker: " << alctDigis[i] << std::endl;
                     alctDigis_0.push_back(alctDigis[i]);
+                  }
                 }
                 alctProduct->move(std::make_pair(alctDigis_0.begin(), alctDigis_0.end()), layer);
               } else
@@ -562,8 +597,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis_0;
                 for (int unsigned i = 0; i < correlatedlctDigis.size(); ++i) {
-                  if (correlatedlctDigis[i].isValid())
+                  if (correlatedlctDigis[i].isValid()) {
+                    //std::cout << "Unpacker: " << correlatedlctDigis[i] << std::endl;
                     correlatedlctDigis_0.push_back(correlatedlctDigis[i]);
+                  }
                 }
                 corrlctProduct->move(std::make_pair(correlatedlctDigis_0.begin(), correlatedlctDigis_0.end()), layer);
               } else
@@ -573,8 +610,10 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
               if (SuppressZeroLCT) {
                 std::vector<CSCCLCTDigi> clctDigis_0;
                 for (int unsigned i = 0; i < clctDigis.size(); ++i) {
-                  if (clctDigis[i].isValid())
+                  if (clctDigis[i].isValid()) {
+                    //std::cout << "Unpacker: " << clctDigis[i] << std::endl;
                     clctDigis_0.push_back(clctDigis[i]);
+                  }
                 }
                 clctProduct->move(std::make_pair(clctDigis_0.begin(), clctDigis_0.end()), layer);
               } else
@@ -623,12 +662,12 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                     int gem_region = (layer.endcap() == 1) ? 1 : -1;
                     // Loop over GEM layer eta/rolls
                     for (unsigned ieta = 0; ieta < 8; ieta++) {
-                      // GE11 eta/roll collection addressing according to GEMDetID definition is 1-8
+                      // GE11 eta/roll collection addressing according to GEMDetID definition is 1-8 (eta 8 being closest to beampipe)
                       GEMDetId gemid(gem_region, layer.ring(), layer.station(), igem + 1, gem_chamber, ieta + 1);
-                      // GE11 actual data format reporting eta/rolls in 0-7 range
+                      // GE11 trigger data format reports eta/rolls in 0-7 range (eta 0 being closest to beampipe)
                       // mapping agreement is that real data eta needs to be reversed from 0-7 to 8-1 for GEMDetId collection convention
-                      std::vector<GEMPadDigiCluster> gemDigis =
-                          cscData[iCSC].tmbData()->gemData()->etaDigis(igem, 7 - ieta);
+                      std::vector<GEMPadDigiCluster> gemDigis = cscData[iCSC].tmbData()->gemData()->etaDigis(
+                          igem, 7 - ieta, cscData[iCSC].tmbHeader()->ALCTMatchTime());
                       if (!gemDigis.empty()) {
                         gemProduct->move(std::make_pair(gemDigis.begin(), gemDigis.end()), gemid);
                       }
