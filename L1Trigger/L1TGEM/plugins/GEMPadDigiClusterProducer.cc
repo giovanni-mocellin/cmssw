@@ -127,15 +127,15 @@ GEMPadDigiClusterProducer::~GEMPadDigiClusterProducer() {}
 void GEMPadDigiClusterProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("InputCollection", edm::InputTag("simMuonGEMPadDigis"));
-  desc.add<unsigned int>("nPartitionsGE11", 4); // Number of clusterizer partitions per OH
-  desc.add<unsigned int>("nPartitionsGE21", 4); // Number of clusterizer partitions per OH
-  desc.add<unsigned int>("maxClustersPartitionGE11", 4); // Maximum number of clusters per clusterizer partition
-  desc.add<unsigned int>("maxClustersPartitionGE21", 4); // Maximum number of clusters per clusterizer partition
-  desc.add<unsigned int>("nOHGE11", 1); // Number of OH boards per chamber
-  desc.add<unsigned int>("nOHGE21", 4); // Number of OH boards per chamber
-  desc.add<unsigned int>("maxClustersOHGE11", 8); // Maximum number of clusters per OH
-  desc.add<unsigned int>("maxClustersOHGE21", 8); // Maximum number of clusters per OH
-  desc.add<unsigned int>("maxClusterSize", 8); // Maximum cluster size (number of pads)
+  desc.add<unsigned int>("nPartitionsGE11", 4);           // Number of clusterizer partitions per OH
+  desc.add<unsigned int>("nPartitionsGE21", 4);           // Number of clusterizer partitions per OH
+  desc.add<unsigned int>("maxClustersPartitionGE11", 4);  // Maximum number of clusters per clusterizer partition
+  desc.add<unsigned int>("maxClustersPartitionGE21", 4);  // Maximum number of clusters per clusterizer partition
+  desc.add<unsigned int>("nOHGE11", 1);                   // Number of OH boards per chamber
+  desc.add<unsigned int>("nOHGE21", 4);                   // Number of OH boards per chamber
+  desc.add<unsigned int>("maxClustersOHGE11", 8);         // Maximum number of clusters per OH
+  desc.add<unsigned int>("maxClustersOHGE21", 8);         // Maximum number of clusters per OH
+  desc.add<unsigned int>("maxClusterSize", 8);            // Maximum cluster size (number of pads)
   desc.add<bool>("sendOverflowClusters", false);
 
   descriptions.add("simMuonGEMPadDigiClustersDef", desc);
@@ -232,38 +232,38 @@ void GEMPadDigiClusterProducer::buildClusters(const GEMPadDigiCollection& det_pa
 
 void GEMPadDigiClusterProducer::selectClusters(const GEMPadDigiClusterContainer& proto_clusters,
                                                GEMPadDigiClusterCollection& out_clusters) const {
-
   for (const auto& ch : geometry_->chambers()) {
-
     const unsigned nOH = ch->id().isGE11() ? nOHGE11_ : nOHGE21_;
     const unsigned nPartitions = ch->id().isGE11() ? nPartitionsGE11_ : nPartitionsGE21_;
-    const unsigned nEtaPerPartition = ch->nEtaPartitions() / (nPartitions*nOH);
+    const unsigned nEtaPerPartition = ch->nEtaPartitions() / (nPartitions * nOH);
     const unsigned maxClustersPart = ch->id().isGE11() ? maxClustersPartitionGE11_ : maxClustersPartitionGE21_;
     const unsigned maxClustersOH = ch->id().isGE11() ? maxClustersOHGE11_ : maxClustersOHGE21_;
 
     // loop over OH in this chamber
     for (unsigned int iOH = 0; iOH < nOH; iOH++) {
-      unsigned int nClustersOH = 0; // Up to 8 clusters per OH
-      // loop over clusterizer partitions
-	  for (unsigned int iPart = 0; iPart < nPartitions; iPart++) {
-	    unsigned int nClustersPart = 0; // Up to 4 clusters per clustizer partition
-	    // loop over the eta partitions for this clusterizer partition
-	    for (unsigned iEta = 1; iEta <= nEtaPerPartition; iEta++) {
-	      // get the clusters for this eta partition
-	      const GEMDetId& iEtaId = ch->etaPartition(iEta + iPart*nEtaPerPartition + iOH*nPartitions*nEtaPerPartition)->id();
-	      if (proto_clusters.find(iEtaId) != proto_clusters.end()) {
-	        for (const auto& cluster : proto_clusters.at(iEtaId)) {
-	          if (nClustersPart < maxClustersPart and nClustersOH < maxClustersOH) {
-		        checkValid(cluster,iEtaId);
-		        out_clusters.insertDigi(iEtaId,cluster);
-		        nClustersPart++; nClustersOH++;
-		      }
-		    }  // end of loop on clusters in eta
-	      }
-	    }  // end of eta partition loop
-	  }  // end of clusterizer partition loop
-    }  // end of OH loop
-  }  // end of chamber loop
+      unsigned int nClustersOH = 0;  // Up to 8 clusters per OH
+                                     // loop over clusterizer partitions
+      for (unsigned int iPart = 0; iPart < nPartitions; iPart++) {
+        unsigned int nClustersPart = 0;  // Up to 4 clusters per clustizer partition
+        // loop over the eta partitions for this clusterizer partition
+        for (unsigned iEta = 1; iEta <= nEtaPerPartition; iEta++) {
+          // get the clusters for this eta partition
+          const GEMDetId& iEtaId =
+              ch->etaPartition(iEta + iPart * nEtaPerPartition + iOH * nPartitions * nEtaPerPartition)->id();
+          if (proto_clusters.find(iEtaId) != proto_clusters.end()) {
+            for (const auto& cluster : proto_clusters.at(iEtaId)) {
+              if (nClustersPart < maxClustersPart and nClustersOH < maxClustersOH) {
+                checkValid(cluster, iEtaId);
+                out_clusters.insertDigi(iEtaId, cluster);
+                nClustersPart++;
+                nClustersOH++;
+              }
+            }  // end of loop on clusters in eta
+          }
+        }  // end of eta partition loop
+      }    // end of clusterizer partition loop
+    }      // end of OH loop
+  }        // end of chamber loop
 }
 
 template <class T>

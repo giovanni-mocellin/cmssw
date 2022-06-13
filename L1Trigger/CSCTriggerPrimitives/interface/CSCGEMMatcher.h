@@ -52,7 +52,10 @@ public:
                            bool ignoreALCTGEMmatch) const;
 
   // matching candidate distance in 1/8 strip, always the total without extrapolation correction, if ForceTotal is true
-  int matchedClusterDistES(const CSCCLCTDigi& clct, const GEMInternalCluster& cluster, const bool isLayer2, const bool ForceTotal) const;
+  int matchedClusterDistES(const CSCCLCTDigi& clct,
+                           const GEMInternalCluster& cluster,
+                           const bool isLayer2,
+                           const bool ForceTotal) const;
 
   // ALCT-CLCT-GEM
   void matchingClustersLoc(const CSCALCTDigi& alct,
@@ -63,14 +66,10 @@ public:
   // best matching clusters by location
 
   // ALCT-GEM
-  void bestClusterLoc(const CSCALCTDigi& alct,
-                      const GEMInternalClusters& clusters,
-                      GEMInternalCluster& best) const;
+  void bestClusterLoc(const CSCALCTDigi& alct, const GEMInternalClusters& clusters, GEMInternalCluster& best) const;
 
   // CLCT-GEM
-  void bestClusterLoc(const CSCCLCTDigi& clct,
-                      const GEMInternalClusters& clusters,
-                      GEMInternalCluster& best) const;
+  void bestClusterLoc(const CSCCLCTDigi& clct, const GEMInternalClusters& clusters, GEMInternalCluster& best) const;
 
   // ALCT-CLCT-GEM
   void bestClusterLoc(const CSCALCTDigi& alct,

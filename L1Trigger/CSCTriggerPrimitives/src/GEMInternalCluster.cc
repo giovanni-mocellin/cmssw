@@ -7,7 +7,6 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
                                        const GEMPadDigiCluster& cluster2,
                                        const unsigned delayGEMinOTMB,
                                        const bool isMC) {
-
   // set coincidence to false first
   isCoincidence_ = false;
   isValid_ = false;
@@ -22,23 +21,29 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
   if (cluster1.isValid()) {
     isValid_ = true;
     cl1_ = cluster1;
-    if (isMC)  bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
-    if (!isMC) bx_ = cluster1.bx() + delayGEMinOTMB;
+    if (isMC)
+      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC)
+      bx_ = cluster1.bx() + delayGEMinOTMB;
     layer1_pad_ = cluster1.pads()[0];
     layer1_size_ = cluster1.pads().size();
   }
   if (cluster2.isValid()) {
     isValid_ = true;
     cl2_ = cluster2;
-    if (isMC)  bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX;
-    if (!isMC) bx_ = cluster2.bx() + delayGEMinOTMB;
+    if (isMC)
+      bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC)
+      bx_ = cluster2.bx() + delayGEMinOTMB;
     layer2_pad_ = cluster2.pads()[0];
     layer2_size_ = cluster2.pads().size();
   }
 
   if (cluster1.isValid() and cluster2.isValid()) {
-    if (isMC)  bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
-    if (!isMC) bx_ = cluster1.bx() + delayGEMinOTMB;
+    if (isMC)
+      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
+    if (!isMC)
+      bx_ = cluster1.bx() + delayGEMinOTMB;
     isCoincidence_ = true;
   }
 
@@ -118,8 +123,7 @@ uint16_t GEMInternalCluster::getKeyStrip(int n, bool isLayer2) const {
     } else {
       return (layer2_first_es_ + layer2_last_es_) / 2.;
     }
-  }
-  else { // Half Strip units
+  } else {  // Half Strip units
     if (!isLayer2) {
       return (layer1_first_es_ + layer1_last_es_) / 8.;
     } else {
@@ -135,8 +139,7 @@ uint16_t GEMInternalCluster::getKeyStripME1a(int n, bool isLayer2) const {
     } else {
       return (layer2_first_es_me1a_ + layer2_last_es_me1a_) / 2.;
     }
-  }
-  else { // Half Strip units
+  } else {  // Half Strip units
     if (!isLayer2) {
       return (layer1_first_es_me1a_ + layer1_last_es_me1a_) / 8.;
     } else {
@@ -154,5 +157,6 @@ bool GEMInternalCluster::operator==(const GEMInternalCluster& cluster) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const GEMInternalCluster& cl) {
-  return os << "Cluster Layer 1: " << cl.id1() << " " << cl.cl1() << ", Cluster Layer 2: " << cl.id2() << " " << cl.cl2();
+  return os << "Cluster Layer 1: " << cl.id1() << " " << cl.cl1() << ", Cluster Layer 2: " << cl.id2() << " "
+            << cl.cl2();
 }

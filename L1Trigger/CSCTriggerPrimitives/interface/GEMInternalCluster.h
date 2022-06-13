@@ -19,7 +19,12 @@
 class GEMInternalCluster {
 public:
   // constructor
-  GEMInternalCluster(const GEMDetId& id1, const GEMDetId& id2, const GEMPadDigiCluster& cluster1, const GEMPadDigiCluster& cluster2, const unsigned delayGEMinOTMB, const bool isMC);
+  GEMInternalCluster(const GEMDetId& id1,
+                     const GEMDetId& id2,
+                     const GEMPadDigiCluster& cluster1,
+                     const GEMPadDigiCluster& cluster2,
+                     const unsigned delayGEMinOTMB,
+                     const bool isMC);
 
   // empty object
   GEMInternalCluster();

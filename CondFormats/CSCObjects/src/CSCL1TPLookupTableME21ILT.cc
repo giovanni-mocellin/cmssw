@@ -108,7 +108,6 @@ void CSCL1TPLookupTableME21ILT::set_es_diff_slope_L1_ME21_odd(t_lut lut) {
   es_diff_slope_L1_ME21_odd_ = std::move(lut);
 }
 
-
 void CSCL1TPLookupTableME21ILT::set_CSC_slope_corr_L2_ME21_even(t_lut lut) {
   CSC_slope_corr_L2_ME21_even_ = std::move(lut);
 }
@@ -124,7 +123,6 @@ void CSCL1TPLookupTableME21ILT::set_es_diff_slope_L2_ME21_even(t_lut lut) {
 void CSCL1TPLookupTableME21ILT::set_es_diff_slope_L2_ME21_odd(t_lut lut) {
   es_diff_slope_L2_ME21_odd_ = std::move(lut);
 }
-
 
 unsigned CSCL1TPLookupTableME21ILT::GEM_pad_CSC_es_ME21_even(unsigned pad) const {
   return GEM_pad_CSC_es_ME21_even_[pad];
