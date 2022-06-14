@@ -49,7 +49,7 @@ tmbPhase1 = cms.PSet(
 tmbPhase2 = tmbPhase1.clone(
     # ALCT-CLCT stays at 7 for the moment
     matchTrigWindowSize = 7,
-    # LCTs found in the window [6, 7, 8, 9, 10] are good
+    # LCTs found in the window [5, 6, 7, 8, 9, 10, 11] are good
     tmbL1aWindowSize = 7,
     tmbDropUsedClcts = False,
 )
