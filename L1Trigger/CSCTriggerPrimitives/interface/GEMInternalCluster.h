@@ -24,7 +24,7 @@ public:
                      const GEMPadDigiCluster& cluster1,
                      const GEMPadDigiCluster& cluster2,
                      const unsigned delayGEMinOTMB,
-                     const bool isMC);
+                     const unsigned tmbL1aWindowSize);
 
   // empty object
   GEMInternalCluster();
