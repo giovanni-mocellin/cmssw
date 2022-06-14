@@ -56,15 +56,13 @@ private:
   // for matching with CSC trigger primitives
   void doCoordinateConversion();
 
-  // Switch for MC
-  bool isMC_;
-
   // Chamber id (trigger-type labels)
   const int region_;
   const int station_;
   const int chamber_;
   bool isEven_;
 
+  unsigned int tmbL1aWindowSize_;
   unsigned int delayGEMinOTMB_;
   unsigned int maxDeltaPad_;
   unsigned int maxDeltaBX_;

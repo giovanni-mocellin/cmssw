@@ -9,12 +9,13 @@ GEMClusterProcessor::GEMClusterProcessor(int region, unsigned station, unsigned 
   isEven_ = chamber_ % 2 == 0;
 
   const edm::ParameterSet aux(conf.getParameter<edm::ParameterSet>("commonParam"));
-  isMC_ = aux.getParameter<bool>("MC");
 
   if (station_ == 1) {
-    const edm::ParameterSet tmb(conf.getParameter<edm::ParameterSet>("tmbPhase2GE11"));
+    const edm::ParameterSet tmb(conf.getParameter<edm::ParameterSet>("tmbPhase2"));
+    const edm::ParameterSet tmb_gem(conf.getParameter<edm::ParameterSet>("tmbPhase2GE11"));
     const edm::ParameterSet copad(conf.getParameter<edm::ParameterSet>("copadParamGE11"));
-    delayGEMinOTMB_ = tmb.getParameter<unsigned int>("delayGEMinOTMB");
+    tmbL1aWindowSize_ = tmb.getParameter<unsigned int>("tmbL1aWindowSize");
+    delayGEMinOTMB_ = tmb_gem.getParameter<unsigned int>("delayGEMinOTMB");
     maxDeltaPad_ = copad.getParameter<unsigned int>("maxDeltaPad");
     maxDeltaRoll_ = copad.getParameter<unsigned int>("maxDeltaRoll");
     maxDeltaBX_ = copad.getParameter<unsigned int>("maxDeltaBX");
@@ -24,9 +25,11 @@ GEMClusterProcessor::GEMClusterProcessor(int region, unsigned station, unsigned 
     // by default set to true
     hasGE21Geometry16Partitions_ = true;
 
-    const edm::ParameterSet tmb(conf.getParameter<edm::ParameterSet>("tmbPhase2GE21"));
+    const edm::ParameterSet tmb(conf.getParameter<edm::ParameterSet>("tmbPhase2"));
+    const edm::ParameterSet tmb_gem(conf.getParameter<edm::ParameterSet>("tmbPhase2GE21"));
     const edm::ParameterSet copad(conf.getParameter<edm::ParameterSet>("copadParamGE21"));
-    delayGEMinOTMB_ = tmb.getParameter<unsigned int>("delayGEMinOTMB");
+    tmbL1aWindowSize_ = tmb.getParameter<unsigned int>("tmbL1aWindowSize");
+    delayGEMinOTMB_ = tmb_gem.getParameter<unsigned int>("delayGEMinOTMB");
     maxDeltaPad_ = copad.getParameter<unsigned int>("maxDeltaPad");
     maxDeltaRoll_ = copad.getParameter<unsigned int>("maxDeltaRoll");
     maxDeltaBX_ = copad.getParameter<unsigned int>("maxDeltaBX");
@@ -142,7 +145,7 @@ void GEMClusterProcessor::addCoincidenceClusters(const GEMPadDigiClusterCollecti
             continue;
 
           // make a new coincidence
-          clusters_.emplace_back(id, co_id, *p, *co_p, delayGEMinOTMB_, isMC_);
+          clusters_.emplace_back(id, co_id, *p, *co_p, delayGEMinOTMB_, tmbL1aWindowSize_);
           // std::cout << clusters_.back() << std::endl;
         }
       }
@@ -186,10 +189,10 @@ void GEMClusterProcessor::addSingleClusters(const GEMPadDigiClusterCollection* i
 
       // put the single clusters into the collection
       if (id.layer() == 1) {
-        clusters_.emplace_back(id, id, *p, GEMPadDigiCluster(), delayGEMinOTMB_, isMC_);
+        clusters_.emplace_back(id, id, *p, GEMPadDigiCluster(), delayGEMinOTMB_, tmbL1aWindowSize_);
         // std::cout << clusters_.back() << std::endl;
       } else {
-        clusters_.emplace_back(id, id, GEMPadDigiCluster(), *p, delayGEMinOTMB_, isMC_);
+        clusters_.emplace_back(id, id, GEMPadDigiCluster(), *p, delayGEMinOTMB_, tmbL1aWindowSize_);
         // std::cout << clusters_.back() << std::endl;
       }
     }
