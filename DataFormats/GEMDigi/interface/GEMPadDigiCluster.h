@@ -45,7 +45,7 @@ public:
   void print() const;
 
   int alctMatchTime() const { return alctMatchTime_; }
-  void setAlctMatchTime(int matchWin) const { alctMatchTime_ = matchWin; }
+  void setAlctMatchTime(int matchWin) { alctMatchTime_ = matchWin; }
 
 private:
   std::vector<uint16_t> v_;
