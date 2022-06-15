@@ -177,8 +177,8 @@ std::vector<GEMPadDigiCluster> CSCGEMData::etaDigis(int gem_chamber, int eta_rol
             GEMPadDigiCluster pad_cluster(pads, i);
             pad_cluster.setAlctMatchTime(alctMatchTime);
             if (CSCGEMData::debug)
-              std::cout << "Timebin: " << i << " alctMatchTime: " << alctMatchTime << " GEM: Layer "
-                        << gem_layer << " iEta " << 8 - eta << " pads: " << pad_cluster << std::endl;
+              std::cout << "Timebin: " << i << " alctMatchTime: " << alctMatchTime << " GEM: Layer " << gem_layer
+                        << " iEta " << 8 - eta << " pads: " << pad_cluster << std::endl;
             result.push_back(pad_cluster);
           }
         }
