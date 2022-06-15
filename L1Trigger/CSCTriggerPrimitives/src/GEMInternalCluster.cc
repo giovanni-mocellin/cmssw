@@ -24,7 +24,7 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
     if (cluster1.alctMatchTime() == -1)  // It is a MC simulation
       bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
     else if (cluster1.alctMatchTime() >= 0)  // It is real data
-      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize/2) - cluster1.alctMatchTime() +
+      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize / 2) - cluster1.alctMatchTime() +
             delayGEMinOTMB;
     layer1_pad_ = cluster1.pads()[0];
     layer1_size_ = cluster1.pads().size();
@@ -35,7 +35,7 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
     if (cluster2.alctMatchTime() == -1)  // It is a MC simulation
       bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX;
     else if (cluster2.alctMatchTime() >= 0)  // It is real data
-      bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize/2) - cluster2.alctMatchTime() +
+      bx_ = cluster2.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize / 2) - cluster2.alctMatchTime() +
             delayGEMinOTMB;
     layer2_pad_ = cluster2.pads()[0];
     layer2_size_ = cluster2.pads().size();
@@ -45,7 +45,7 @@ GEMInternalCluster::GEMInternalCluster(const GEMDetId& id1,
     if (cluster1.alctMatchTime() == -1)  // It is a MC simulation
       bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX;
     else if (cluster1.alctMatchTime() >= 0)  // It is real data
-      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize/2) - cluster1.alctMatchTime() +
+      bx_ = cluster1.bx() + CSCConstants::LCT_CENTRAL_BX - int(tmbL1aWindowSize / 2) - cluster1.alctMatchTime() +
             delayGEMinOTMB;
     isCoincidence_ = true;
   }
