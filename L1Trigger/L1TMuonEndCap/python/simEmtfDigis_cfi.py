@@ -164,4 +164,4 @@ stage2L1Trigger_2018.toModify(simEmtfDigis, RPCEnable = cms.bool(True), Era = cm
 
 ## Era: Run3_2021
 from Configuration.Eras.Modifier_stage2L1Trigger_2021_cff import stage2L1Trigger_2021
-stage2L1Trigger_2021.toModify(simEmtfDigis, RPCEnable = cms.bool(True), UseRun3CCLUT_OTMB = cms.bool(False), Era = cms.string('Run3_2021'))
+stage2L1Trigger_2021.toModify(simEmtfDigis, RPCEnable = cms.bool(True), UseRun3CCLUT_OTMB = cms.bool(True), Era = cms.string('Run3_2021'))

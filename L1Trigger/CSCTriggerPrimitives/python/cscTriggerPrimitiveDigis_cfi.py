@@ -63,8 +63,8 @@ run2_common.toModify( cscTriggerPrimitiveDigis,
 from Configuration.Eras.Modifier_run3_common_cff import run3_common
 run3_common.toModify( cscTriggerPrimitiveDigis,
                       keepShowers = True,
-                      commonParam = dict(run3 = False, # To be set to true for Run-3 later
-                                         runCCLUT_OTMB = False, # To be set to true for Run-3 later
+                      commonParam = dict(run3 = True,
+                                         runCCLUT_OTMB = True,
                                          runPhase2 = True,
                                          runME11Up = True,
                                          runME21Up = True,
@@ -76,7 +76,7 @@ run3_common.toModify( cscTriggerPrimitiveDigis,
 from Configuration.Eras.Modifier_run3_GEM_cff import run3_GEM
 run3_GEM.toModify( cscTriggerPrimitiveDigis,
                    GEMPadDigiClusterProducer = cms.InputTag("simMuonGEMPadDigiClusters"),
-                   commonParam = dict(runME11ILT = False) # To be set to true for Run-3 later
+                   commonParam = dict(runME11ILT = True)
 )
 
 ## GEM-CSC integrated local trigger in ME2/1
