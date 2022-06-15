@@ -92,7 +92,7 @@ tmbPhase2GE11 = tmbPhase2GEM.clone(
     # efficiency recovery switches
     dropLowQualityCLCTs_ME1a = cms.bool(True),
     # delay applied in OTMB to GEM trigger primitives
-    delayGEMinOTMB = cms.uint32(1)
+    delayGEMinOTMB = cms.uint32(0)
 )
 
 # to be used by ME21 chambers with GEM-CSC ILT
@@ -101,7 +101,7 @@ tmbPhase2GE21 = tmbPhase2GEM.clone(
     maxDeltaHsEven = cms.uint32(5),
     maxDeltaHsOdd = cms.uint32(10),
     # delay applied in OTMB to GEM trigger primitives
-    delayGEMinOTMB = cms.uint32(1)
+    delayGEMinOTMB = cms.uint32(0)
 )
 
 tmbPSets = cms.PSet(
