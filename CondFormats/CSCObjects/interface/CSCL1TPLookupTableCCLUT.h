@@ -11,6 +11,7 @@ public:
   ~CSCL1TPLookupTableCCLUT() {}
 
   typedef std::unordered_map<unsigned, std::vector<unsigned> > t_lut;
+  typedef std::unordered_map<unsigned, std::vector<int> > t_lut_signed;
 
   // setters
   void set_cclutPosition(t_lut lut);
