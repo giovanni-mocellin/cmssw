@@ -236,9 +236,26 @@ int CSCGEMMatcher::matchedClusterDistES(const CSCCLCTDigi& clct,
 
   int cl_es = isME1a ? cl.getKeyStripME1a(8, isLayer2) : cl.getKeyStrip(8, isLayer2);
 
-  int eighthStripDiff = cl_es - clct.getKeyStrip(8);
+  int alignCorrection = 0;
+  if (station_ == 1) {  // GE1/1
+    if (endcap_ == 1)  // Positive endcap
+      alignCorrection = isLayer2 ? lookupTableME11ILT_->GEM_align_corr_es_ME11_positive_endcap(chamber_, cl.roll2())
+                                 : lookupTableME11ILT_->GEM_align_corr_es_ME11_positive_endcap(chamber_, cl.roll1());
+    else // Negative endcap
+      alignCorrection = isLayer2 ? lookupTableME11ILT_->GEM_align_corr_es_ME11_negative_endcap(chamber_, cl.roll2())
+                                 : lookupTableME11ILT_->GEM_align_corr_es_ME11_negative_endcap(chamber_, cl.roll1());
+  } else { // GE2/1
+    if (endcap_ == 1)  // Positive endcap
+      alignCorrection = isLayer2 ? lookupTableME21ILT_->GEM_align_corr_es_ME21_positive_endcap(chamber_, cl.roll2())
+                                 : lookupTableME21ILT_->GEM_align_corr_es_ME21_positive_endcap(chamber_, cl.roll1());
+    else // Negative endcap
+      alignCorrection = isLayer2 ? lookupTableME21ILT_->GEM_align_corr_es_ME21_negative_endcap(chamber_, cl.roll2())
+                                 : lookupTableME21ILT_->GEM_align_corr_es_ME21_negative_endcap(chamber_, cl.roll1());
+  }
 
-  if (matchCLCTpropagation_ and !ForceTotal) {  //modification of DeltaStrip by CLCT slope
+  int eighthStripDiff = cl_es + alignCorrection - clct.getKeyStrip(8);
+
+  if (matchCLCTpropagation_ and !ForceTotal) {  // modification of DeltaStrip by CLCT slope
     int SlopeShift = 0;
     uint16_t baseSlope = -1;
     baseSlope = mitigateSlopeByCosi_ ? mitigatedSlopeByConsistency(clct) : clct.getSlope();

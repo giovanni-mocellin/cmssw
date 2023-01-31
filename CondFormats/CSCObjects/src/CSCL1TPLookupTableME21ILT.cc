@@ -176,11 +176,11 @@ unsigned CSCL1TPLookupTableME21ILT::GEM_roll_L2_CSC_max_wg_ME21_odd(unsigned rol
 }
 
 int CSCL1TPLookupTableME21ILT::GEM_align_corr_es_ME21_positive_endcap(unsigned chamber, unsigned roll) const {
-  return GEM_align_corr_es_ME21_positive_endcap_[8*(chamber-1)+(roll-1)];
+  return GEM_align_corr_es_ME21_positive_endcap_[16*(chamber-1)+(roll-1)];
 }
 
 int CSCL1TPLookupTableME21ILT::GEM_align_corr_es_ME21_negative_endcap(unsigned chamber, unsigned roll) const {
-  return GEM_align_corr_es_ME21_negative_endcap_[8*(chamber-1)+(roll-1)];
+  return GEM_align_corr_es_ME21_negative_endcap_[16*(chamber-1)+(roll-1)];
 }
 
 unsigned CSCL1TPLookupTableME21ILT::CSC_slope_cosi_2to1_L1_ME21_even(unsigned slope) const {
