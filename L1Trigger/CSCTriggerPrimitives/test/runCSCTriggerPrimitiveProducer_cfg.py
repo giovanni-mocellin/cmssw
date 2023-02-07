@@ -110,7 +110,7 @@ if options.mc:
 else:
       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
       if options.run3:
-            process.GlobalTag = GlobalTag(process.GlobalTag, '112X_dataRun3_Prompt_v5', '')
+            process.GlobalTag = GlobalTag(process.GlobalTag, '124X_dataRun3_v10', '')
 
 ## running on unpacked data, or after running the unpacker
 if not options.mc or options.unpack:
