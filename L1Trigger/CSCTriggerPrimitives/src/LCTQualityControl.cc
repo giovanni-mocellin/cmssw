@@ -229,7 +229,7 @@ void LCTQualityControl::checkValid(const CSCCorrelatedLCTDigi& lct, unsigned sta
   }
 
   // LCT type does not agree with the LCT quality when CCLUT is on
-  if (runCCLUT_) {
+  if (runCCLUT_ and isME11_) {
     const bool ME11ILT(isME11_ and runME11ILT_);
     const bool ME21ILT(isME21_ and runME21ILT_);
 

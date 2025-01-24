@@ -70,15 +70,16 @@ tmbPhase2GEM = tmbPhase2.clone(
     dropLowQualityCLCTs = cms.bool(True),
     buildLCTfromALCTandGEM = cms.bool(True),
     buildLCTfromCLCTandGEM = cms.bool(False),
-    # assign GEM-CSC bending angle. Works only for
-    # Run-3 GEM-CSC TPs.
+    # assign GEM-CSC bending angle. Works only for Run-3 GEM-CSC TPs.
     assignGEMCSCBending = cms.bool(True),
+    # enables full precision of GEM-CSC bending angle, instead of slope
+    enableGEMCSCBendingFullPrecision = cms.bool(True),
     # When running the GEM-CSC matching, whether to mitigate
     # the slope of CLCTs with high, meaning inconsistent,
     # values of cosi (consistency of slope indicator)
     # to optimize GEM-CSC slope correction
     mitigateSlopeByCosi = cms.bool(False),
-    # Preferred order of bunchcrossing difference between CSC minus GEM BX for matching
+    # Preferred order of BX difference: CSC minus GEM BX for matching
     BunchCrossingCSCminGEMwindow = cms.vint32(0, -1, 1, -2, 2, -3, 3)
 )
 

@@ -121,6 +121,7 @@ private:
   unsigned maxDeltaHsOdd_;
 
   bool assign_gem_csc_bending_;
+  bool enable_gem_csc_bending_full_precision_;
   bool mitigateSlopeByCosi_;
 };
 

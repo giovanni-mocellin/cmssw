@@ -24,6 +24,7 @@ CSCGEMMatcher::CSCGEMMatcher(
 
   mitigateSlopeByCosi_ = tmbParams.getParameter<bool>("mitigateSlopeByCosi");
   assign_gem_csc_bending_ = tmbParams.getParameter<bool>("assignGEMCSCBending");
+  enable_gem_csc_bending_full_precision_ = tmbParams.getParameter<bool>("enableGEMCSCBendingFullPrecision");
 }
 
 //##############################################################
@@ -499,5 +500,8 @@ int CSCGEMMatcher::calculateGEMCSCBending(const CSCCLCTDigi& clct,
   //account for the sign of the difference
   slopeShift *= pow(-1, std::signbit(SignedEighthStripDiff));
 
-  return slopeShift;
+  if (enable_gem_csc_bending_full_precision_)
+    return SignedEighthStripDiff;
+  else
+    return slopeShift;
 }
